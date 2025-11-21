@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -11,24 +11,41 @@ import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import api from "@/lib/api";
+
+interface PricingModel {
+  modelName: string;
+  organization: string;
+  inputPrice?: number;
+  outputPrice?: number;
+  modelType: string;
+  openSource?: boolean;
+  license?: string;
+}
 
 // CostCalculator component
-const CostCalculator: React.FC = () => {
+interface CostCalculatorProps {
+  pricingData: PricingModel[];
+}
+
+const CostCalculator: React.FC<CostCalculatorProps> = ({ pricingData }) => {
   const [usagePeriod, setUsagePeriod] = useState("Per Month");
   const [inputTokens, setInputTokens] = useState("10000");
   const [outputTokens, setOutputTokens] = useState("2000");
   const [imagesGenerated, setImagesGenerated] = useState("50");
   const [audioMinutes, setAudioMinutes] = useState("60");
-  const [selectedModels, setSelectedModels] = useState({
-    "GPT-4o": false,
-    "Claude 3.5 Sonnet": false,
-    "Llama 3.1 405B": false,
-    "Gemini 1.5 Pro": false,
-    "DALL-E 3": false,
-    "Midjourney v6": false,
-    "Stable Diffusion XL": false,
-    "Whisper Large v3": false,
-  });
+  const [selectedModels, setSelectedModels] = useState<Record<string, boolean>>(
+    {}
+  );
+
+  // Update selectedModels when pricingData changes
+  useEffect(() => {
+    const newSelectedModels = pricingData.reduce((acc, model) => {
+      acc[model.modelName] = false;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setSelectedModels(newSelectedModels);
+  }, [pricingData]);
 
   const handleModelChange = (model: string, checked: boolean) => {
     setSelectedModels((prev) => ({ ...prev, [model]: checked }));
@@ -378,27 +395,33 @@ interface CostEstimate {
   outputCost: string;
   totalCost: string;
 }
-const CostEstimates: React.FC = () => {
-  const estimates: CostEstimate[] = [
-    {
-      model: "Gemini 1.5 Pro",
-      inputCost: "$0.01",
-      outputCost: "$0.01",
-      totalCost: "$0.02",
-    },
-    {
-      model: "GPT-4o",
-      inputCost: "$0.03",
-      outputCost: "$0.02",
-      totalCost: "$0.04",
-    },
-    {
-      model: "Claude 3.5 Sonnet",
-      inputCost: "$0.03",
-      outputCost: "$0.03",
-      totalCost: "$0.06",
-    },
-  ];
+interface CostEstimatesProps {
+  pricingData: PricingModel[];
+}
+
+const CostEstimates: React.FC<CostEstimatesProps> = ({ pricingData }) => {
+  // Transform pricing data to estimates format (show first 5 models with pricing)
+  const estimates: CostEstimate[] = pricingData
+    .filter((model) => model.inputPrice || model.outputPrice)
+    .slice(0, 5)
+    .map((model) => {
+      const inputCost = model.inputPrice
+        ? `$${model.inputPrice.toFixed(3)}`
+        : "$0.000";
+      const outputCost = model.outputPrice
+        ? `$${model.outputPrice.toFixed(3)}`
+        : "$0.000";
+      const totalCost = `$${(
+        (model.inputPrice || 0) + (model.outputPrice || 0)
+      ).toFixed(3)}`;
+
+      return {
+        model: model.modelName,
+        inputCost,
+        outputCost,
+        totalCost,
+      };
+    });
 
   return (
     <section className="box-border w-full max-w-2xl border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
@@ -407,31 +430,37 @@ const CostEstimates: React.FC = () => {
           Cost Estimates
         </h2>
         <p className="box-border text-[#717182] text-base font-normal leading-6">
-          Projected costs based on your usage parameters
+          Projected costs based on your usage parameters (per 1K tokens)
         </p>
       </header>
       <div className="space-y-4">
-        {estimates.map((estimate, index) => (
-          <article
-            key={index}
-            className="box-border w-full border relative p-[17px] rounded-[10px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4"
-          >
-            <h3 className="box-border text-neutral-950 dark:text-white text-base font-normal leading-6 mb-1">
-              {estimate.model}
-            </h3>
-            <p className="box-border text-[#717182] text-sm font-normal leading-5">
-              Input: {estimate.inputCost} | Output: {estimate.outputCost}
-            </p>
-            <div className="absolute right-[17px] top-[17px] max-sm:static max-sm:mt-2">
-              <div className="box-border text-neutral-950 dark:text-white text-lg font-normal leading-7 text-right max-sm:text-left">
-                {estimate.totalCost}
+        {estimates.length === 0 ? (
+          <p className="text-neutral-950 dark:text-white text-center py-4">
+            No pricing data available
+          </p>
+        ) : (
+          estimates.map((estimate, index) => (
+            <article
+              key={index}
+              className="box-border w-full border relative p-[17px] rounded-[10px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4"
+            >
+              <h3 className="box-border text-neutral-950 dark:text-white text-base font-normal leading-6 mb-1">
+                {estimate.model}
+              </h3>
+              <p className="box-border text-[#717182] text-sm font-normal leading-5">
+                Input: {estimate.inputCost} | Output: {estimate.outputCost}
+              </p>
+              <div className="absolute right-[17px] top-[17px] max-sm:static max-sm:mt-2">
+                <div className="box-border text-neutral-950 dark:text-white text-lg font-normal leading-7 text-right max-sm:text-left">
+                  {estimate.totalCost}
+                </div>
+                <div className="box-border text-[#717182] text-sm font-normal leading-5 text-right max-sm:text-left">
+                  Per 1K Tokens
+                </div>
               </div>
-              <div className="box-border text-[#717182] text-sm font-normal leading-5 text-right max-sm:text-left">
-                Monthly
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))
+        )}
       </div>
     </section>
   );
@@ -719,9 +748,7 @@ const PerformanceAnalysis: React.FC = () => {
                   <td className="p-3">
                     <button
                       className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() =>
-                        navigate("/viewPage/modelView")
-                      }
+                      onClick={() => navigate("/viewPage/modelView")}
                       type="button"
                     >
                       View
@@ -738,9 +765,7 @@ const PerformanceAnalysis: React.FC = () => {
                   <td className="p-3">
                     <button
                       className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() =>
-                        navigate("/viewPage/modelView")
-                      }
+                      onClick={() => navigate("/viewPage/modelView")}
                       type="button"
                     >
                       View
@@ -757,9 +782,7 @@ const PerformanceAnalysis: React.FC = () => {
                   <td className="p-3">
                     <button
                       className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() =>
-                        navigate("/viewPage/modelView")
-                      }
+                      onClick={() => navigate("/viewPage/modelView")}
                       type="button"
                     >
                       View
@@ -784,7 +807,15 @@ interface PricingModel {
   color: string;
 }
 const PricingInfo: React.FC = () => {
-  const pricingModels: PricingModel[] = [
+  interface PricingModelInfo {
+    icon: JSX.Element;
+    title: string;
+    description: string;
+    features: string[];
+    color: string;
+  }
+
+  const pricingModels: PricingModelInfo[] = [
     {
       icon: (
         <svg
@@ -925,6 +956,26 @@ const PricingInfo: React.FC = () => {
 
 // Main Pricing Page
 const Pricing: React.FC = () => {
+  const [pricingData, setPricingData] = useState<PricingModel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPricingData = async () => {
+      try {
+        const response = await api.getPricingData();
+        if (response.success) {
+          setPricingData(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch pricing data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPricingData();
+  }, []);
+
   return (
     <div className="box-border w-full min-h-screen relative bg-white dark:bg-black">
       <Navigation />
@@ -939,17 +990,27 @@ const Pricing: React.FC = () => {
               cost-effective AI models for your needs
             </p>
           </header>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <CostCalculator />
-            <div className="space-y-6">
-              <CostEstimates />
-              <CostComparison />
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-neutral-950 dark:text-white">
+                Loading pricing data...
+              </p>
             </div>
-          </div>
-          <div className="space-y-6">
-            <PerformanceAnalysis />
-            <PricingInfo />
-          </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <CostCalculator pricingData={pricingData} />
+                <div className="space-y-6">
+                  <CostEstimates pricingData={pricingData} />
+                  <CostComparison />
+                </div>
+              </div>
+              <div className="space-y-6">
+                <PerformanceAnalysis />
+                <PricingInfo />
+              </div>
+            </>
+          )}
         </div>
       </main>
       <Footer />

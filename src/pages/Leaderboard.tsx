@@ -16,6 +16,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
+import { useCompare } from "@/contexts/CompareContext";
 
 const categories = [
   "All",
@@ -92,13 +93,20 @@ function RankBadge({ rank }: { rank: number }) {
 
 export default function Leaderboard() {
   const navigate = useNavigate();
+  const {
+    compareModels,
+    addModel,
+    removeModel,
+    clearAll,
+    isSelected,
+    canAddMore,
+  } = useCompare();
   const [modelData, setModelData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLicense, setSelectedLicense] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
-  const [compareBucket, setCompareBucket] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -154,17 +162,29 @@ export default function Leaderboard() {
 
   // Add/remove model to/from compare bucket
   const handleCompareClick = (model: any) => {
-    const isSelected = compareBucket.some((m) => m.rank === model.rank);
-    if (isSelected) {
-      setCompareBucket(compareBucket.filter((m) => m.rank !== model.rank));
-    } else if (compareBucket.length < 3) {
-      setCompareBucket([...compareBucket, model]);
+    if (isSelected(model.id)) {
+      removeModel(model.id);
+    } else {
+      const success = addModel({
+        id: model.id,
+        rank: model.rank,
+        model: model.model,
+        organization: model.organization,
+        score: model.score,
+        type: model.type,
+        cost: model.cost,
+        license: model.license,
+        released: model.released,
+      });
+      if (!success) {
+        alert("You can only compare up to 4 models at once");
+      }
     }
   };
 
   // Remove single model from compare bucket
-  const handleRemoveModel = (rank: number) => {
-    setCompareBucket(compareBucket.filter((m) => m.rank !== rank));
+  const handleRemoveModel = (id: string) => {
+    removeModel(id);
   };
 
   // Filter models based on search, category, license, and year
@@ -208,7 +228,16 @@ export default function Leaderboard() {
   }
 
   // Clear all
-  const handleClearAll = () => setCompareBucket([]);
+  const handleClearAll = () => clearAll();
+
+  // Navigate to comparison page
+  const handleCompare = () => {
+    if (compareModels.length >= 2 && compareModels.length <= 4) {
+      navigate("/comparison/modelComparison");
+    } else {
+      alert("Please select 2-4 models to compare");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F1EBFF] dark:bg-black dark:text-white">
@@ -355,24 +384,23 @@ export default function Leaderboard() {
                 <tbody>
                   {(() => {
                     const firstSelectedIndex = filteredModels.findIndex(
-                      (model) =>
-                        compareBucket.some((m) => m.rank === model.rank)
+                      (model) => compareModels.some((m) => m.id === model.id)
                     );
                     return filteredModels.map((model, index) => (
                       <React.Fragment key={model.rank}>
                         {/* Insert compare bucket row only once, before the first selected model */}
-                        {compareBucket.length > 0 &&
+                        {compareModels.length > 0 &&
                           index === firstSelectedIndex && (
                             <tr>
                               <td colSpan={8}>
                                 <div className="flex items-center justify-between my-2 bg-[#F1EBFF] dark:bg-[#23232b] border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 rounded-[10px] px-6 py-3">
                                   <div className="flex gap-2 flex-wrap items-center">
                                     <span className="text-sm font-semibold text-neutral-950 dark:text-white mr-2">
-                                      Compare Models ({compareBucket.length}/3)
+                                      Compare Models ({compareModels.length}/4)
                                     </span>
-                                    {compareBucket.map((selectedModel) => (
+                                    {compareModels.map((selectedModel) => (
                                       <div
-                                        key={selectedModel.rank}
+                                        key={selectedModel.id}
                                         className="flex items-center bg-white dark:bg-neutral-800 rounded-lg px-3 py-1 mr-1 border border-[#B18BEF] dark:border-[#7c3aed]"
                                       >
                                         <span className="text-xs font-medium text-[#4B00A8] mr-2">
@@ -381,9 +409,7 @@ export default function Leaderboard() {
                                         <button
                                           className="ml-1 text-xs text-[#717182] hover:text-red-500"
                                           onClick={() =>
-                                            handleRemoveModel(
-                                              selectedModel.rank
-                                            )
+                                            handleRemoveModel(selectedModel.id)
                                           }
                                           title="Remove"
                                         >
@@ -401,26 +427,18 @@ export default function Leaderboard() {
                                     </button>
                                     <button
                                       className={`min-w-[90px] px-5 h-9 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 text-sm font-semibold leading-5 text-center text-white${
-                                        compareBucket.length > 1 ? " pr-6" : ""
+                                        compareModels.length >= 2 ? " pr-6" : ""
                                       }`}
                                       style={{
                                         minWidth:
-                                          compareBucket.length > 0 ? 110 : 90,
+                                          compareModels.length > 0 ? 110 : 90,
                                       }}
-                                      disabled={compareBucket.length === 0}
-                                      // Use React Router navigation for SPA routing
-                                      // Use React Router navigation for SPA routing
-                                      onClick={() => {
-                                        if (compareBucket.length > 0) {
-                                          navigate(
-                                            "/comparison/modelComparison"
-                                          );
-                                        }
-                                      }}
+                                      disabled={compareModels.length < 2}
+                                      onClick={handleCompare}
                                     >
                                       Compare
-                                      {compareBucket.length > 0
-                                        ? ` (${compareBucket.length})`
+                                      {compareModels.length > 0
+                                        ? ` (${compareModels.length})`
                                         : ""}
                                     </button>
                                   </div>
@@ -502,23 +520,15 @@ export default function Leaderboard() {
                             </button>
                             <button
                               className={`w-[82px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
-                                compareBucket.some((m) => m.rank === model.rank)
+                                isSelected(model.id)
                                   ? "bg-[#717182] opacity-80"
                                   : "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90"
                               }`}
-                              disabled={
-                                !compareBucket.some(
-                                  (m) => m.rank === model.rank
-                                ) && compareBucket.length >= 3
-                              }
+                              disabled={!isSelected(model.id) && !canAddMore}
                               onClick={() => handleCompareClick(model)}
                             >
                               <span className="text-sm font-semibold leading-5 text-center text-white">
-                                {compareBucket.some(
-                                  (m) => m.rank === model.rank
-                                )
-                                  ? "Remove"
-                                  : "Compare"}
+                                {isSelected(model.id) ? "Remove" : "Compare"}
                               </span>
                             </button>
                           </td>

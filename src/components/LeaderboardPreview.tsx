@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CategoryFilter from "./CategoryFilter";
 import { api } from "@/lib/api";
+import { useCompare } from "@/contexts/CompareContext";
 
 const LeaderboardPreview = () => {
   const navigate = useNavigate();
+  const { addModel, isSelected, canAddMore } = useCompare();
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -284,9 +286,32 @@ const LeaderboardPreview = () => {
                     </span>
                   </button>
 
-                  <button className="w-[82px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90">
+                  <button
+                    className={`w-[82px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
+                      isSelected(item.id)
+                        ? "bg-[#717182] opacity-80"
+                        : "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90"
+                    }`}
+                    disabled={!isSelected(item.id) && !canAddMore}
+                    onClick={() => {
+                      const success = addModel({
+                        id: item.id,
+                        rank: item.rank,
+                        model: item.model,
+                        organization: item.organization,
+                        score: item.score,
+                        type: item.category,
+                        cost: "Free",
+                        license: item.license,
+                        released: "N/A",
+                      });
+                      if (!success) {
+                        alert("You can only compare up to 4 models at once");
+                      }
+                    }}
+                  >
                     <span className="text-sm font-semibold leading-5 text-center text-white">
-                      Compare
+                      {isSelected(item.id) ? "Remove" : "Compare"}
                     </span>
                   </button>
                 </div>

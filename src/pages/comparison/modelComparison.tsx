@@ -1,9 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "../../components/Navigation";
 import Footer from "../../components/Footer";
+import { useCompare } from "../../contexts/CompareContext";
+import api from "@/lib/api";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 type TabType = "performance" | "pricing" | "features";
+
+// Model detail interface
+interface ModelDetail {
+  _id: string;
+  modelName: string;
+  organization: string;
+  overallBenchmarkScore?: number;
+  mmluScore?: number;
+  humanEvalScore?: number;
+  gsm8kScore?: number;
+  mathScore?: number;
+  clipScore?: number;
+  inputPrice?: number;
+  outputPrice?: number;
+  contextWindow?: string;
+  maxOutputTokens?: string;
+  imageSupport?: boolean;
+  audioSupport?: boolean;
+  videoSupport?: boolean;
+  apiAvailable?: boolean;
+  openSource?: boolean;
+}
 
 // ModelCard component
 interface ModelCardProps {
@@ -33,7 +67,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <article className="box-border w-full max-w-md border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] flex flex-col justify-between max-md:w-full max-sm:p-4">
+    <article className="box-border w-full max-w-md border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] flex flex-col justify-between max-md:w-full max-sm:p-4">
       <header className="flex items-start justify-between mb-6">
         <div>
           <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-1 flex items-center gap-2">
@@ -122,7 +156,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
             Cost
           </span>
           {isFree ? (
-            <div className="flex w-10 h-[21px] justify-center items-center border px-2 py-[2.67px] rounded-lg border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] bg-white dark:bg-neutral-900">
+            <div className="flex w-10 h-[21px] justify-center items-center border px-2 py-[2.67px] rounded-lg border-solid border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] bg-white dark:bg-neutral-900">
               <span className="text-[#00A63E] dark:text-green-300 text-center text-xs font-semibold leading-4">
                 Free
               </span>
@@ -155,9 +189,23 @@ const ModelCard: React.FC<ModelCardProps> = ({
 };
 
 // OverallScores component
-const OverallScores: React.FC = () => {
+interface OverallScoresProps {
+  models: ModelDetail[];
+}
+
+const OverallScores: React.FC<OverallScoresProps> = ({ models }) => {
+  if (!models || models.length === 0) return null;
+
+  const chartData = models.map((model) => ({
+    name: model.modelName,
+    score: model.overallBenchmarkScore || 0,
+    organization: model.organization,
+  }));
+
+  const COLORS = ["#FFBE0C", "#49FF71", "#FF4C4C", "#8B5CF6"];
+
   return (
-    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] max-md:w-full max-sm:p-4 overflow-x-auto">
+    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] max-md:w-full max-sm:p-4 overflow-x-auto">
       <header className="mb-6">
         <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-2">
           Overall Scores
@@ -167,68 +215,147 @@ const OverallScores: React.FC = () => {
         </p>
       </header>
 
-      <div className="mb-6 w-full overflow-x-auto">
-        <div
-          className="min-w-[350px] w-full dark:bg-neutral-900 rounded-lg"
-          style={{ maxWidth: "100%", overflowX: "auto" }}
-          dangerouslySetInnerHTML={{
-            __html: `<svg width="100%" height="320" viewBox="0 0 544 321" fill="none" xmlns="http://www.w3.org/2000/svg" class="bar-chart" style="box-sizing: border-box; max-width: 100%; height: 320px; margin-bottom: 24px; display: block; background: transparent;">
-                <g class="grid-lines">
-                  <path d="M65.6699 285.67H538.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M65.6699 215.67H538.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M65.6699 145.67H538.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M65.6699 75.67H538.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M65.6699 5.66998H538.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M144.503 5.66998V285.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M302.17 5.66998V285.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M459.836 5.66998V285.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M65.6699 5.66998V285.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                  <path d="M538.67 5.66998V285.67" stroke="#CCCCCC" stroke-dasharray="3 3" class="light-grid"/>
-                </g>
-                <g class="axes">
-                  <path d="M65.6699 285.67H538.67" stroke="#666666"/>
-                  <path d="M144.503 291.67V285.67" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="115.355" y="301.508">GPT-4o</tspan></text>
-                  <path d="M302.17 291.67V285.67" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="232.506" y="301.508">Claude 3.5 Sonnet</tspan></text>
-                  <path d="M459.837 291.67V285.67" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="402.626" y="301.508">Llama 3.1 405B</tspan></text>
-                  <path d="M65.6699 5.66998V285.67" stroke="#666666"/>
-                  <path d="M59.6699 285.67H65.6699" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="47.6699" y="289.248">0</tspan></text>
-                  <path d="M59.6699 215.67H65.6699" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="38.248" y="219.248">25</tspan></text>
-                  <path d="M59.6699 145.67H65.6699" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="37.9355" y="149.248">50</tspan></text>
-                  <path d="M59.6699 75.67H65.6699" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="38.9512" y="79.2482">75</tspan></text>
-                  <path d="M59.6699 5.66998H65.6699" stroke="#666666"/>
-                  <text fill="#666666" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="30.2324" y="16.2482">100</tspan></text>
-                </g>
-                <g class="bars">
-                  <path d="M81.4365 28.91H207.437V285.67H81.4365V28.91Z" fill="#FFBE0C"/>
-                  <path d="M239.103 76H365.103V285.67H239.103V76Z" fill="#49FF71"/>
-                  <path d="M396.77 146H522.77V285.67H396.77V146Z" fill="#FF4C4C"/>
-                </g>
-                <style>
-                  @media (prefers-color-scheme: dark) {
-                    .bar-chart .light-grid { stroke: #333333 !important; }
-                    .bar-chart .axes path, .bar-chart .axes text { stroke: #BBBBBB !important; fill: #BBBBBB !important; }
-                    .bar-chart .bars path { opacity: 0.85; }
-                  }
-                </style>
-              </svg>`,
-          }}
-        />
+      <div className="flex flex-wrap gap-2 mb-6">
+        {models.map((model, index) => (
+          <div
+            key={model._id}
+            className="flex items-center gap-2 bg-[#F6F3FF] dark:bg-zinc-800 px-3 py-2 rounded-lg"
+          >
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+            />
+            <span className="text-xs font-medium text-neutral-950 dark:text-neutral-100">
+              {model.modelName}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <ResponsiveContainer width="100%" height={320}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            className="opacity-30"
+            stroke="#CCCCCC"
+          />
+          <XAxis
+            dataKey="name"
+            angle={-45}
+            textAnchor="end"
+            height={80}
+            interval={0}
+            tick={{ fill: "currentColor", fontSize: 12 }}
+            className="text-neutral-950 dark:text-white"
+          />
+          <YAxis
+            label={{
+              value: "Overall Score",
+              angle: -90,
+              position: "insideLeft",
+              style: { fill: "currentColor" },
+            }}
+            tick={{ fill: "currentColor" }}
+            className="text-neutral-950 dark:text-white"
+            domain={[0, 100]}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "rgba(255, 255, 255, 0.95)",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
+            labelStyle={{ color: "#000" }}
+            formatter={(value: number) => [`${value.toFixed(1)}`, "Score"]}
+          />
+          <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+
+      <div
+        className={`mt-6 grid grid-cols-1 ${
+          models.length === 2
+            ? "sm:grid-cols-2"
+            : models.length === 3
+            ? "sm:grid-cols-2 lg:grid-cols-3"
+            : "sm:grid-cols-2 lg:grid-cols-4"
+        } gap-4`}
+      >
+        {models.map((model, index) => (
+          <div
+            key={model._id}
+            className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-800"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <h4 className="text-sm font-semibold text-neutral-950 dark:text-white truncate">
+                {model.modelName}
+              </h4>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              {model.organization}
+            </p>
+            <p
+              className="text-2xl font-bold"
+              style={{ color: COLORS[index % COLORS.length] }}
+            >
+              {model.overallBenchmarkScore?.toFixed(1) || "N/A"}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Overall Score
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
 };
 
 // PerformanceRadar component
-const PerformanceRadar: React.FC = () => {
+interface PerformanceRadarProps {
+  models: ModelDetail[];
+}
+
+const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ models }) => {
+  if (!models || models.length === 0) return null;
+
+  // Calculate average scores for radar visualization
+  const avgMMLU =
+    models.reduce((sum, m) => sum + (m.mmluScore || 0), 0) / models.length;
+  const avgHumanEval =
+    models.reduce((sum, m) => sum + (m.humanEvalScore || 0), 0) / models.length;
+  const avgGSM8K =
+    models.reduce((sum, m) => sum + (m.gsm8kScore || 0), 0) / models.length;
+  const avgMATH =
+    models.reduce((sum, m) => sum + (m.mathScore || 0), 0) / models.length;
+
+  // Calculate radar chart coordinates
+  const centerX = 272.17;
+  const centerY = 160.67;
+  const maxRadius = 114.4;
+
+  const mmluY = centerY - (avgMMLU / 100) * maxRadius;
+  const humanEvalX = centerX + (avgHumanEval / 100) * maxRadius;
+  const gsm8kY = centerY + (avgGSM8K / 100) * maxRadius;
+  const mathX = centerX - (avgMATH / 100) * maxRadius;
+
+  const dataPath = `M${centerX} ${mmluY}L${humanEvalX} ${centerY}L${centerX} ${gsm8kY}L${mathX} ${centerY}Z`;
+
   return (
-    <section className="box-border w-full max-w-xl border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] max-md:w-full max-sm:p-4 overflow-x-auto">
+    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] max-md:w-full max-sm:p-4 overflow-x-auto">
       <header className="mb-6">
         <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-2">
           Performance Radar
@@ -237,158 +364,418 @@ const PerformanceRadar: React.FC = () => {
           Multi-dimensional performance comparison
         </p>
       </header>
-
       <div className="mb-6 w-full overflow-x-auto">
-        <div
-          className="min-w-[350px] w-full dark:bg-neutral-900 rounded-lg"
-          style={{ maxWidth: "100%", overflowX: "auto" }}
-          dangerouslySetInnerHTML={{
-            __html: `<svg width="100%" height="320" viewBox="0 0 544 321" fill="none" xmlns="http://www.w3.org/2000/svg" class="radar-chart" style="box-sizing: border-box; max-width: 100%; height: 320px; margin-bottom: 24px; display: block; background: transparent;">
-                <style>
-                  @media (prefers-color-scheme: dark) {
-                    .radar-chart .radar-grid { stroke: #333333 !important; }
-                    .radar-chart .radar-label { fill: #BBBBBB !important; }
-                    .radar-chart .radar-fill { fill: #fff !important; opacity: 0.08 !important; }
-                  }
-                </style>
-                <path class="radar-grid" d="M272.17 132.07L300.77 160.67L272.17 189.27L243.57 160.67L272.17 132.07Z" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 103.47L329.37 160.67L272.17 217.87L214.97 160.67L272.17 103.47Z" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 74.87L357.97 160.67L272.17 246.47L186.37 160.67L272.17 74.87Z" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 46.27L386.57 160.67L272.17 275.07L157.77 160.67L272.17 46.27Z" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 160.67V46.27" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 160.67H386.57" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 160.67V275.07" stroke="#CCCCCC"></path>
-                <path class="radar-grid" d="M272.17 160.67H157.77" stroke="#CCCCCC"></path>
-                <text class="radar-label" fill="#808080" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="247.506" y="37.5882">MMLU</tspan></text>
-                <text class="radar-label" fill="#808080" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="394.57" y="164.248">HumanEval</tspan></text>
-                <text class="radar-label" fill="#808080" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="243.857" y="290.908">GSM8K</tspan></text>
-                <text class="radar-label" fill="#808080" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="16" letter-spacing="0em"><tspan x="66.5513" y="164.248">CLIP Score</tspan></text>
-                <path class="radar-grid" d="M272.17 160.67V46.27" stroke="#CCCCCC"></path>
-                <path class="radar-fill" d="M272.17 59.1972L375.359 160.67L272.17 270.265L166.808 160.67L272.17 59.1972Z" fill="black" fill-opacity="0.1"></path>
-                <path class="radar-fill" d="M272.17 59.6548L377.418 160.67L272.17 270.952L170.125 160.67L272.17 59.6548Z" fill="black" fill-opacity="0.1"></path>
-                <path class="radar-fill" d="M272.17 60.7988L373.986 160.67L272.17 271.409V160.67V60.7988Z" fill="black" fill-opacity="0.1"></path>
-              </svg>`,
+        <svg
+          width="100%"
+          height="320"
+          viewBox="0 0 544 321"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="radar-chart"
+          style={{
+            maxWidth: "100%",
+            height: "320px",
+            marginBottom: "24px",
+            display: "block",
+            background: "transparent",
           }}
-        />
+        >
+          <style>{`
+            @media (prefers-color-scheme: dark) {
+              .radar-chart .radar-grid { stroke: #444444 !important; stroke-width: 1 !important; }
+              .radar-chart .radar-label { fill: #FFFFFF !important; font-weight: 600 !important; }
+              .radar-chart .radar-fill { fill: #B18BEF !important; opacity: 0.4 !important; }
+              .radar-chart .radar-stroke { stroke: #B18BEF !important; stroke-width: 2 !important; }
+              .radar-chart .radar-point { fill: #B18BEF !important; }
+              .radar-chart .radar-value { fill: #B18BEF !important; font-weight: 700 !important; }
+            }
+            .radar-chart .radar-value { fill: #B18BEF; font-weight: 700; }
+          `}</style>
+          {/* Grid lines - 4 concentric diamonds */}
+          <path
+            className="radar-grid"
+            d="M272.17 132.07L300.77 160.67L272.17 189.27L243.57 160.67L272.17 132.07Z"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 103.47L329.37 160.67L272.17 217.87L214.97 160.67L272.17 103.47Z"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 74.87L357.97 160.67L272.17 246.47L186.37 160.67L272.17 74.87Z"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 46.27L386.57 160.67L272.17 275.07L157.77 160.67L272.17 46.27Z"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+
+          {/* Axis lines */}
+          <path
+            className="radar-grid"
+            d="M272.17 160.67V46.27"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 160.67H386.57"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 160.67V275.07"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+          <path
+            className="radar-grid"
+            d="M272.17 160.67H157.77"
+            stroke="#DDDDDD"
+            strokeWidth="1"
+          ></path>
+
+          {/* Labels */}
+          <text
+            className="radar-label"
+            fill="#808080"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="16"
+            fontWeight="600"
+            letterSpacing="0em"
+          >
+            <tspan x="247.506" y="37.5882">
+              MMLU
+            </tspan>
+          </text>
+          <text
+            className="radar-label"
+            fill="#808080"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="16"
+            fontWeight="600"
+            letterSpacing="0em"
+          >
+            <tspan x="394.57" y="164.248">
+              HumanEval
+            </tspan>
+          </text>
+          <text
+            className="radar-label"
+            fill="#808080"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="16"
+            fontWeight="600"
+            letterSpacing="0em"
+          >
+            <tspan x="243.857" y="290.908">
+              GSM8K
+            </tspan>
+          </text>
+          <text
+            className="radar-label"
+            fill="#808080"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="16"
+            fontWeight="600"
+            letterSpacing="0em"
+          >
+            <tspan x="66.5513" y="164.248">
+              MATH Score
+            </tspan>
+          </text>
+
+          {/* Data polygon */}
+          <path
+            className="radar-fill"
+            d={dataPath}
+            fill="#B18BEF"
+            fillOpacity="0.35"
+          ></path>
+          <path
+            className="radar-stroke"
+            d={dataPath}
+            stroke="#B18BEF"
+            strokeWidth="2"
+            fill="none"
+          ></path>
+          {/* Data points with value labels */}
+          <circle
+            className="radar-point"
+            cx={centerX}
+            cy={mmluY}
+            r="6"
+            fill="#B18BEF"
+            stroke="#FFFFFF"
+            strokeWidth="2"
+          />
+          <text
+            className="radar-value"
+            fontFamily="Inter"
+            fontSize="14"
+            textAnchor="middle"
+          >
+            <tspan x={centerX} y={mmluY - 12}>
+              {avgMMLU.toFixed(1)}
+            </tspan>
+          </text>
+
+          <circle
+            className="radar-point"
+            cx={humanEvalX}
+            cy={centerY}
+            r="6"
+            fill="#B18BEF"
+            stroke="#FFFFFF"
+            strokeWidth="2"
+          />
+          <text
+            className="radar-value"
+            fontFamily="Inter"
+            fontSize="14"
+            textAnchor="start"
+          >
+            <tspan x={humanEvalX + 12} y={centerY + 5}>
+              {avgHumanEval.toFixed(1)}
+            </tspan>
+          </text>
+
+          <circle
+            className="radar-point"
+            cx={centerX}
+            cy={gsm8kY}
+            r="6"
+            fill="#B18BEF"
+            stroke="#FFFFFF"
+            strokeWidth="2"
+          />
+          <text
+            className="radar-value"
+            fontFamily="Inter"
+            fontSize="14"
+            textAnchor="middle"
+          >
+            <tspan x={centerX} y={gsm8kY + 20}>
+              {avgGSM8K.toFixed(1)}
+            </tspan>
+          </text>
+
+          <circle
+            className="radar-point"
+            cx={mathX}
+            cy={centerY}
+            r="6"
+            fill="#B18BEF"
+            stroke="#FFFFFF"
+            strokeWidth="2"
+          />
+          <text
+            className="radar-value"
+            fontFamily="Inter"
+            fontSize="14"
+            textAnchor="end"
+          >
+            <tspan x={mathX - 12} y={centerY + 5}>
+              {avgMATH.toFixed(1)}
+            </tspan>
+          </text>
+        </svg>
+      </div>
+
+      {/* Score breakdown table */}
+      <div className="mb-6 border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] pt-6">
+        <h4 className="text-neutral-950 dark:text-white text-sm font-semibold mb-4">
+          Individual Scores
+        </h4>
+        <div className="grid grid-cols-2 gap-4">
+          {["MMLU", "HumanEval", "GSM8K", "MATH Score"].map((benchmark) => (
+            <div key={benchmark} className="space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-neutral-950 dark:text-white text-xs font-semibold">
+                  {benchmark}
+                </span>
+                <span className="text-[#B18BEF] text-xs font-bold">
+                  Avg:{" "}
+                  {benchmark === "MMLU"
+                    ? avgMMLU.toFixed(1)
+                    : benchmark === "HumanEval"
+                    ? avgHumanEval.toFixed(1)
+                    : benchmark === "GSM8K"
+                    ? avgGSM8K.toFixed(1)
+                    : avgMATH.toFixed(1)}
+                </span>
+              </div>
+              <div className="space-y-1">
+                {models.map((model, index) => {
+                  const score =
+                    benchmark === "MMLU"
+                      ? model.mmluScore
+                      : benchmark === "HumanEval"
+                      ? model.humanEvalScore
+                      : benchmark === "GSM8K"
+                      ? model.gsm8kScore
+                      : model.mathScore;
+                  const colors = ["#FFBE0C", "#49FF71", "#FF4C4C", "#8B5CF6"];
+
+                  return (
+                    <div key={index} className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{
+                          backgroundColor: colors[index % colors.length],
+                        }}
+                      ></div>
+                      <span className="text-neutral-950 dark:text-white text-xs flex-1 truncate">
+                        {model.modelName.length > 12
+                          ? model.modelName.substring(0, 12) + "..."
+                          : model.modelName}
+                      </span>
+                      <span className="text-neutral-950 dark:text-white text-xs font-semibold">
+                        {score ? score.toFixed(1) : "N/A"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex h-6 items-start gap-2.5 w-full justify-center flex-wrap overflow-x-auto">
-        <div className="flex h-6 justify-center items-end gap-1 text-neutral-950 dark:text-white text-center text-base font-normal leading-6 px-0 py-[1.33px] whitespace-nowrap">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="legend-icon" style="box-sizing: border-box; width: 14px; height: 14px">
-                  <style>
-                    @media (prefers-color-scheme: dark) { .legend-rect { fill: #fff !important; opacity: 0.8 !important; } }
-                  </style>
-                  <rect class="legend-rect" x="0.79" y="2.08" width="14" height="10.5" fill="black"/>
-                </svg>`,
-            }}
-          />
-          <span className="text-neutral-950 dark:text-white text-center text-base font-normal leading-6">
-            Claude 3.5 Sonnet
-          </span>
-        </div>
-        <div className="flex h-6 justify-center items-end gap-1 text-neutral-950 dark:text-white text-center text-base font-normal leading-6 px-0 py-[1.33px] whitespace-nowrap">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="legend-icon" style="box-sizing: border-box; width: 14px; height: 14px">
-                  <style>
-                    @media (prefers-color-scheme: dark) { .legend-rect { fill: #fff !important; opacity: 0.8 !important; } }
-                  </style>
-                  <rect class="legend-rect" x="0.8198" y="2.08" width="14" height="10.5" fill="black"/>
-                </svg>`,
-            }}
-          />
-          <span className="text-neutral-950 dark:text-white text-center text-base font-normal leading-6">
-            GPT-4o
-          </span>
-        </div>
-        <div className="flex h-6 justify-center items-end gap-1 text-neutral-950 dark:text-white text-center text-base font-normal leading-6 px-0 py-[1.33px] whitespace-nowrap">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="legend-icon" style="box-sizing: border-box; width: 14px; height: 14px">
-                  <style>
-                    @media (prefers-color-scheme: dark) { .legend-rect { fill: #fff !important; opacity: 0.8 !important; } }
-                  </style>
-                  <rect class="legend-rect" x="0.54" y="2.08" width="14" height="10.5" fill="black"/>
-                </svg>`,
-            }}
-          />
-          <span className="text-neutral-950 dark:text-white text-center text-base font-normal leading-6">
-            Llama 3.1 405B
-          </span>
-        </div>
+        {models.map((model, index) => {
+          const colors = ["#FFBE0C", "#49FF71", "#FF4C4C", "#8B5CF6"];
+          return (
+            <div
+              key={index}
+              className="flex h-6 justify-center items-end gap-1 text-neutral-950 dark:text-white text-center text-base font-normal leading-6 px-0 py-[1.33px] whitespace-nowrap"
+            >
+              <div
+                className="w-3.5 h-3.5 rounded-sm"
+                style={{
+                  backgroundColor: colors[index % colors.length],
+                  opacity: 0.8,
+                }}
+              ></div>
+              <span className="text-neutral-950 dark:text-white text-center text-sm font-normal leading-6">
+                {model.modelName}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 };
 
 // DetailedComparison component
-type PerformanceRow = {
-  benchmark: string;
-  gpt4o: string;
-  claude: string;
-  llama: string;
-};
-type FeatureOrPricingRow = {
-  feature: string;
-  gpt4o: string;
-  claude: string;
-  llama: string;
-};
+interface DetailedComparisonProps {
+  models: ModelDetail[];
+}
 
-const DetailedComparison: React.FC = () => {
+const DetailedComparison: React.FC<DetailedComparisonProps> = ({ models }) => {
   const [activeTab, setActiveTab] = useState<TabType>("performance");
 
-  const performanceData: PerformanceRow[] = [
+  if (!models || models.length === 0) return null;
+
+  const performanceData = [
     {
       benchmark: "Overall Score",
-      gpt4o: "91.7%",
-      claude: "91.5%",
-      llama: "91.0%",
+      values: models.map(
+        (m) => `${(m.overallBenchmarkScore || 0).toFixed(1)}%`
+      ),
     },
-    { benchmark: "MMLU", gpt4o: "88.7%", claude: "88.3%", llama: "87.3%" },
-    { benchmark: "HumanEval", gpt4o: "90.2%", claude: "92.0%", llama: "89.0%" },
-    { benchmark: "GSM8K", gpt4o: "95.8%", claude: "96.4%", llama: "96.8%" },
-    { benchmark: "CLIP Score", gpt4o: "92.1%", claude: "89.2%", llama: "N/A" },
+    {
+      benchmark: "MMLU",
+      values: models.map((m) =>
+        m.mmluScore ? `${m.mmluScore.toFixed(1)}%` : "N/A"
+      ),
+    },
+    {
+      benchmark: "HumanEval",
+      values: models.map((m) =>
+        m.humanEvalScore ? `${m.humanEvalScore.toFixed(1)}%` : "N/A"
+      ),
+    },
+    {
+      benchmark: "GSM8K",
+      values: models.map((m) =>
+        m.gsm8kScore ? `${m.gsm8kScore.toFixed(1)}%` : "N/A"
+      ),
+    },
+    {
+      benchmark: "MATH",
+      values: models.map((m) =>
+        m.mathScore ? `${m.mathScore.toFixed(1)}%` : "N/A"
+      ),
+    },
+    {
+      benchmark: "CLIP Score",
+      values: models.map((m) =>
+        m.clipScore ? `${m.clipScore.toFixed(1)}` : "N/A"
+      ),
+    },
   ];
 
-  const pricingData: FeatureOrPricingRow[] = [
+  const pricingData = [
     {
       feature: "Input Cost",
-      gpt4o: "$2.5/1M tokens",
-      claude: "$3/1M tokens",
-      llama: "Free",
+      values: models.map((m) =>
+        m.inputPrice ? `$${m.inputPrice}/1M tokens` : "Free"
+      ),
     },
     {
       feature: "Output Cost",
-      gpt4o: "$10/1M tokens",
-      claude: "$15/1M tokens",
-      llama: "Free",
+      values: models.map((m) =>
+        m.outputPrice ? `$${m.outputPrice}/1M tokens` : "Free"
+      ),
     },
     {
       feature: "Context Window",
-      gpt4o: "128K tokens",
-      claude: "200K tokens",
-      llama: "128K tokens",
+      values: models.map((m) => m.contextWindow || "N/A"),
     },
     {
-      feature: "Rate Limits",
-      gpt4o: "10K RPM",
-      claude: "5K RPM",
-      llama: "Unlimited",
+      feature: "Max Output Tokens",
+      values: models.map((m) => m.maxOutputTokens || "N/A"),
     },
   ];
 
-  const featuresData: FeatureOrPricingRow[] = [
-    { feature: "Multimodal", gpt4o: "✓", claude: "✓", llama: "✗" },
-    { feature: "Function Calling", gpt4o: "✓", claude: "✓", llama: "✓" },
-    { feature: "JSON Mode", gpt4o: "✓", claude: "✗", llama: "✓" },
-    { feature: "Streaming", gpt4o: "✓", claude: "✓", llama: "✓" },
-    { feature: "Fine-tuning", gpt4o: "✓", claude: "✗", llama: "✓" },
+  const featuresData = [
+    {
+      feature: "Image Support",
+      values: models.map((m) => (m.imageSupport ? "✓" : "✗")),
+    },
+    {
+      feature: "Audio Support",
+      values: models.map((m) => (m.audioSupport ? "✓" : "✗")),
+    },
+    {
+      feature: "Video Support",
+      values: models.map((m) => (m.videoSupport ? "✓" : "✗")),
+    },
+    {
+      feature: "API Available",
+      values: models.map((m) => (m.apiAvailable ? "✓" : "✗")),
+    },
+    {
+      feature: "Open Source",
+      values: models.map((m) => (m.openSource ? "✓" : "✗")),
+    },
   ];
 
-  const getCurrentData = (): (PerformanceRow | FeatureOrPricingRow)[] => {
+  const getCurrentData = () => {
     switch (activeTab) {
       case "performance":
         return performanceData;
@@ -415,7 +802,7 @@ const DetailedComparison: React.FC = () => {
   };
 
   return (
-    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] max-md:w-full max-sm:p-4 overflow-x-auto">
+    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] max-md:w-full max-sm:p-4 overflow-x-auto">
       <header className="mb-6">
         <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-2">
           Detailed Comparison
@@ -469,19 +856,18 @@ const DetailedComparison: React.FC = () => {
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead>
-            <tr className="border-b border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)]">
-              <th className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 w-1/4 whitespace-nowrap">
+            <tr className="border-b border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]">
+              <th className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 whitespace-nowrap">
                 {getColumnHeader()}
               </th>
-              <th className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 w-1/4 whitespace-nowrap">
-                GPT-4o
-              </th>
-              <th className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 w-1/4 whitespace-nowrap">
-                Claude 3.5 Sonnet
-              </th>
-              <th className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 w-1/4 whitespace-nowrap">
-                Llama 3.1 405B
-              </th>
+              {models.map((model, index) => (
+                <th
+                  key={index}
+                  className="text-left text-[#717182] dark:text-neutral-400 text-sm font-semibold leading-5 py-3 whitespace-nowrap"
+                >
+                  {model.modelName}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -490,22 +876,21 @@ const DetailedComparison: React.FC = () => {
                 key={index}
                 className={`${
                   index < getCurrentData().length - 1
-                    ? "border-b border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)]"
+                    ? "border-b border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]"
                     : ""
                 } ${index % 2 === 1 ? "bg-[#F6F3FF] dark:bg-neutral-800" : ""}`}
               >
                 <td className="text-neutral-950 dark:text-white text-sm font-normal leading-5 py-3 whitespace-nowrap">
                   {"benchmark" in row ? row.benchmark : row.feature}
                 </td>
-                <td className="text-neutral-950 dark:text-white text-sm font-normal leading-5 py-3 whitespace-nowrap">
-                  {row.gpt4o}
-                </td>
-                <td className="text-neutral-950 dark:text-white text-sm font-normal leading-5 py-3 whitespace-nowrap">
-                  {row.claude}
-                </td>
-                <td className="text-neutral-950 dark:text-white text-sm font-normal leading-5 py-3 whitespace-nowrap">
-                  {row.llama}
-                </td>
+                {row.values.map((value, idx) => (
+                  <td
+                    key={idx}
+                    className="text-neutral-950 dark:text-white text-sm font-normal leading-5 py-3 whitespace-nowrap"
+                  >
+                    {value}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -518,6 +903,58 @@ const DetailedComparison: React.FC = () => {
 // Main page component
 const ModelComparisonPage = () => {
   const navigate = useNavigate();
+  const { compareModels } = useCompare();
+  const [detailedModels, setDetailedModels] = useState<ModelDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch detailed model data
+  useEffect(() => {
+    const fetchModelDetails = async () => {
+      if (compareModels.length === 0) {
+        navigate("/leaderboard");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await api.getAllModels();
+        if (response.success) {
+          // Filter to get only the selected models with full details
+          const modelIds = compareModels.map((m) => m.id);
+          const fullModels = response.data.filter((model: ModelDetail) =>
+            modelIds.includes(model._id)
+          );
+          setDetailedModels(fullModels);
+        }
+      } catch (error) {
+        console.error("Failed to fetch model details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModelDetails();
+  }, [compareModels, navigate]);
+
+  // If no models to compare, redirect to leaderboard
+  if (compareModels.length === 0) {
+    navigate("/leaderboard");
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="box-border min-h-screen bg-white dark:bg-black">
+        <Navigation />
+        <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px)] bg-[#F6F3FF] dark:bg-neutral-950">
+          <p className="text-neutral-950 dark:text-white text-lg">
+            Loading comparison data...
+          </p>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="box-border min-h-screen bg-white dark:bg-black">
       <div className="box-border flex w-full min-h-screen flex-col justify-center items-start bg-white dark:bg-black">
@@ -566,65 +1003,58 @@ const ModelComparisonPage = () => {
                   Model Comparison
                 </h1>
                 <p className="text-[#717182] dark:text-neutral-400 text-lg font-normal leading-7">
-                  Side-by-side comparison of 3 AI models
+                  Side-by-side comparison of {compareModels.length} AI models
                 </p>
               </header>
 
               {/* Model Tags */}
               <div className="flex flex-wrap gap-2 mb-8 max-md:mb-6">
-                <div className="flex w-[65px] flex-col justify-center items-center h-[25px] text-[#030213] dark:text-white text-center text-sm font-semibold leading-5 bg-[#ECEEF2] dark:bg-neutral-800 px-2 py-[3.33px] rounded-lg">
-                  GPT-4o
-                </div>
-                <div className="flex w-[132px] flex-col justify-center items-center h-[25px] text-[#030213] dark:text-white text-center text-sm font-semibold leading-5 bg-[#ECEEF2] dark:bg-neutral-800 px-2 py-[3.33px] rounded-lg">
-                  Claude 3.5 Sonnet
-                </div>
-                <div className="flex w-[111px] flex-col justify-center items-center h-[25px] text-[#030213] dark:text-white text-center text-sm font-semibold leading-5 bg-[#ECEEF2] dark:bg-neutral-800 px-2 py-[3.33px] rounded-lg">
-                  Llama 3.1 405B
-                </div>
+                {compareModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="flex flex-col justify-center items-center h-[25px] text-[#030213] dark:text-white text-center text-sm font-semibold leading-5 bg-[#ECEEF2] dark:bg-neutral-800 px-2 py-[3.33px] rounded-lg"
+                  >
+                    {model.model}
+                  </div>
+                ))}
               </div>
 
               {/* Model Cards Grid */}
-              <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                <ModelCard
-                  name="GPT-4o"
-                  company="OpenAI"
-                  score="91.7"
-                  type="multimodal"
-                  released="13/5/2024"
-                  cost="$2.5/1M"
-                  isStarred={true}
-                  isAPI={true}
-                />
-                <ModelCard
-                  name="Claude 3.5 Sonnet"
-                  company="Anthropic"
-                  score="91.5"
-                  type="multimodal"
-                  released="20/6/2024"
-                  cost="$3/1M"
-                  isAPI={true}
-                />
-                <ModelCard
-                  name="Llama 3.1 405B"
-                  company="Meta"
-                  score="91.0"
-                  type="text"
-                  released="23/7/2024"
-                  cost="Free"
-                  isOpenSource={true}
-                  isFree={true}
-                />
+              <section
+                className={`grid grid-cols-1 ${
+                  compareModels.length === 2
+                    ? "md:grid-cols-2"
+                    : compareModels.length === 3
+                    ? "md:grid-cols-2 lg:grid-cols-3"
+                    : "md:grid-cols-2 lg:grid-cols-4"
+                } gap-6 mb-12`}
+              >
+                {compareModels.map((model) => (
+                  <ModelCard
+                    key={model.id}
+                    name={model.model}
+                    company={model.organization}
+                    score={model.score.toString()}
+                    type={model.type}
+                    released={model.released}
+                    cost={model.cost}
+                    isStarred={model.rank === 1}
+                    isAPI={model.license !== "Open Source"}
+                    isOpenSource={model.license === "Open Source"}
+                    isFree={model.cost.toLowerCase().includes("free")}
+                  />
+                ))}
               </section>
 
               {/* Charts Grid */}
               <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                <PerformanceRadar />
-                <OverallScores />
+                <PerformanceRadar models={detailedModels} />
+                <OverallScores models={detailedModels} />
               </section>
 
               {/* Detailed Comparison */}
               <section className="mb-12">
-                <DetailedComparison />
+                <DetailedComparison models={detailedModels} />
               </section>
             </div>
           </main>

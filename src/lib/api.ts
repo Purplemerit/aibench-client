@@ -45,6 +45,12 @@ export const api = {
     return response.json();
   },
 
+  getPricingData: async () => {
+    const response = await fetch(`${API_BASE_URL}/models/pricing`);
+    if (!response.ok) throw new Error('Failed to fetch pricing data');
+    return response.json();
+  },
+
   // Upload endpoint
   uploadCSV: async (file) => {
     const formData = new FormData();
