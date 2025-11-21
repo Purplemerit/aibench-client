@@ -11,33 +11,83 @@ const FeaturedModels = () => {
       try {
         const response = await api.getFeaturedModels();
         if (response.success && response.data) {
+          const allModels = response.data;
+
+          // Separate models by category
+          const topRated = allModels
+            .sort(
+              (a: any, b: any) =>
+                (b.overallBenchmarkScore || 0) - (a.overallBenchmarkScore || 0)
+            )
+            .slice(0, 5); // Top 5 highest rated
+
+          const openSource = allModels.filter(
+            (m: any) => m.openSource === "Yes"
+          );
+
+          const costEffective = allModels.filter((m: any) => {
+            const price = m.inputPrice || "";
+            return (
+              price.toLowerCase().includes("free") ||
+              price === "Free" ||
+              price === ""
+            );
+          });
+
+          // Randomly select one from each category
+          const recommended =
+            topRated[Math.floor(Math.random() * Math.min(topRated.length, 5))];
+          const openSourceModel =
+            openSource.length > 0
+              ? openSource[Math.floor(Math.random() * openSource.length)]
+              : topRated[1];
+          const costEffectiveModel =
+            costEffective.length > 0
+              ? costEffective[Math.floor(Math.random() * costEffective.length)]
+              : topRated[2];
+
           // Map API data to component format
-          const formattedModels = response.data
-            .slice(0, 3)
-            .map((model: any, index: number) => ({
-              title: model.modelName,
-              organization: model.organization,
-              description:
-                model.specialFeatures ||
-                `${model.modelType} model with advanced capabilities`,
-              score: model.overallBenchmarkScore || 0,
-              badge: {
-                type: model.openSource === "Yes" ? "open-source" : "api",
-                label: model.openSource === "Yes" ? "Open Source" : "API",
-              },
-              capabilities: [
-                model.modelType,
-                model.imageSupport === "Yes" ? "Vision" : null,
-                model.audioSupport === "Yes" ? "Audio" : null,
-                "Code",
-              ]
-                .filter(Boolean)
-                .slice(0, 3)
-                .concat(["+more"]),
-              icon: getIconByCategory(index),
-              categoryTitle: getCategoryTitle(index),
-              featured: index === 0,
-            }));
+          const formattedModels = [
+            {
+              model: recommended,
+              categoryTitle: "Recommended",
+              icon: recommendedIcon,
+            },
+            {
+              model: openSourceModel,
+              categoryTitle: "Open Source",
+              icon: openSourceIcon,
+            },
+            {
+              model: costEffectiveModel,
+              categoryTitle: "Cost Effective",
+              icon: costEffectiveIcon,
+            },
+          ].map((item, index) => ({
+            title: item.model.modelName,
+            organization: item.model.organization,
+            description:
+              item.model.specialFeatures ||
+              `${item.model.modelType} model with advanced capabilities`,
+            score: item.model.overallBenchmarkScore || 0,
+            badge: {
+              type: item.model.openSource === "Yes" ? "open-source" : "api",
+              label: item.model.openSource === "Yes" ? "Open Source" : "API",
+            },
+            capabilities: [
+              item.model.modelType,
+              item.model.imageSupport === "Yes" ? "Vision" : null,
+              item.model.audioSupport === "Yes" ? "Audio" : null,
+              "Code",
+            ]
+              .filter(Boolean)
+              .slice(0, 3)
+              .concat(["+more"]),
+            icon: item.icon,
+            categoryTitle: item.categoryTitle,
+            featured: index === 0,
+          }));
+
           setModels(formattedModels);
         }
       } catch (error) {
