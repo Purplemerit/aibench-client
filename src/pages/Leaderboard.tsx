@@ -57,7 +57,7 @@ function LicenseBadge({ license }: { license: string }) {
   if (license === "Open Source") {
     return (
       <Badge
-        className="border-0 rounded-lg px-2 py-1 text-xs font-semibold"
+        className="border-0 rounded-lg px-2 py-1 text-xs font-semibold whitespace-nowrap"
         style={{ backgroundColor: "#D1FADF", color: "#027A48" }}
       >
         Open Source
@@ -508,7 +508,7 @@ export default function Leaderboard() {
                           </td>
                           <td className="min-w-[100px] py-3 pl-3">
                             <div
-                              className={`h-[21px] flex items-center justify-center px-2 py-1 rounded-lg border ${
+                              className={`min-h-[21px] h-auto flex items-center justify-center px-2 py-1 rounded-lg border whitespace-nowrap ${
                                 model.license === "Open Source"
                                   ? "border-green-500 bg-green-50 dark:bg-green-900/20"
                                   : "border-[rgba(0,0,0,0.10)] dark:border-neutral-800 bg-[#F1EBFF] dark:bg-[#232136]"
