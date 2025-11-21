@@ -98,7 +98,7 @@ const Navigation = () => {
   );
 
   return (
-    <nav className="box-border flex items-center w-full h-16 px-20 py-4 max-md:px-10 max-sm:px-5 relative bg-white dark:bg-black text-neutral-950 dark:text-white border-b border-gray-200 dark:border-gray-700">
+    <nav className="fixed top-0 left-0 right-0 z-50 box-border flex items-center w-full h-16 px-20 py-4 max-md:px-10 max-sm:px-5 bg-white dark:bg-black text-neutral-950 dark:text-white border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center z-10">
         <div className="box-border w-8 h-8 flex items-center justify-center rounded-[10px] bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] mr-2">
           <svg
