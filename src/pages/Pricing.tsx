@@ -127,13 +127,6 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({
       }
     });
 
-  console.log("CostCalculator - Total pricing data:", pricingData.length);
-  console.log("CostCalculator - Available models:", availableModels.length);
-  console.log(
-    "CostCalculator - Sample available:",
-    availableModels.slice(0, 2)
-  );
-
   return (
     <aside className="box-border w-full max-w-md border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-md:w-full max-md:mb-6 max-sm:p-4">
       <header className="box-border flex items-center gap-2 mb-4">
@@ -509,10 +502,6 @@ const CostComparison: React.FC<CostComparisonProps> = ({
 
                     const barHeight = (totalCost / maxCost) * 220; // 220px max height
                     const colors = ["#8859FF", "#FF44B4", "#44D7B6"];
-
-                    console.log(
-                      `Model: ${model.modelName}, Input: ${model.inputPrice}, Output: ${model.outputPrice}, Total: ${totalCost}`
-                    );
 
                     return (
                       <div
@@ -1176,14 +1165,9 @@ const Pricing: React.FC = () => {
     const fetchPricingData = async () => {
       try {
         const response = await api.getPricingData();
-        console.log("=== FRONTEND PRICING DATA ===");
-        console.log("API Response:", response);
-        console.log("Total models received:", response.data?.length);
-        console.log("Sample data:", response.data?.slice(0, 3));
 
         if (response.success) {
           setPricingData(response.data);
-          console.log("Pricing data set in state");
 
           // Auto-select first 3 models sorted by name (default sort)
           const modelsWithPricing = response.data
@@ -1196,23 +1180,9 @@ const Pricing: React.FC = () => {
               a.modelName.localeCompare(b.modelName)
             );
 
-          console.log(
-            "Models with pricing after filter:",
-            modelsWithPricing.length
-          );
-          console.log(
-            "Models with non-zero pricing:",
-            response.data.filter(
-              (m: PricingModel) =>
-                (typeof m.inputPrice === "number" && m.inputPrice > 0) ||
-                (typeof m.outputPrice === "number" && m.outputPrice > 0)
-            ).length
-          );
-
           const initialSelection = modelsWithPricing
             .slice(0, 3)
             .map((m: PricingModel) => m.modelName);
-          console.log("Initial selection:", initialSelection);
           setSelectedModels(initialSelection);
         }
       } catch (error) {
