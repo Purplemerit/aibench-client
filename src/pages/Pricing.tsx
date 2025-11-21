@@ -366,7 +366,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({
         <button
           onClick={handleSubmit}
           type="submit"
-          className="w-full mt-6 px-4 py-3 bg-[#4B00A8] text-white font-semibold rounded-lg hover:bg-[#3a0082] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full mt-6 px-4 py-3 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={selectedModels.length === 0}
         >
           Calculate Costs
@@ -428,7 +428,7 @@ const CostComparison: React.FC<CostComparisonProps> = ({
   );
 
   return (
-    <section className="box-border w-full max-w-2xl border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
+    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
       <header className="mb-6">
         <h2 className="box-border text-neutral-950 dark:text-white text-base font-semibold leading-4 mb-2">
           Cost Comparison
@@ -446,9 +446,9 @@ const CostComparison: React.FC<CostComparisonProps> = ({
             Select up to 3 models to compare costs
           </p>
         ) : (
-          <div className="relative pt-4 pb-4">
+          <div className="relative pt-4 pb-2">
             {/* Y-axis label */}
-            <div className="absolute -left-2 top-4 bottom-16 flex items-center">
+            <div className="absolute -left-2 top-4 bottom-12 flex items-center">
               <span className="text-xs text-neutral-600 dark:text-neutral-400 -rotate-90 whitespace-nowrap">
                 Cost ($)
               </span>
@@ -459,7 +459,7 @@ const CostComparison: React.FC<CostComparisonProps> = ({
               {/* Y-axis scale */}
               <div
                 className="flex flex-col-reverse justify-between absolute left-10 top-4 text-xs text-neutral-600 dark:text-neutral-400"
-                style={{ height: "240px" }}
+                style={{ height: "400px" }}
               >
                 <span>${0}</span>
                 <span>${(maxCost * 0.25).toFixed(2)}</span>
@@ -469,10 +469,10 @@ const CostComparison: React.FC<CostComparisonProps> = ({
               </div>
 
               {/* Single unified graph with all models */}
-              <div className="ml-12 pb-16">
+              <div className="ml-12 pb-12">
                 <div
                   className="flex items-end justify-around gap-4 border-b-2 border-neutral-300 dark:border-neutral-700"
-                  style={{ height: "240px" }}
+                  style={{ height: "400px" }}
                 >
                   {selectedPricingData.map((model, index) => {
                     const calculated = calculatedCosts[model.modelName];
@@ -500,7 +500,7 @@ const CostComparison: React.FC<CostComparisonProps> = ({
                         (isNaN(outputCost) ? 0 : outputCost);
                     }
 
-                    const barHeight = (totalCost / maxCost) * 220; // 220px max height
+                    const barHeight = (totalCost / maxCost) * 380; // 380px max height
                     const colors = ["#8859FF", "#FF44B4", "#44D7B6"];
 
                     return (
@@ -606,7 +606,7 @@ const CostEstimates: React.FC<CostEstimatesProps> = ({
     });
 
   return (
-    <section className="box-border w-full max-w-2xl border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
+    <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
       <header className="mb-6">
         <h2 className="box-border text-neutral-950 dark:text-white text-base font-semibold leading-4 mb-2">
           Cost Estimates
@@ -1317,14 +1317,14 @@ const Pricing: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-4 mb-4">
                 <CostCalculator
                   pricingData={pricingData}
                   selectedModels={selectedModels}
                   onModelSelectionChange={handleModelSelectionChange}
                   onCalculate={handleCalculate}
                 />
-                <div className="space-y-6">
+                <div className="space-y-3">
                   <CostEstimates
                     pricingData={pricingData}
                     selectedModels={selectedModels}
@@ -1337,7 +1337,7 @@ const Pricing: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-4 mt-3">
                 <PerformanceAnalysis
                   pricingData={pricingData}
                   selectedModels={selectedModels}
