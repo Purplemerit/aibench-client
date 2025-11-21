@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import CategoryFilter from "./CategoryFilter";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
 
@@ -9,32 +8,6 @@ const LeaderboardPreview = () => {
   const { addModel, isSelected, canAddMore } = useCompare();
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const categories = [
-    "All",
-    "Text",
-    "Image",
-    "Audio",
-    "Video",
-    "Reasoning",
-    "Multi-Modal",
-  ];
-
-  const [isDark, setIsDark] = useState(
-    typeof window !== "undefined" && document.body.classList.contains("dark")
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.body.classList.contains("dark"));
-    });
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -145,21 +118,6 @@ const LeaderboardPreview = () => {
     },
   ];
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    console.log("Leaderboard category:", category);
-  };
-
-  const filteredData =
-    selectedCategory === "All"
-      ? leaderboardData
-      : leaderboardData.filter(
-          (item: any) =>
-            item.category.toLowerCase() === selectedCategory.toLowerCase() ||
-            (selectedCategory === "Multi-Modal" &&
-              item.category.toLowerCase().includes("multimodal"))
-        );
-
   if (loading) {
     return (
       <section className="w-full flex flex-col items-center px-20 py-16 max-md:px-10 max-md:py-12 max-sm:px-4 max-sm:py-6 dark:bg-black">
@@ -190,14 +148,6 @@ const LeaderboardPreview = () => {
           Ranked by overall performance scores
         </p>
 
-        <div className="absolute right-6 top-7 max-md:static max-md:mb-6">
-          <CategoryFilter
-            categories={categories}
-            onCategoryChange={handleCategoryChange}
-            isDark={isDark}
-          />
-        </div>
-
         <div className="w-full min-w-[800px]">
           <div className="w-full h-10 flex items-center border-b border-gray-200 dark:border-gray-700 max-md:text-xs">
             <div className="text-sm font-semibold leading-5 text-neutral-950 dark:text-white min-w-[60px] text-center">
@@ -221,7 +171,7 @@ const LeaderboardPreview = () => {
           </div>
 
           <div className="w-full">
-            {filteredData.map((item, index) => (
+            {leaderboardData.map((item, index) => (
               <div
                 key={index}
                 className="flex w-full h-[57px] items-center relative border-b border-gray-200 dark:border-gray-700 max-md:text-xs"

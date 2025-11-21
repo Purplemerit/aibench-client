@@ -416,7 +416,7 @@ const BenchmarksPage = () => {
       <div className="bg-white dark:bg-black w-full max-md:max-w-full">
         <div className="bg-white dark:bg-black w-full max-md:max-w-full">
           <Navigation />
-          <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-10 pb-10 max-md:max-w-full max-md:pb-6">
+          <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-24 pb-10 max-md:max-w-full max-md:pb-6">
             <div className="self-center flex w-full max-w-[1216px] flex-col px-4 max-md:max-w-full">
               <header className="mb-[34px]">
                 <h1 className="text-neutral-950 dark:text-white text-3xl font-semibold leading-[1.2] mb-[29px]">
