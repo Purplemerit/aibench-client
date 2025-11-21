@@ -1,30 +1,372 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { api } from "@/lib/api";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
-// --- ModelSelector ---
+// --- Types ---
+interface AIModel {
+  _id: string;
+  modelName: string;
+  modelType: string;
+  organization: string;
+  overallBenchmarkScore: number;
+  mmluscoe?: number;
+  humanevalScore?: number;
+  gsm8kScore?: number;
+  mathScore?: number;
+}
+
 interface Model {
   id: string;
   name: string;
   selected: boolean;
+  data: AIModel;
 }
 
 interface ModelSelectorProps {
+  models: Model[];
+  onToggleModel: (id: string) => void;
   className?: string;
 }
 
-const ModelSelector: React.FC<ModelSelectorProps> = ({ className = "" }) => {
-  const [models, setModels] = useState<Model[]>([
-    { id: "gpt-4o", name: "GPT-4o", selected: true },
-    { id: "claude-3.5", name: "Claude 3.5 Sonnet", selected: true },
-    { id: "llama-3.1", name: "Llama 3.1 405B", selected: true },
-    { id: "gemini-1.5", name: "Gemini 1.5 Pro", selected: true },
-    { id: "dall-e-3", name: "DALL-E 3", selected: false },
-    { id: "midjourney-v6", name: "Midjourney v6", selected: false },
-    { id: "stable-diffusion", name: "Stable Diffusion XL", selected: false },
-    { id: "whisper-large", name: "Whisper Large v3", selected: false },
-  ]);
+// --- ModelSelector ---
+const ModelSelector: React.FC<ModelSelectorProps> = ({
+  models,
+  onToggleModel,
+  className = "",
+}) => {
+  const selectedCount = models.filter((m) => m.selected).length;
 
+  return (
+    <div className={className}>
+      <label className="text-neutral-950 dark:text-white text-sm font-normal leading-none block mb-3">
+        Models to Compare (Max 4 - {selectedCount}/4 selected)
+      </label>
+      <div className="space-y-[15px] max-h-[400px] overflow-y-auto pr-2">
+        {models.map((model) => {
+          const isDisabled = !model.selected && selectedCount >= 4;
+          return (
+            <div
+              key={model.id}
+              className={`flex items-stretch gap-2 text-sm text-neutral-950 dark:text-white font-normal leading-none ${
+                isDisabled ? "opacity-50" : ""
+              }`}
+            >
+              <button
+                onClick={() => !isDisabled && onToggleModel(model.id)}
+                disabled={isDisabled}
+                className={`flex w-[13px] shrink-0 h-[13px] rounded-[3px] border transition-colors ${
+                  model.selected
+                    ? "bg-[rgba(117,71,207,1)] border-[rgba(117,71,207,1)]"
+                    : "bg-white dark:bg-neutral-800 border-[rgba(118,118,118,1)] border-solid"
+                } ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+                aria-checked={model.selected}
+                role="checkbox"
+                aria-label={`Toggle ${model.name}`}
+              />
+              <span className="flex-1 text-left break-words">{model.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// --- ChartControls ---
+interface ChartControlsProps {
+  selectedBenchmark: string;
+  onBenchmarkChange: (value: string) => void;
+  modelTypes: string[];
+  models: Model[];
+  onToggleModel: (id: string) => void;
+  className?: string;
+}
+
+const ChartControls: React.FC<ChartControlsProps> = ({
+  selectedBenchmark,
+  onBenchmarkChange,
+  modelTypes,
+  models,
+  onToggleModel,
+  className = "",
+}) => {
+  return (
+    <aside
+      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-6 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
+    >
+      <div className="flex items-stretch gap-2 text-base text-neutral-950 dark:text-white font-normal leading-none mb-9">
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+        <h3 className="basis-auto my-auto">Chart Controls</h3>
+      </div>
+      <div className="mb-[30px]">
+        <label
+          htmlFor="benchmark-select"
+          className="text-neutral-950 dark:text-white text-sm font-normal leading-none block mb-3"
+        >
+          Benchmark Type
+        </label>
+        <div className="relative">
+          <select
+            id="benchmark-select"
+            value={selectedBenchmark}
+            onChange={(e) => onBenchmarkChange(e.target.value)}
+            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-800 w-full flex items-stretch gap-5 text-sm text-neutral-950 dark:text-white font-normal leading-none justify-between px-3 py-2.5 rounded-lg appearance-none cursor-pointer border border-gray-300 dark:border-gray-600"
+          >
+            <option value="All">All Models</option>
+            {modelTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+          <svg
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-600 dark:text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+      </div>
+      <ModelSelector models={models} onToggleModel={onToggleModel} />
+    </aside>
+  );
+};
+
+// --- BenchmarkChart ---
+interface BenchmarkChartProps {
+  selectedModels: AIModel[];
+  className?: string;
+}
+
+const BenchmarkChart: React.FC<BenchmarkChartProps> = ({
+  selectedModels,
+  className = "",
+}) => {
+  const chartData = selectedModels.map((model) => ({
+    name: model.modelName,
+    score: model.overallBenchmarkScore || 0,
+    organization: model.organization,
+  }));
+
+  const COLORS = [
+    "rgba(117,71,207,1)",
+    "rgba(43,255,163,1)",
+    "rgba(255,154,12,1)",
+    "rgba(255,177,239,1)",
+  ];
+
+  return (
+    <section
+      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-7 pb-8 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid max-md:max-w-full max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
+    >
+      <header className="mb-6">
+        <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none mb-2">
+          Benchmark Overview
+        </h2>
+        <p className="text-[rgba(113,113,130,1)] text-sm font-normal">
+          Compare overall benchmark scores across selected models
+        </p>
+      </header>
+
+      {selectedModels.length === 0 ? (
+        <div className="flex items-center justify-center h-[400px] text-gray-500 dark:text-gray-400">
+          <div className="text-center">
+            <svg
+              className="w-16 h-16 mx-auto mb-4 opacity-50"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            <p className="text-lg">Select models from the left to compare</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {selectedModels.map((model, index) => (
+              <div
+                key={model._id}
+                className="flex items-center gap-2 bg-[rgba(246,243,255,1)] dark:bg-zinc-800 px-3 py-2 rounded-lg"
+              >
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: COLORS[index] }}
+                />
+                <span className="text-xs font-medium text-neutral-950 dark:text-neutral-100">
+                  {model.modelName}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis
+                dataKey="name"
+                angle={-45}
+                textAnchor="end"
+                height={120}
+                interval={0}
+                tick={{ fill: "currentColor", fontSize: 12 }}
+                className="text-neutral-950 dark:text-white"
+              />
+              <YAxis
+                label={{
+                  value: "Overall Score",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+                tick={{ fill: "currentColor" }}
+                className="text-neutral-950 dark:text-white"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(255, 255, 255, 0.95)",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                }}
+                labelStyle={{ color: "#000" }}
+              />
+              <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {selectedModels.map((model, index) => (
+              <div
+                key={model._id}
+                className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-800"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index] }}
+                  />
+                  <h4 className="text-sm font-semibold text-neutral-950 dark:text-white truncate">
+                    {model.modelName}
+                  </h4>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  {model.organization}
+                </p>
+                <p className="text-2xl font-bold text-[rgba(117,71,207,1)]">
+                  {model.overallBenchmarkScore?.toFixed(1) || "N/A"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Overall Score
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+};
+
+// --- Page Component ---
+const BenchmarksPage = () => {
+  const [allModels, setAllModels] = useState<AIModel[]>([]);
+  const [modelTypes, setModelTypes] = useState<string[]>([]);
+  const [selectedBenchmark, setSelectedBenchmark] = useState("All");
+  const [models, setModels] = useState<Model[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [modelsResponse, typesResponse] = await Promise.all([
+          api.getAllModels({
+            limit: 100,
+            sortBy: "overallBenchmarkScore",
+            order: "desc",
+          }),
+          api.getModelTypes(),
+        ]);
+
+        setAllModels(modelsResponse.data);
+        setModelTypes(typesResponse.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load benchmark data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter and prepare models based on benchmark type
+  const filteredModels = useMemo(() => {
+    if (selectedBenchmark === "All") {
+      return allModels;
+    }
+    return allModels.filter((model) => model.modelType === selectedBenchmark);
+  }, [allModels, selectedBenchmark]);
+
+  // Create Model objects with selection state
+  useEffect(() => {
+    const modelObjects = filteredModels.map((model, index) => ({
+      id: model._id,
+      name: model.modelName,
+      selected: index < 4, // Auto-select first 4
+      data: model,
+    }));
+    setModels(modelObjects);
+  }, [filteredModels]);
+
+  // Toggle model selection
   const toggleModel = (id: string) => {
     setModels((prev) =>
       prev.map((model) =>
@@ -33,231 +375,71 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ className = "" }) => {
     );
   };
 
-  return (
-    <div className={className}>
-      <label className="text-neutral-950 dark:text-white text-sm font-normal leading-none block mb-3">
-        Models to Compare
-      </label>
-      <div className="space-y-[15px]">
-        {models.map((model) => (
-          <div
-            key={model.id}
-            className="flex items-stretch gap-2 text-sm text-neutral-950 dark:text-white font-normal leading-none"
-          >
-            <button
-              onClick={() => toggleModel(model.id)}
-              className={`flex w-[13px] shrink-0 h-[13px] rounded-[3px] border transition-colors ${
-                model.selected
-                  ? "bg-[rgba(117,71,207,1)] border-[rgba(117,71,207,1)]"
-                  : "bg-white border-[rgba(118,118,118,1)] border-solid"
-              }`}
-              aria-checked={model.selected}
-              role="checkbox"
-              aria-label={`Toggle ${model.name}`}
-            />
-            <span className={model.name.includes("Sonnet") ? "basis-auto" : ""}>
-              {model.name}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+  // Get selected models
+  const selectedModels = useMemo(() => {
+    return models.filter((m) => m.selected).map((m) => m.data);
+  }, [models]);
 
-// --- ChartControls ---
-interface ChartControlsProps {
-  className?: string;
-}
-
-const ChartControls: React.FC<ChartControlsProps> = ({ className = "" }) => {
-  const [selectedBenchmark, setSelectedBenchmark] = useState("Overview");
-
-  return (
-    <aside
-      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-[151px] px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid max-md:mt-6 max-md:pb-[100px] max-md:px-4 max-sm:px-2 ${className}`}
-    >
-      <div className="flex items-stretch gap-2 text-base text-neutral-950 dark:text-white font-normal leading-none mb-9">
-        <img
-          src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/bfb143761be4f4e487dcc09076eb425c251c4097?placeholderIfAbsent=true"
-          alt="Chart Controls Icon"
-          className="aspect-[1] object-contain w-5 shrink-0"
-        />
-        <h3 className="basis-auto my-auto">Chart Controls</h3>
-      </div>
-      <div className="mb-[30px]">
-        <label
-          htmlFor="benchmark-select"
-          className="text-neutral-950 dark:text-white text-sm font-normal leading-none block mb-3"
-        >
-          Benchmark
-        </label>
-        <div className="relative">
-          <select
-            id="benchmark-select"
-            value={selectedBenchmark}
-            onChange={(e) => setSelectedBenchmark(e.target.value)}
-            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-900 w-full flex items-stretch gap-5 text-sm text-neutral-950 dark:text-white font-normal whitespace-nowrap leading-none justify-between px-3 py-2.5 rounded-lg appearance-none cursor-pointer"
-          >
-            <option value="Overview">Overview</option>
-            <option value="Language">Language</option>
-            <option value="Vision">Vision</option>
-            <option value="Audio">Audio</option>
-          </select>
-          <img
-            src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/263f7536157f114eeba1c4dd7abd74ae2ad39c00?placeholderIfAbsent=true"
-            alt="Dropdown Arrow"
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 aspect-[1] object-contain w-4 shrink-0 pointer-events-none"
-          />
-        </div>
-      </div>
-      <ModelSelector />
-    </aside>
-  );
-};
-
-// --- BenchmarkChart ---
-interface ChartData {
-  model: string;
-  score: number;
-  color: string;
-  height: number;
-}
-
-interface BenchmarkChartProps {
-  className?: string;
-}
-
-const BenchmarkChart: React.FC<BenchmarkChartProps> = ({ className = "" }) => {
-  const chartData: ChartData[] = [
-    { model: "GPT-4o", score: 95, color: "rgba(143,255,38,1)", height: 359 },
-    {
-      model: "Claude 3.5",
-      score: 87,
-      color: "rgba(43,255,163,1)",
-      height: 292,
-    },
-    {
-      model: "Sonnet Llama",
-      score: 78,
-      color: "rgba(255,154,12,1)",
-      height: 256,
-    },
-    {
-      model: "Llama 3.1 405B",
-      score: 92,
-      color: "rgba(255,177,239,1)",
-      height: 349,
-    },
-  ];
-
-  const selectedModels = [
-    "GPT-4o",
-    "Claude 3.5 Sonnet",
-    "Llama 3.1 405B",
-    "Gemini 1.5 Pro",
-  ];
-
-  return (
-    <section
-      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-7 pb-3 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid max-md:max-w-full max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
-    >
-      <header className="mb-[31px]">
-        <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none mb-[7px]">
-          Benchmark Overview
-        </h2>
-        <p className="text-[rgba(113,113,130,1)] text-base font-normal">
-          Compare models across multiple benchmarks
-        </p>
-      </header>
-      <div className="flex items-stretch gap-2 text-xs text-[rgba(3,2,19,1)] dark:text-neutral-100 font-semibold text-center leading-none mb-[22px]">
-        {selectedModels.map((model) => (
-          <div
-            key={model}
-            className="bg-[rgba(246,243,255,1)] dark:bg-zinc-900 flex flex-col overflow-hidden items-stretch whitespace-nowrap justify-center px-[9px] py-[7px] rounded-lg"
-          >
-            <span>{model}</span>
-          </div>
-        ))}
-      </div>
-      <div className="self-stretch flex flex-wrap ml-6 max-md:ml-0">
-        <div className="w-0.5 shrink-0 h-[378px] border-black border-solid border-2 max-sm:hidden" />
-        <div className="flex w-full flex-col items-center grow shrink-0 basis-0 mt-5 max-md:max-w-full">
-          <div className="w-full overflow-x-auto">
-            <div className="flex gap-5 flex-nowrap w-max min-w-full">
-              {chartData.map((data, index) => (
-                <div
-                  key={data.model}
-                  className="min-w-[90px] max-w-[120px] w-[90px] sm:w-[111px] flex flex-col items-center"
-                  style={{ marginLeft: index === 0 ? "20px" : "0" }}
-                >
-                  <div
-                    className="flex shrink-0 w-full mx-auto rounded-lg"
-                    style={{
-                      backgroundColor: data.color,
-                      height: `${data.height}px`,
-                      marginTop:
-                        index === 0
-                          ? "0px"
-                          : index === 1
-                          ? "67px"
-                          : index === 2
-                          ? "103px"
-                          : "10px",
-                    }}
-                    role="img"
-                    aria-label={`${data.model}: ${data.score}% performance`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="border self-stretch shrink-0 h-px border-black border-solid max-md:max-w-full" />
-          <div className="flex gap-5 flex-nowrap w-max min-w-full text-base text-black dark:text-white font-normal leading-none ml-3 mt-2.5 max-md:ml-0 overflow-x-auto">
-            <span className="min-w-[90px] max-w-[120px] w-[90px] sm:w-[111px] text-center">
-              GPT-4o
-            </span>
-            <span className="min-w-[90px] max-w-[120px] w-[90px] sm:w-[111px] text-center">
-              Claude 3.5
-            </span>
-            <span className="min-w-[90px] max-w-[120px] w-[90px] sm:w-[111px] text-center">
-              Sonnet Llama
-            </span>
-            <span className="min-w-[90px] max-w-[120px] w-[90px] sm:w-[111px] text-center">
-              Llama 3.1 405B
-            </span>
+  if (loading) {
+    return (
+      <div className="bg-[rgba(246,243,255,1)] dark:bg-black min-h-screen">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[rgba(117,71,207,1)] mx-auto mb-4"></div>
+            <p className="text-neutral-950 dark:text-white">
+              Loading benchmark data...
+            </p>
           </div>
         </div>
+        <Footer />
       </div>
-    </section>
-  );
-};
+    );
+  }
 
-// --- Page Component ---
-const BenchmarksPage = () => {
+  if (error) {
+    return (
+      <div className="bg-[rgba(246,243,255,1)] dark:bg-black min-h-screen">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center text-red-600 dark:text-red-400">
+            <p className="text-xl mb-2">⚠️ {error}</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[rgba(246,243,255,1)] dark:bg-black">
       <div className="bg-white dark:bg-black w-full max-md:max-w-full">
         <div className="bg-white dark:bg-black w-full max-md:max-w-full">
           <Navigation />
           <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-10 pb-10 max-md:max-w-full max-md:pb-6">
-            <div className="self-center flex w-full max-w-[1216px] flex-col max-md:max-w-full">
+            <div className="self-center flex w-full max-w-[1216px] flex-col px-4 max-md:max-w-full">
               <header className="mb-[34px]">
                 <h1 className="text-neutral-950 dark:text-white text-3xl font-semibold leading-[1.2] mb-[29px]">
                   AI Model Benchmarks
                 </h1>
                 <p className="text-[rgba(113,113,130,1)] text-base font-normal max-md:max-w-full">
                   Explore and compare AI model performance across various
-                  standardized benchmarks
+                  standardized benchmarks. Select up to 4 models to compare.
                 </p>
               </header>
               <section className="self-stretch max-md:max-w-full">
                 <div className="gap-5 flex max-md:flex-col max-md:items-stretch">
                   <div className="w-[24%] max-lg:w-[35%] max-md:w-full max-md:ml-0">
-                    <ChartControls />
+                    <ChartControls
+                      selectedBenchmark={selectedBenchmark}
+                      onBenchmarkChange={setSelectedBenchmark}
+                      modelTypes={modelTypes}
+                      models={models}
+                      onToggleModel={toggleModel}
+                    />
                   </div>
                   <div className="w-[76%] ml-5 max-lg:w-[65%] max-md:w-full max-md:ml-0">
-                    <BenchmarkChart />
+                    <BenchmarkChart selectedModels={selectedModels} />
                   </div>
                 </div>
               </section>
