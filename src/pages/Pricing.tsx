@@ -44,7 +44,8 @@ interface CostCalculatorProps {
     inputTokens: number,
     outputTokens: number,
     imagesGenerated: number,
-    audioMinutes: number
+    audioMinutes: number,
+    usagePeriod: string
   ) => void;
 }
 
@@ -86,7 +87,8 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({
       parseFloat(inputTokens) || 0,
       parseFloat(outputTokens) || 0,
       parseFloat(imagesGenerated) || 0,
-      parseFloat(audioMinutes) || 0
+      parseFloat(audioMinutes) || 0,
+      usagePeriod
     );
   };
 
@@ -1192,8 +1194,24 @@ const Pricing: React.FC = () => {
     inputTokens: number,
     outputTokens: number,
     imagesGenerated: number,
-    audioMinutes: number
+    audioMinutes: number,
+    usagePeriod: string
   ) => {
+    // Calculate period multiplier
+    let periodMultiplier = 1;
+    switch (usagePeriod) {
+      case "Per Day":
+        periodMultiplier = 30; // Approximate month
+        break;
+      case "Per Week":
+        periodMultiplier = 4; // Approximate month
+        break;
+      case "Per Month":
+      default:
+        periodMultiplier = 1;
+        break;
+    }
+
     const costs: typeof calculatedCosts = {};
 
     selectedModels.forEach((modelName) => {
@@ -1207,15 +1225,25 @@ const Pricing: React.FC = () => {
 
       // Calculate costs based on usage
       // Prices are typically per 1K tokens, so divide by 1000
-      const inputCost = (inputTokens / 1000) * inputPrice;
-      const outputCost = (outputTokens / 1000) * outputPrice;
+      const inputCost = (inputTokens / 1000) * inputPrice * periodMultiplier;
+      const outputCost = (outputTokens / 1000) * outputPrice * periodMultiplier;
 
-      // For image and audio models, you might want to add specific pricing
-      // For now, we'll focus on token-based pricing
-      const totalCost = inputCost + outputCost;
+      // Image generation cost (assuming $0.02 per image for DALL-E style models)
+      // Adjust based on model type if needed
+      const imageCost = model.modelType?.toLowerCase().includes("image")
+        ? imagesGenerated * 0.02 * periodMultiplier
+        : 0;
+
+      // Audio processing cost (assuming $0.006 per minute for audio models)
+      // Adjust based on model type if needed
+      const audioCost = model.modelType?.toLowerCase().includes("audio")
+        ? audioMinutes * 0.006 * periodMultiplier
+        : 0;
+
+      const totalCost = inputCost + outputCost + imageCost + audioCost;
 
       costs[modelName] = {
-        inputCost,
+        inputCost: inputCost + imageCost + audioCost,
         outputCost,
         totalCost,
       };
