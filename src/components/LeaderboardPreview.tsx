@@ -38,22 +38,54 @@ const LeaderboardPreview = () => {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
-        const response = await api.getLeaderboard(5);
+        const response = await api.getLeaderboard(100);
         if (response.success && response.data) {
-          const formattedData = response.data.map(
-            (model: any, index: number) => ({
-              rank: model.globalRankPosition || index + 1,
-              model: model.modelName,
-              category: model.modelType?.toLowerCase() || "text",
-              organization: model.organization,
-              score: model.overallBenchmarkScore || 0,
-              license:
-                model.openSource === "Yes"
-                  ? "Open Source"
-                  : model.license || "API",
-              id: model._id,
-            })
-          );
+          // Sort by rank and remove duplicates based on rank position
+          const uniqueRanks = new Map();
+          response.data
+            .filter((model: any) => model.globalRankPosition)
+            .sort(
+              (a: any, b: any) => a.globalRankPosition - b.globalRankPosition
+            )
+            .forEach((model: any) => {
+              if (!uniqueRanks.has(model.globalRankPosition)) {
+                uniqueRanks.set(model.globalRankPosition, model);
+              }
+            });
+
+          const formattedData = Array.from(uniqueRanks.values())
+            .slice(0, 5)
+            .map((model: any) => {
+              let category = (model.modelType || "text").toLowerCase();
+              // Normalize category names to match filter options
+              // Check for multimodal first (most specific)
+              if (category.includes("multi") || category.includes("modal")) {
+                category = "multimodal";
+              } else if (category.includes("reason")) {
+                category = "reasoning";
+              } else if (category.includes("video")) {
+                category = "video";
+              } else if (category.includes("audio")) {
+                category = "audio";
+              } else if (category.includes("image")) {
+                category = "image";
+              } else {
+                category = "text";
+              }
+
+              return {
+                rank: model.globalRankPosition,
+                model: model.modelName,
+                category: category,
+                organization: model.organization,
+                score: model.overallBenchmarkScore || 0,
+                license:
+                  model.openSource === "Yes"
+                    ? "Open Source"
+                    : model.license || "API",
+                id: model._id,
+              };
+            });
           setLeaderboardData(formattedData);
         }
       } catch (error) {
@@ -211,11 +243,8 @@ const LeaderboardPreview = () => {
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center items-center">
-                  <div className="text-sm font-normal leading-5 text-neutral-950 dark:text-white capitalize">
+                  <div className="text-sm font-normal leading-5 text-neutral-950 dark:text-white">
                     {item.model}
-                  </div>
-                  <div className="text-sm font-normal leading-5 text-[#717182] dark:text-white capitalize">
-                    {item.category}
                   </div>
                 </div>
 
@@ -227,8 +256,20 @@ const LeaderboardPreview = () => {
                   {item.score}
                 </div>
 
-                <div className="min-w-[100px] h-[21px] flex items-center justify-center px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-[#F1EBFF] dark:bg-[#232136]">
-                  <span className="text-xs font-semibold leading-4 text-neutral-950 dark:text-white text-center">
+                <div
+                  className={`min-w-[100px] h-[21px] flex items-center justify-center px-2 py-1 rounded-lg border ${
+                    item.license === "Open Source"
+                      ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                      : "border-gray-300 dark:border-gray-700 bg-[#F1EBFF] dark:bg-[#232136]"
+                  }`}
+                >
+                  <span
+                    className={`text-xs font-semibold leading-4 text-center ${
+                      item.license === "Open Source"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-neutral-950 dark:text-white"
+                    }`}
+                  >
                     {item.license}
                   </span>
                 </div>

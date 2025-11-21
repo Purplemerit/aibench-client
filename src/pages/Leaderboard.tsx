@@ -96,6 +96,8 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedLicense, setSelectedLicense] = useState("all");
+  const [selectedYear, setSelectedYear] = useState("all");
   const [compareBucket, setCompareBucket] = useState<any[]>([]);
 
   useEffect(() => {
@@ -103,15 +105,28 @@ export default function Leaderboard() {
       try {
         setLoading(true);
         const response = await api.getAllModels({
-          limit: 50,
+          limit: 100,
           sortBy: "globalRankPosition",
           order: "asc",
         });
 
         if (response.success && response.data) {
-          const formattedData = response.data.map(
-            (model: any, index: number) => ({
-              rank: model.globalRankPosition || index + 1,
+          // Remove duplicates based on rank position
+          const uniqueRanks = new Map();
+          response.data
+            .filter((model: any) => model.globalRankPosition)
+            .sort(
+              (a: any, b: any) => a.globalRankPosition - b.globalRankPosition
+            )
+            .forEach((model: any) => {
+              if (!uniqueRanks.has(model.globalRankPosition)) {
+                uniqueRanks.set(model.globalRankPosition, model);
+              }
+            });
+
+          const formattedData = Array.from(uniqueRanks.values()).map(
+            (model: any) => ({
+              rank: model.globalRankPosition,
               model: model.modelName,
               type: model.modelType?.toLowerCase() || "text",
               organization: model.organization,
@@ -152,19 +167,33 @@ export default function Leaderboard() {
     setCompareBucket(compareBucket.filter((m) => m.rank !== rank));
   };
 
-  // Filter models based on search and category
+  // Filter models based on search, category, license, and year
   const filteredModels = modelData.filter((model) => {
     const matchesSearch =
+      searchQuery === "" ||
       model.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
       model.organization.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "All" ||
-      model.type.toLowerCase() === selectedCategory.toLowerCase() ||
+      model.type.toLowerCase().includes(selectedCategory.toLowerCase()) ||
       (selectedCategory === "Multi-Modal" &&
         model.type.toLowerCase().includes("multimodal"));
 
-    return matchesSearch && matchesCategory;
+    const matchesLicense =
+      selectedLicense === "all" ||
+      (selectedLicense === "api" &&
+        (model.license === "API" || model.license.includes("Proprietary"))) ||
+      (selectedLicense === "open" && model.license === "Open Source") ||
+      (selectedLicense === "apache" && model.license.includes("Apache")) ||
+      (selectedLicense === "mit" && model.license.includes("MIT")) ||
+      (selectedLicense === "commercial" && model.license === "Commercial");
+
+    const matchesYear =
+      selectedYear === "all" ||
+      (model.released && model.released.includes(selectedYear));
+
+    return matchesSearch && matchesCategory && matchesLicense && matchesYear;
   });
 
   if (loading) {
@@ -243,14 +272,19 @@ export default function Leaderboard() {
                 <label className="block text-sm text-neutral-950 dark:text-white mb-2">
                   License
                 </label>
-                <Select>
+                <Select
+                  value={selectedLicense}
+                  onValueChange={setSelectedLicense}
+                >
                   <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9">
                     <SelectValue placeholder="All Licenses" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Licenses</SelectItem>
-                    <SelectItem value="api">API</SelectItem>
+                    <SelectItem value="api">API / Proprietary</SelectItem>
                     <SelectItem value="open">Open Source</SelectItem>
+                    <SelectItem value="apache">Apache 2.0</SelectItem>
+                    <SelectItem value="mit">MIT</SelectItem>
                     <SelectItem value="commercial">Commercial</SelectItem>
                   </SelectContent>
                 </Select>
@@ -260,14 +294,17 @@ export default function Leaderboard() {
                 <label className="block text-sm text-neutral-950 dark:text-white mb-2">
                   Release Year
                 </label>
-                <Select>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9">
                     <SelectValue placeholder="All Years" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Years</SelectItem>
+                    <SelectItem value="2025">2025</SelectItem>
                     <SelectItem value="2024">2024</SelectItem>
                     <SelectItem value="2023">2023</SelectItem>
+                    <SelectItem value="2022">2022</SelectItem>
+                    <SelectItem value="2020">2020</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -412,11 +449,8 @@ export default function Leaderboard() {
                             </div>
                           </td>
                           <td className="min-w-[160px] pl-8 py-3">
-                            <div className="text-sm font-normal leading-5 text-neutral-950 dark:text-white capitalize">
+                            <div className="text-sm font-normal leading-5 text-neutral-950 dark:text-white">
                               {model.model}
-                            </div>
-                            <div className="text-sm font-normal leading-5 text-[#717182] dark:text-gray-400 capitalize">
-                              {model.type}
                             </div>
                           </td>
                           <td className="min-w-[120px] text-sm font-normal leading-5 text-neutral-950 dark:text-white pl-4 py-3">
@@ -435,10 +469,24 @@ export default function Leaderboard() {
                               </div>
                             )}
                           </td>
-                          <td className="min-w-[100px] h-[21px] flex items-center justify-center ml-3 px-2 py-3 rounded-lg border border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800">
-                            <span className="text-xs font-semibold leading-4 text-neutral-950 dark:text-white text-center">
-                              {model.license}
-                            </span>
+                          <td className="min-w-[100px] py-3 pl-3">
+                            <div
+                              className={`h-[21px] flex items-center justify-center px-2 py-1 rounded-lg border ${
+                                model.license === "Open Source"
+                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                  : "border-[rgba(0,0,0,0.10)] dark:border-neutral-800 bg-[#F1EBFF] dark:bg-[#232136]"
+                              }`}
+                            >
+                              <span
+                                className={`text-xs font-semibold leading-4 text-center ${
+                                  model.license === "Open Source"
+                                    ? "text-green-600 dark:text-green-400"
+                                    : "text-neutral-950 dark:text-white"
+                                }`}
+                              >
+                                {model.license}
+                              </span>
+                            </div>
                           </td>
                           <td className="min-w-[100px] text-sm font-normal leading-5 text-neutral-950 dark:text-white py-3 pl-8">
                             {model.released}
