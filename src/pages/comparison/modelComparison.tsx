@@ -104,18 +104,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
             </div>
           )}
           {isOpenSource && (
-            <div className="inline-flex min-w-[60px] flex-row justify-center items-center text-[#030213] dark:text-green-200 text-center text-xs font-semibold leading-5 h-[20px] gap-1 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-md border border-green-200 dark:border-green-700 shadow-sm">
-              <div className="flex items-center gap-1">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      '<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="open-source-icon" style="box-sizing: border-box; width: 16px; height: 16px"> <path d="M4.63965 1.99998V9.99998" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.6396 5.99998C13.7442 5.99998 14.6396 5.10455 14.6396 3.99998C14.6396 2.89542 13.7442 1.99998 12.6396 1.99998C11.5351 1.99998 10.6396 2.89542 10.6396 3.99998C10.6396 5.10455 11.5351 5.99998 12.6396 5.99998Z" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4.63965 14C5.74422 14 6.63965 13.1046 6.63965 12C6.63965 10.8954 5.74422 9.99998 4.63965 9.99998C3.53508 9.99998 2.63965 10.8954 2.63965 12C2.63965 13.1046 3.53508 14 4.63965 14Z" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.6396 5.99998C12.6396 7.59128 12.0075 9.11741 10.8823 10.2426C9.75707 11.3678 8.23095 12 6.63965 12" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> </svg>',
-                  }}
-                />
-                <span className="text-[#030213] dark:text-green-200 text-center text-sm font-semibold leading-5">
-                  Open Source
-                </span>
-              </div>
+            <div className="inline-flex flex-row justify-center items-center text-[#030213] dark:text-green-200 text-center text-xs font-semibold h-[20px] gap-1 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-md border border-green-200 dark:border-green-700 shadow-sm whitespace-nowrap">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html:
+                    '<svg width="12" height="12" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="open-source-icon flex-shrink-0" style="box-sizing: border-box; width: 12px; height: 12px"> <path d="M4.63965 1.99998V9.99998" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.6396 5.99998C13.7442 5.99998 14.6396 5.10455 14.6396 3.99998C14.6396 2.89542 13.7442 1.99998 12.6396 1.99998C11.5351 1.99998 10.6396 2.89542 10.6396 3.99998C10.6396 5.10455 11.5351 5.99998 12.6396 5.99998Z" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4.63965 14C5.74422 14 6.63965 13.1046 6.63965 12C6.63965 10.8954 5.74422 9.99998 4.63965 9.99998C3.53508 9.99998 2.63965 10.8954 2.63965 12C2.63965 13.1046 3.53508 14 4.63965 14Z" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.6396 5.99998C12.6396 7.59128 12.0075 9.11741 10.8823 10.2426C9.75707 11.3678 8.23095 12 6.63965 12" stroke="#016630" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"></path> </svg>',
+                }}
+              />
+              <span className="text-[#016630] dark:text-green-200 text-xs font-semibold leading-4">
+                Open Source
+              </span>
             </div>
           )}
         </div>
