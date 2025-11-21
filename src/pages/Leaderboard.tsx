@@ -11,103 +11,11 @@ import {
 } from "@/components/ui/select";
 import { Search, ExternalLink, Zap, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import React, { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
-
-const modelData = [
-  {
-    rank: 1,
-    model: "o1-preview",
-    type: "reasoning",
-    organization: "OpenAI",
-    score: 92.5,
-    cost: "$15/1M",
-    license: "API",
-    released: "12/9/2024",
-  },
-  {
-    rank: 2,
-    model: "GPT-4o",
-    type: "multimodal",
-    organization: "OpenAI",
-    score: 91.7,
-    cost: "$2.5/1M",
-    license: "API",
-    released: "13/5/2024",
-  },
-  {
-    rank: 3,
-    model: "Claude 3.5 Sonnet",
-    type: "multimodal",
-    organization: "Anthropic",
-    score: 91.5,
-    cost: "$3/1M",
-    license: "API",
-    released: "20/6/2024",
-  },
-  {
-    rank: 4,
-    model: "Llama 3.1 405B",
-    type: "text",
-    organization: "Meta",
-    score: 91.0,
-    cost: "Free",
-    license: "Open Source",
-    released: "23/7/2024",
-  },
-  {
-    rank: 5,
-    model: "Midjourney v6",
-    type: "image",
-    organization: "Midjourney",
-    score: 90.1,
-    cost: "$10/1M",
-    license: "Commercial",
-    released: "21/12/2023",
-  },
-  {
-    rank: 6,
-    model: "Whisper Large v3",
-    type: "audio",
-    organization: "OpenAI",
-    score: 89.5,
-    cost: "Free",
-    license: "Open Source",
-    released: "6/11/2023",
-  },
-  {
-    rank: 7,
-    model: "DALL-E 3",
-    type: "image",
-    organization: "OpenAI",
-    score: 88.0,
-    cost: "$40/1M",
-    license: "API",
-    released: "2/10/2023",
-  },
-  {
-    rank: 8,
-    model: "Gemini 1.5 Pro",
-    type: "multimodal",
-    organization: "Google",
-    score: 87.7,
-    cost: "$1.25/1M",
-    license: "API",
-    released: "15/2/2024",
-  },
-  {
-    rank: 9,
-    model: "Stable Diffusion XL",
-    type: "image",
-    organization: "Stability AI",
-    score: 85.0,
-    cost: "Free",
-    license: "Open Source",
-    released: "26/7/2023",
-  },
-];
+import { api } from "@/lib/api";
 
 const categories = [
   "All",
@@ -182,16 +90,55 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-import React, { useState } from "react";
-
 export default function Leaderboard() {
   const navigate = useNavigate();
-  // State for compare bucket (max 3)
-  type ModelType = (typeof modelData)[number];
-  const [compareBucket, setCompareBucket] = useState<ModelType[]>([]);
+  const [modelData, setModelData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [compareBucket, setCompareBucket] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getAllModels({
+          limit: 50,
+          sortBy: "globalRankPosition",
+          order: "asc",
+        });
+
+        if (response.success && response.data) {
+          const formattedData = response.data.map(
+            (model: any, index: number) => ({
+              rank: model.globalRankPosition || index + 1,
+              model: model.modelName,
+              type: model.modelType?.toLowerCase() || "text",
+              organization: model.organization,
+              score: model.overallBenchmarkScore || 0,
+              cost: model.inputPrice || "Free",
+              license:
+                model.openSource === "Yes"
+                  ? "Open Source"
+                  : model.license || "API",
+              released: model.releaseDate || "N/A",
+              id: model._id,
+            })
+          );
+          setModelData(formattedData);
+        }
+      } catch (error) {
+        console.error("Error fetching models:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, []);
 
   // Add/remove model to/from compare bucket
-  const handleCompareClick = (model: ModelType) => {
+  const handleCompareClick = (model: any) => {
     const isSelected = compareBucket.some((m) => m.rank === model.rank);
     if (isSelected) {
       setCompareBucket(compareBucket.filter((m) => m.rank !== model.rank));
@@ -204,6 +151,32 @@ export default function Leaderboard() {
   const handleRemoveModel = (rank: number) => {
     setCompareBucket(compareBucket.filter((m) => m.rank !== rank));
   };
+
+  // Filter models based on search and category
+  const filteredModels = modelData.filter((model) => {
+    const matchesSearch =
+      model.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      model.organization.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      model.type.toLowerCase() === selectedCategory.toLowerCase() ||
+      (selectedCategory === "Multi-Modal" &&
+        model.type.toLowerCase().includes("multimodal"));
+
+    return matchesSearch && matchesCategory;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <Navigation />
+        <p className="text-neutral-950 dark:text-white">
+          Loading leaderboard...
+        </p>
+      </div>
+    );
+  }
 
   // Clear all
   const handleClearAll = () => setCompareBucket([]);
@@ -241,6 +214,8 @@ export default function Leaderboard() {
               <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
               <Input
                 placeholder="Search models or organizations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-12 bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg"
               />
             </div>
@@ -250,8 +225,9 @@ export default function Leaderboard() {
               {categories.map((category, index) => (
                 <button
                   key={category}
+                  onClick={() => setSelectedCategory(category)}
                   className={`px-4 h-8 text-xs font-semibold rounded-lg border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 transition-all duration-200 ${
-                    index === 0
+                    selectedCategory === category
                       ? "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] text-white"
                       : "bg-[#F1EBFF] dark:bg-[#23232b] text-[#030213] dark:text-white"
                   }`}
@@ -302,7 +278,7 @@ export default function Leaderboard() {
           <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 overflow-hidden max-md:p-4 max-sm:p-2">
             <div className="pb-0">
               <h3 className="text-base font-semibold text-neutral-950 dark:text-white mb-1">
-                Results (9 models)
+                Results ({filteredModels.length} models)
               </h3>
               <p className="text-base font-normal leading-6 text-[#717182] dark:text-gray-400 mb-6">
                 Click column headers to sort
@@ -341,10 +317,11 @@ export default function Leaderboard() {
                 </thead>
                 <tbody>
                   {(() => {
-                    const firstSelectedIndex = modelData.findIndex((model) =>
-                      compareBucket.some((m) => m.rank === model.rank)
+                    const firstSelectedIndex = filteredModels.findIndex(
+                      (model) =>
+                        compareBucket.some((m) => m.rank === model.rank)
                     );
-                    return modelData.map((model, index) => (
+                    return filteredModels.map((model, index) => (
                       <React.Fragment key={model.rank}>
                         {/* Insert compare bucket row only once, before the first selected model */}
                         {compareBucket.length > 0 &&
@@ -398,7 +375,9 @@ export default function Leaderboard() {
                                       // Use React Router navigation for SPA routing
                                       onClick={() => {
                                         if (compareBucket.length > 0) {
-                                          navigate("/comparison/modelComparison");
+                                          navigate(
+                                            "/comparison/modelComparison"
+                                          );
                                         }
                                       }}
                                     >
@@ -456,7 +435,7 @@ export default function Leaderboard() {
                               </div>
                             )}
                           </td>
-                          <td className="min-w-[100px] h-[21px] border flex items-center justify-center ml-3 px-2 py-1 rounded-lg border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 py-3">
+                          <td className="min-w-[100px] h-[21px] flex items-center justify-center ml-3 px-2 py-3 rounded-lg border border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800">
                             <span className="text-xs font-semibold leading-4 text-neutral-950 dark:text-white text-center">
                               {model.license}
                             </span>

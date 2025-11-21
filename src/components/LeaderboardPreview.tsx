@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CategoryFilter from "./CategoryFilter";
+import { api } from "@/lib/api";
 
 const LeaderboardPreview = () => {
   const navigate = useNavigate();
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
   const categories = [
     "All",
     "Text",
@@ -29,7 +34,41 @@ const LeaderboardPreview = () => {
     return () => observer.disconnect();
   }, []);
 
-  const leaderboardData = [
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getLeaderboard(5);
+        if (response.success && response.data) {
+          const formattedData = response.data.map(
+            (model: any, index: number) => ({
+              rank: model.globalRankPosition || index + 1,
+              model: model.modelName,
+              category: model.modelType?.toLowerCase() || "text",
+              organization: model.organization,
+              score: model.overallBenchmarkScore || 0,
+              license:
+                model.openSource === "Yes"
+                  ? "Open Source"
+                  : model.license || "API",
+              id: model._id,
+            })
+          );
+          setLeaderboardData(formattedData);
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+        // Fallback to default data
+        setLeaderboardData(getDefaultData());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, []);
+
+  const getDefaultData = () => [
     {
       rank: 1,
       model: "o1-preview",
@@ -73,8 +112,30 @@ const LeaderboardPreview = () => {
   ];
 
   const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
     console.log("Leaderboard category:", category);
   };
+
+  const filteredData =
+    selectedCategory === "All"
+      ? leaderboardData
+      : leaderboardData.filter(
+          (item: any) =>
+            item.category.toLowerCase() === selectedCategory.toLowerCase() ||
+            (selectedCategory === "Multi-Modal" &&
+              item.category.toLowerCase().includes("multimodal"))
+        );
+
+  if (loading) {
+    return (
+      <section className="w-full flex flex-col items-center px-20 py-16 max-md:px-10 max-md:py-12 max-sm:px-4 max-sm:py-6 dark:bg-black">
+        <h2 className="text-3xl font-semibold leading-9 text-neutral-950 dark:text-white text-center mb-4">
+          Leaderboard Preview
+        </h2>
+        <p className="text-center text-[#717182] dark:text-white">Loading...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full flex flex-col items-center px-20 py-16 max-md:px-10 max-md:py-12 max-sm:px-4 max-sm:py-6 dark:bg-black">
@@ -126,7 +187,7 @@ const LeaderboardPreview = () => {
           </div>
 
           <div className="w-full">
-            {leaderboardData.map((item, index) => (
+            {filteredData.map((item, index) => (
               <div
                 key={index}
                 className="flex w-full h-[57px] items-center relative border-b border-gray-200 dark:border-gray-700 max-md:text-xs"
@@ -166,7 +227,7 @@ const LeaderboardPreview = () => {
                   {item.score}
                 </div>
 
-                <div className="min-w-[100px] h-[21px] border flex items-center justify-center px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-[#F1EBFF] dark:bg-[#232136]">
+                <div className="min-w-[100px] h-[21px] flex items-center justify-center px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-[#F1EBFF] dark:bg-[#232136]">
                   <span className="text-xs font-semibold leading-4 text-neutral-950 dark:text-white text-center">
                     {item.license}
                   </span>
