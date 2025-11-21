@@ -16,40 +16,121 @@ import api from "@/lib/api";
 interface PricingModel {
   modelName: string;
   organization: string;
-  inputPrice?: number;
-  outputPrice?: number;
+  inputPrice?: number | string;
+  outputPrice?: number | string;
   modelType: string;
   openSource?: boolean;
+  license?: string;
+}
+
+interface DetailedModel {
+  _id: string;
+  modelName: string;
+  organization: string;
+  inputPrice?: number | string;
+  outputPrice?: number | string;
+  modelType: string;
+  overallBenchmarkScore?: number;
+  openSource?: string;
   license?: string;
 }
 
 // CostCalculator component
 interface CostCalculatorProps {
   pricingData: PricingModel[];
+  selectedModels: string[];
+  onModelSelectionChange: (models: string[]) => void;
+  onCalculate: (
+    inputTokens: number,
+    outputTokens: number,
+    imagesGenerated: number,
+    audioMinutes: number
+  ) => void;
 }
 
-const CostCalculator: React.FC<CostCalculatorProps> = ({ pricingData }) => {
+const CostCalculator: React.FC<CostCalculatorProps> = ({
+  pricingData,
+  selectedModels,
+  onModelSelectionChange,
+  onCalculate,
+}) => {
   const [usagePeriod, setUsagePeriod] = useState("Per Month");
   const [inputTokens, setInputTokens] = useState("10000");
   const [outputTokens, setOutputTokens] = useState("2000");
   const [imagesGenerated, setImagesGenerated] = useState("50");
   const [audioMinutes, setAudioMinutes] = useState("60");
-  const [selectedModels, setSelectedModels] = useState<Record<string, boolean>>(
-    {}
+  const [searchFilter, setSearchFilter] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "organization" | "cost">(
+    "name"
   );
 
-  // Update selectedModels when pricingData changes
-  useEffect(() => {
-    const newSelectedModels = pricingData.reduce((acc, model) => {
-      acc[model.modelName] = false;
-      return acc;
-    }, {} as Record<string, boolean>);
-    setSelectedModels(newSelectedModels);
-  }, [pricingData]);
-
-  const handleModelChange = (model: string, checked: boolean) => {
-    setSelectedModels((prev) => ({ ...prev, [model]: checked }));
+  const handleModelChange = (modelName: string, checked: boolean) => {
+    if (checked) {
+      // Limit to 3 selections
+      if (selectedModels.length < 3) {
+        onModelSelectionChange([...selectedModels, modelName]);
+      }
+    } else {
+      onModelSelectionChange(selectedModels.filter((m) => m !== modelName));
+    }
   };
+
+  const handleClearFilter = () => {
+    setSearchFilter("");
+    setSortBy("name");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onCalculate(
+      parseFloat(inputTokens) || 0,
+      parseFloat(outputTokens) || 0,
+      parseFloat(imagesGenerated) || 0,
+      parseFloat(audioMinutes) || 0
+    );
+  };
+
+  // Get models with pricing data (0 is valid for free models)
+  const availableModels = pricingData
+    .filter(
+      (model) =>
+        (model.inputPrice !== null && model.inputPrice !== undefined) ||
+        (model.outputPrice !== null && model.outputPrice !== undefined)
+    )
+    .filter((model) => {
+      if (!searchFilter) return true;
+      const search = searchFilter.toLowerCase();
+      return (
+        model.modelName.toLowerCase().includes(search) ||
+        model.organization.toLowerCase().includes(search)
+      );
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.modelName.localeCompare(b.modelName);
+        case "organization":
+          return a.organization.localeCompare(b.organization);
+        case "cost": {
+          const costA =
+            (typeof a.inputPrice === "number" ? a.inputPrice : 0) +
+            (typeof a.outputPrice === "number" ? a.outputPrice : 0);
+          const costB =
+            (typeof b.inputPrice === "number" ? b.inputPrice : 0) +
+            (typeof b.outputPrice === "number" ? b.outputPrice : 0);
+          return costA - costB;
+        }
+        default:
+          return 0;
+      }
+    });
+
+  console.log("CostCalculator - Total pricing data:", pricingData.length);
+  console.log("CostCalculator - Available models:", availableModels.length);
+  console.log(
+    "CostCalculator - Sample available:",
+    availableModels.slice(0, 2)
+  );
 
   return (
     <aside className="box-border w-full max-w-md border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-md:w-full max-md:mb-6 max-sm:p-4">
@@ -213,32 +294,144 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ pricingData }) => {
         </div>
         <div>
           <label className="box-border text-neutral-950 dark:text-white text-sm font-semibold leading-[14px] block mb-2">
-            Models to Compare
+            Models to Compare (Select up to 3)
           </label>
-          <div className="box-border flex flex-col gap-2 mt-2">
-            {Object.entries(selectedModels).map(([model, checked]) => (
-              <div key={model} className="box-border flex items-center gap-2">
-                <Checkbox
-                  checked={checked}
-                  onCheckedChange={(isChecked) =>
-                    handleModelChange(model, !!isChecked)
-                  }
-                  className="w-[13px] h-[13px] rounded-[2.5px] border border-gray-300"
-                />
-                <label className="box-border text-neutral-950 dark:text-white text-sm font-normal leading-5">
-                  {model}
-                </label>
-              </div>
-            ))}
+          {selectedModels.length >= 3 && (
+            <p className="box-border text-orange-600 dark:text-orange-400 text-xs font-normal leading-4 mb-2">
+              Maximum 3 models can be selected
+            </p>
+          )}
+
+          {/* Filter and Sort Controls */}
+          <div className="space-y-2 mb-3">
+            <Input
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              placeholder="Search models or organizations..."
+              className="box-border w-full h-9 flex items-center bg-[#F6F3FF] dark:bg-zinc-900 px-3 py-2 rounded-lg text-sm"
+            />
+            <div className="flex gap-2">
+              <Select
+                value={sortBy}
+                onValueChange={(value: "name" | "organization" | "cost") =>
+                  setSortBy(value)
+                }
+              >
+                <SelectTrigger className="box-border flex-1 h-9 flex items-center justify-between bg-[#F6F3FF] dark:bg-zinc-900 px-3 py-2 rounded-lg text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Sort by Name</SelectItem>
+                  <SelectItem value="organization">
+                    Sort by Organization
+                  </SelectItem>
+                  <SelectItem value="cost">Sort by Cost</SelectItem>
+                </SelectContent>
+              </Select>
+              <button
+                onClick={handleClearFilter}
+                className="px-3 py-1 text-xs bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white rounded-lg hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <div className="box-border flex flex-col gap-2 mt-2 max-h-64 overflow-y-auto pr-2">
+            {availableModels.length === 0 ? (
+              <p className="text-neutral-950 dark:text-white text-sm">
+                No pricing data available
+              </p>
+            ) : (
+              availableModels.map((model) => (
+                <div
+                  key={model.modelName}
+                  className="box-border flex items-center gap-2"
+                >
+                  <Checkbox
+                    checked={selectedModels.includes(model.modelName)}
+                    onCheckedChange={(isChecked) =>
+                      handleModelChange(model.modelName, !!isChecked)
+                    }
+                    disabled={
+                      !selectedModels.includes(model.modelName) &&
+                      selectedModels.length >= 3
+                    }
+                    className="w-[13px] h-[13px] rounded-[2.5px] border border-gray-300"
+                  />
+                  <label className="box-border text-neutral-950 dark:text-white text-sm font-normal leading-5">
+                    {model.modelName}
+                  </label>
+                </div>
+              ))
+            )}
           </div>
         </div>
+        <button
+          onClick={handleSubmit}
+          type="submit"
+          className="w-full mt-6 px-4 py-3 bg-[#4B00A8] text-white font-semibold rounded-lg hover:bg-[#3a0082] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={selectedModels.length === 0}
+        >
+          Calculate Costs
+        </button>
       </form>
     </aside>
   );
 };
 
 // CostComparison component
-const CostComparison: React.FC = () => {
+interface CostComparisonProps {
+  pricingData: PricingModel[];
+  selectedModels: string[];
+  calculatedCosts: {
+    [modelName: string]: {
+      inputCost: number;
+      outputCost: number;
+      totalCost: number;
+    };
+  };
+}
+
+const CostComparison: React.FC<CostComparisonProps> = ({
+  pricingData,
+  selectedModels,
+  calculatedCosts,
+}) => {
+  // Filter to get data for selected models
+  const selectedPricingData = pricingData.filter((model) =>
+    selectedModels.includes(model.modelName)
+  );
+
+  // Calculate max cost for scaling
+  const maxCost = Math.max(
+    ...selectedPricingData.map((model) => {
+      const calculated = calculatedCosts[model.modelName];
+
+      if (calculated) {
+        // Use calculated total cost
+        return calculated.totalCost;
+      } else {
+        // Use base pricing
+        const input =
+          typeof model.inputPrice === "number"
+            ? model.inputPrice
+            : model.inputPrice
+            ? parseFloat(String(model.inputPrice))
+            : 0;
+        const output =
+          typeof model.outputPrice === "number"
+            ? model.outputPrice
+            : model.outputPrice
+            ? parseFloat(String(model.outputPrice))
+            : 0;
+        return (isNaN(input) ? 0 : input) + (isNaN(output) ? 0 : output);
+      }
+    }),
+    1
+  );
+
   return (
     <section className="box-border w-full max-w-2xl border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
       <header className="mb-6">
@@ -246,143 +439,122 @@ const CostComparison: React.FC = () => {
           Cost Comparison
         </h2>
         <p className="box-border text-[#717182] text-base font-normal leading-6">
-          Visual comparison of estimated costs
+          {Object.keys(calculatedCosts).length > 0
+            ? "Total cost comparison for your usage"
+            : "Base pricing comparison per 1K tokens"}
+          Visual comparison of estimated costs (per 1M tokens)
         </p>
       </header>
       <div className="mt-6">
-        <svg
-          width="100%"
-          height="256"
-          viewBox="0 0 752 283"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-64"
-        >
-          <path
-            d="M65.6699 171.67H746.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M65.6699 130.17H746.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M65.6699 88.67H746.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M65.6699 47.17H746.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M65.6699 5.66998H746.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M179.17 5.66998V171.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M406.17 5.66998V171.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M633.17 5.66998V171.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M65.6699 5.66998V171.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path
-            d="M746.67 5.66998V171.67"
-            stroke="#CCCCCC"
-            strokeDasharray="3 3"
-          />
-          <path d="M65.6699 171.67H746.67" stroke="#666666" />
-          <path d="M179.17 177.67V171.67" stroke="#666666" />
-          <text
-            transform="translate(97.5137 250.748) rotate(-45)"
-            fill="#666666"
-            fontSize="16"
-            fontFamily="Inter"
-          >
-            <tspan x="0.890625" y="15.3182">
-              Gemini 1.5 Pro
-            </tspan>
-          </text>
-          <path d="M406.171 177.67V171.67" stroke="#666666" />
-          <text
-            transform="translate(359.162 216.1) rotate(-45)"
-            fill="#666666"
-            fontSize="16"
-            fontFamily="Inter"
-          >
-            <tspan x="0.703125" y="15.3182">
-              GPT-4o
-            </tspan>
-          </text>
-          <path d="M633.171 177.67V171.67" stroke="#666666" />
-          <text
-            transform="translate(528.887 273.376) rotate(-45)"
-            fill="#666666"
-            fontSize="16"
-            fontFamily="Inter"
-          >
-            <tspan x="0.671875" y="15.3182">
-              Claude 3.5 Sonnet
-            </tspan>
-          </text>
-          <path d="M65.6699 5.66998V171.67" stroke="#666666" />
-          <path d="M59.6699 171.67H65.6699" stroke="#666666" />
-          <text fill="#666666" fontSize="16" fontFamily="Inter">
-            <tspan x="47.6699" y="175.248">
-              0
-            </tspan>
-          </text>
-          <path d="M59.6699 130.17H65.6699" stroke="#666666" />
-          <text fill="#666666" fontSize="16" fontFamily="Inter">
-            <tspan x="16.9043" y="133.748">
-              0.015
-            </tspan>
-          </text>
-          <path d="M59.6699 88.67H65.6699" stroke="#666666" />
-          <text fill="#666666" fontSize="16" fontFamily="Inter">
-            <tspan x="23.8887" y="92.2482">
-              0.03
-            </tspan>
-          </text>
-          <path d="M59.6699 47.17H65.6699" stroke="#666666" />
-          <text fill="#666666" fontSize="16" fontFamily="Inter">
-            <tspan x="14.0762" y="50.7482">
-              0.045
-            </tspan>
-          </text>
-          <path d="M59.6699 5.66998H65.6699" stroke="#666666" />
-          <text fill="#666666" fontSize="16" fontFamily="Inter">
-            <tspan x="24.0918" y="16.2482">
-              0.06
-            </tspan>
-          </text>
-          <path
-            d="M88.3701 109.42H269.37V171.67H88.3701V109.42Z"
-            fill="#C4B1FF"
-          />
-          <path d="M315.37 47.17H496.37V171.67H315.37V47.17Z" fill="#C4B1FF" />
-          <path
-            d="M542.37 5.66998H723.37V171.67H542.37V5.66998Z"
-            fill="#C4B1FF"
-          />
-        </svg>
+        {selectedPricingData.length === 0 ? (
+          <p className="text-neutral-950 dark:text-white text-center py-12">
+            Select up to 3 models to compare costs
+          </p>
+        ) : (
+          <div className="relative pt-4 pb-4">
+            {/* Y-axis label */}
+            <div className="absolute -left-2 top-4 bottom-16 flex items-center">
+              <span className="text-xs text-neutral-600 dark:text-neutral-400 -rotate-90 whitespace-nowrap">
+                Cost ($)
+              </span>
+            </div>
+
+            {/* Chart area */}
+            <div className="ml-10 mr-4">
+              {/* Y-axis scale */}
+              <div
+                className="flex flex-col-reverse justify-between absolute left-10 top-4 text-xs text-neutral-600 dark:text-neutral-400"
+                style={{ height: "240px" }}
+              >
+                <span>${0}</span>
+                <span>${(maxCost * 0.25).toFixed(2)}</span>
+                <span>${(maxCost * 0.5).toFixed(2)}</span>
+                <span>${(maxCost * 0.75).toFixed(2)}</span>
+                <span>${maxCost.toFixed(2)}</span>
+              </div>
+
+              {/* Single unified graph with all models */}
+              <div className="ml-12 pb-16">
+                <div
+                  className="flex items-end justify-around gap-4 border-b-2 border-neutral-300 dark:border-neutral-700"
+                  style={{ height: "240px" }}
+                >
+                  {selectedPricingData.map((model, index) => {
+                    const calculated = calculatedCosts[model.modelName];
+
+                    let totalCost: number;
+                    if (calculated) {
+                      // Use calculated total cost
+                      totalCost = calculated.totalCost;
+                    } else {
+                      // Use base pricing
+                      const inputCost =
+                        typeof model.inputPrice === "number"
+                          ? model.inputPrice
+                          : model.inputPrice
+                          ? parseFloat(String(model.inputPrice))
+                          : 0;
+                      const outputCost =
+                        typeof model.outputPrice === "number"
+                          ? model.outputPrice
+                          : model.outputPrice
+                          ? parseFloat(String(model.outputPrice))
+                          : 0;
+                      totalCost =
+                        (isNaN(inputCost) ? 0 : inputCost) +
+                        (isNaN(outputCost) ? 0 : outputCost);
+                    }
+
+                    const barHeight = (totalCost / maxCost) * 220; // 220px max height
+                    const colors = ["#8859FF", "#FF44B4", "#44D7B6"];
+
+                    console.log(
+                      `Model: ${model.modelName}, Input: ${model.inputPrice}, Output: ${model.outputPrice}, Total: ${totalCost}`
+                    );
+
+                    return (
+                      <div
+                        key={model.modelName}
+                        className="flex flex-col items-center flex-1 max-w-[120px]"
+                      >
+                        <div className="w-full flex items-end justify-center h-full">
+                          <div className="relative w-full group">
+                            <div
+                              className="w-full rounded-t-lg transition-all duration-300 hover:opacity-80"
+                              style={{
+                                height: `${Math.max(barHeight, 10)}px`,
+                                backgroundColor: colors[index % colors.length],
+                              }}
+                            >
+                              <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-neutral-950 dark:text-white whitespace-nowrap">
+                                ${totalCost.toFixed(3)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="w-full mt-3">
+                          <p className="text-xs text-center text-neutral-950 dark:text-white font-medium truncate">
+                            {model.modelName}
+                          </p>
+                          <p className="text-[10px] text-center text-neutral-500 dark:text-neutral-400 truncate">
+                            {model.organization}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* X-axis label */}
+                <div className="text-center mt-3">
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                    AI Models
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -397,30 +569,49 @@ interface CostEstimate {
 }
 interface CostEstimatesProps {
   pricingData: PricingModel[];
+  selectedModels: string[];
+  calculatedCosts: {
+    [modelName: string]: {
+      inputCost: number;
+      outputCost: number;
+      totalCost: number;
+    };
+  };
 }
 
-const CostEstimates: React.FC<CostEstimatesProps> = ({ pricingData }) => {
-  // Transform pricing data to estimates format (show first 5 models with pricing)
+const CostEstimates: React.FC<CostEstimatesProps> = ({
+  pricingData,
+  selectedModels,
+  calculatedCosts,
+}) => {
+  // Transform pricing data to estimates format for selected models
   const estimates: CostEstimate[] = pricingData
-    .filter((model) => model.inputPrice || model.outputPrice)
-    .slice(0, 5)
+    .filter((model) => selectedModels.includes(model.modelName))
     .map((model) => {
-      const inputCost = model.inputPrice
-        ? `$${model.inputPrice.toFixed(3)}`
-        : "$0.000";
-      const outputCost = model.outputPrice
-        ? `$${model.outputPrice.toFixed(3)}`
-        : "$0.000";
-      const totalCost = `$${(
-        (model.inputPrice || 0) + (model.outputPrice || 0)
-      ).toFixed(3)}`;
+      const calculated = calculatedCosts[model.modelName];
 
-      return {
-        model: model.modelName,
-        inputCost,
-        outputCost,
-        totalCost,
-      };
+      if (calculated) {
+        // Use calculated costs based on user input
+        return {
+          model: model.modelName,
+          inputCost: `$${calculated.inputCost.toFixed(4)}`,
+          outputCost: `$${calculated.outputCost.toFixed(4)}`,
+          totalCost: `$${calculated.totalCost.toFixed(4)}`,
+        };
+      } else {
+        // Show base pricing per 1K tokens
+        const inputPrice =
+          typeof model.inputPrice === "number" ? model.inputPrice : 0;
+        const outputPrice =
+          typeof model.outputPrice === "number" ? model.outputPrice : 0;
+
+        return {
+          model: model.modelName,
+          inputCost: `$${inputPrice.toFixed(4)}`,
+          outputCost: `$${outputPrice.toFixed(4)}`,
+          totalCost: `$${(inputPrice + outputPrice).toFixed(4)}`,
+        };
+      }
     });
 
   return (
@@ -430,13 +621,15 @@ const CostEstimates: React.FC<CostEstimatesProps> = ({ pricingData }) => {
           Cost Estimates
         </h2>
         <p className="box-border text-[#717182] text-base font-normal leading-6">
-          Projected costs based on your usage parameters (per 1K tokens)
+          {Object.keys(calculatedCosts).length > 0
+            ? "Calculated costs based on your usage"
+            : "Base pricing per 1K tokens (click Calculate Costs to see estimates)"}
         </p>
       </header>
       <div className="space-y-4">
         {estimates.length === 0 ? (
           <p className="text-neutral-950 dark:text-white text-center py-4">
-            No pricing data available
+            Select models to see cost estimates
           </p>
         ) : (
           estimates.map((estimate, index) => (
@@ -455,7 +648,9 @@ const CostEstimates: React.FC<CostEstimatesProps> = ({ pricingData }) => {
                   {estimate.totalCost}
                 </div>
                 <div className="box-border text-[#717182] text-sm font-normal leading-5 text-right max-sm:text-left">
-                  Per 1K Tokens
+                  {Object.keys(calculatedCosts).length > 0
+                    ? "Total Cost"
+                    : "Per 1K Tokens"}
                 </div>
               </div>
             </article>
@@ -467,9 +662,85 @@ const CostEstimates: React.FC<CostEstimatesProps> = ({ pricingData }) => {
 };
 
 // PerformanceAnalysis component
-const PerformanceAnalysis: React.FC = () => {
+interface PerformanceAnalysisProps {
+  pricingData: PricingModel[];
+  selectedModels: string[];
+}
+
+const PerformanceAnalysis: React.FC<PerformanceAnalysisProps> = ({
+  pricingData,
+  selectedModels,
+}) => {
   const [activeTab, setActiveTab] = useState("Cost vs Score");
   const navigate = useNavigate();
+
+  // Get data for selected models with full information
+  const [detailedModels, setDetailedModels] = useState<DetailedModel[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchDetailedData = async () => {
+      if (selectedModels.length === 0) return;
+
+      try {
+        setLoading(true);
+        const response = await api.getAllModels({
+          limit: 100,
+          search: selectedModels.join("|"),
+        });
+
+        if (response.success && response.data) {
+          const filtered = response.data.filter((model: DetailedModel) =>
+            selectedModels.includes(model.modelName)
+          );
+          setDetailedModels(filtered);
+        }
+      } catch (error) {
+        console.error("Error fetching detailed model data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetailedData();
+  }, [selectedModels]);
+
+  // Calculate efficiency (score per dollar)
+  const getEfficiency = (model: DetailedModel) => {
+    const inputPrice =
+      typeof model.inputPrice === "string"
+        ? parseFloat(model.inputPrice)
+        : model.inputPrice || 0;
+    const outputPrice =
+      typeof model.outputPrice === "string"
+        ? parseFloat(model.outputPrice)
+        : model.outputPrice || 0;
+
+    const input = isNaN(inputPrice) ? 0 : inputPrice;
+    const output = isNaN(outputPrice) ? 0 : outputPrice;
+    const totalCost = input + output;
+    const score = model.overallBenchmarkScore || 0;
+
+    if (totalCost === 0) return "Free";
+    return (score / totalCost).toFixed(1);
+  };
+
+  // Get cost per 1M tokens
+  const getTotalCost = (model: DetailedModel) => {
+    const inputPrice =
+      typeof model.inputPrice === "string"
+        ? parseFloat(model.inputPrice)
+        : model.inputPrice || 0;
+    const outputPrice =
+      typeof model.outputPrice === "string"
+        ? parseFloat(model.outputPrice)
+        : model.outputPrice || 0;
+
+    const input = isNaN(inputPrice) ? 0 : inputPrice;
+    const output = isNaN(outputPrice) ? 0 : outputPrice;
+
+    return input + output;
+  };
 
   return (
     <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] max-sm:p-4">
@@ -527,285 +798,178 @@ const PerformanceAnalysis: React.FC = () => {
           Detailed Table
         </button>
       </div>
-      {activeTab === "Cost vs Score" && (
-        <div className="mt-6">
-          <svg
-            width="100%"
-            height="320"
-            viewBox="0 0 1168 320"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-80"
-          >
-            {/* Horizontal grid lines */}
-            <path
-              d="M65.6699 285H1162.67"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M65.6699 215H1162.67"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M65.6699 145H1162.67"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M65.6699 74.9999H1162.67"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M65.6699 4.99994H1162.67"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
 
-            {/* Vertical grid lines */}
-            <path
-              d="M157.087 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M339.92 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M522.753 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M705.587 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M888.42 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M1071.25 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M65.6699 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-            <path
-              d="M1162.67 4.99994V285"
-              stroke="#CCCCCC"
-              strokeDasharray="3 3"
-            />
-
-            {/* Axis lines */}
-            <path d="M65.6699 285H1162.67" stroke="#666666" />
-
-            {/* Y-axis labels */}
-            <text
-              x="30"
-              y="289"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-            >
-              0%
-            </text>
-            <text
-              x="20"
-              y="219"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-            >
-              25%
-            </text>
-            <text
-              x="20"
-              y="149"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-            >
-              50%
-            </text>
-            <text x="20" y="79" fill="#666666" fontSize="16" fontFamily="Inter">
-              75%
-            </text>
-            <text x="10" y="19" fill="#666666" fontSize="16" fontFamily="Inter">
-              100%
-            </text>
-
-            {/* Bars */}
-            <rect x="120" y="142" width="63" height="142" fill="#8859FF" />
-            <rect x="308" y="72" width="63" height="213" fill="#FF44B4" />
-            <rect x="486" y="146" width="63" height="138" fill="#8CCDFF" />
-            <rect x="668" y="75" width="63" height="209" fill="#82FF79" />
-            <rect x="851" y="215" width="63" height="70" fill="#FFEE51" />
-            <rect x="1034" y="75" width="63" height="211" fill="#FF7474" />
-
-            {/* X-axis cost labels under each pillar */}
-            <text
-              x="120"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              1.25$/1M
-            </text>
-            <text
-              x="308"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              2.5$/1M
-            </text>
-            <text
-              x="486"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              3$/1M
-            </text>
-            <text
-              x="668"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              10$/1M
-            </text>
-            <text
-              x="851"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              15$/1M
-            </text>
-            <text
-              x="1034"
-              y="310"
-              fill="#666666"
-              fontSize="16"
-              fontFamily="Inter"
-              textAnchor="middle"
-              transform="translate(31,0)"
-            >
-              40$/1M
-            </text>
-          </svg>
+      {loading ? (
+        <div className="text-center py-12">
+          <p className="text-neutral-950 dark:text-white">
+            Loading analysis...
+          </p>
         </div>
-      )}
-      {activeTab === "Detailed Table" && (
-        <div className="mt-6">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3">Model</th>
-                  <th className="text-left p-3">Organization</th>
-                  <th className="text-left p-3">Type</th>
-                  <th className="text-left p-3">Cost per 1M tokens</th>
-                  <th className="text-left p-3">Performance Score</th>
-                  <th className="text-left p-3">Efficiency</th>
-                  <th className="text-left p-3">View</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-3">Gemini 1.5 Pro</td>
-                  <td className="p-3">Google</td>
-                  <td className="p-3">Multimodal</td>
-                  <td className="p-3">$1.25</td>
-                  <td className="p-3">85%</td>
-                  <td className="p-3">70.2</td>
-                  <td className="p-3">
-                    <button
-                      className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() => navigate("/viewPage/modelView")}
-                      type="button"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-3">GPT-4o</td>
-                  <td className="p-3">OpenAI</td>
-                  <td className="p-3">Multimodal</td>
-                  <td className="p-3">$2.50</td>
-                  <td className="p-3">92%</td>
-                  <td className="p-3">36.7</td>
-                  <td className="p-3">
-                    <button
-                      className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() => navigate("/viewPage/modelView")}
-                      type="button"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-3">Claude 3.5 Sonnet</td>
-                  <td className="p-3">Anthropic</td>
-                  <td className="p-3">Reasoning</td>
-                  <td className="p-3">$3.00</td>
-                  <td className="p-3">90%</td>
-                  <td className="p-3">30.5</td>
-                  <td className="p-3">
-                    <button
-                      className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
-                      onClick={() => navigate("/viewPage/modelView")}
-                      type="button"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      ) : selectedModels.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-neutral-950 dark:text-white">
+            Select models to see performance analysis
+          </p>
         </div>
+      ) : (
+        <>
+          {activeTab === "Cost vs Score" && (
+            <div className="mt-6 relative pb-4 overflow-hidden">
+              {/* Y-axis label (Score) */}
+              <div className="absolute -left-2 top-0 bottom-20 flex items-center">
+                <span className="text-xs text-neutral-600 dark:text-neutral-400 -rotate-90 whitespace-nowrap">
+                  Benchmark Score
+                </span>
+              </div>
+
+              {/* Chart area */}
+              <div className="ml-10 mr-4">
+                {/* Y-axis scale */}
+                <div
+                  className="flex flex-col-reverse justify-between absolute left-10 top-0 text-xs text-neutral-600 dark:text-neutral-400"
+                  style={{ height: "280px" }}
+                >
+                  <span>0</span>
+                  <span>25</span>
+                  <span>50</span>
+                  <span>75</span>
+                  <span>100</span>
+                </div>
+
+                {/* Single unified graph with all models */}
+                <div className="ml-12 pb-20">
+                  <div
+                    className="flex items-end justify-around gap-4 border-b-2 border-neutral-300 dark:border-neutral-700"
+                    style={{ height: "280px" }}
+                  >
+                    {detailedModels.map((model, index) => {
+                      const totalCost = getTotalCost(model);
+                      const score = model.overallBenchmarkScore || 0;
+                      const barHeight = (score / 100) * 260; // 260px max height
+                      const colors = ["#8859FF", "#FF44B4", "#44D7B6"];
+
+                      return (
+                        <div
+                          key={model._id}
+                          className="flex flex-col items-center flex-1 max-w-[120px]"
+                        >
+                          <div className="w-full flex items-end justify-center h-full">
+                            <div className="relative w-full group">
+                              <div
+                                className="w-full rounded-t-lg transition-all duration-300 hover:opacity-80"
+                                style={{
+                                  height: `${Math.max(barHeight, 10)}px`,
+                                  backgroundColor:
+                                    colors[index % colors.length],
+                                }}
+                              >
+                                <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-neutral-950 dark:text-white whitespace-nowrap">
+                                  {score.toFixed(1)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-full mt-3">
+                            <p className="text-xs text-center text-neutral-950 dark:text-white font-medium truncate">
+                              {model.modelName}
+                            </p>
+                            <p className="text-[10px] text-center text-neutral-500 dark:text-neutral-400">
+                              ${totalCost.toFixed(2)}/1M
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* X-axis label */}
+                  <div className="text-center mt-3">
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                      AI Models (Cost per 1M tokens shown below)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === "Detailed Table" && (
+            <div className="mt-6">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b dark:border-neutral-700">
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Model
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Organization
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Type
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Cost per 1M tokens
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Performance Score
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        Efficiency
+                      </th>
+                      <th className="text-left p-3 text-neutral-950 dark:text-white">
+                        View
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailedModels.map((model) => (
+                      <tr
+                        key={model._id}
+                        className="border-b dark:border-neutral-700"
+                      >
+                        <td className="p-3 text-neutral-950 dark:text-white">
+                          {model.modelName}
+                        </td>
+                        <td className="p-3 text-neutral-600 dark:text-neutral-400">
+                          {model.organization}
+                        </td>
+                        <td className="p-3 text-neutral-600 dark:text-neutral-400">
+                          {model.modelType}
+                        </td>
+                        <td className="p-3 text-neutral-950 dark:text-white font-semibold">
+                          {getTotalCost(model) === 0
+                            ? "Free"
+                            : `$${getTotalCost(model).toFixed(2)}`}
+                        </td>
+                        <td className="p-3 text-neutral-950 dark:text-white">
+                          {(model.overallBenchmarkScore || 0).toFixed(1)}%
+                        </td>
+                        <td className="p-3 text-neutral-950 dark:text-white">
+                          {getEfficiency(model)}
+                        </td>
+                        <td className="p-3">
+                          <button
+                            className="px-4 py-1 rounded bg-[#F1EBFF] text-[#4B00A8] dark:bg-[#23232b] dark:text-white border border-[#B18BEF] hover:bg-[#B18BEF] hover:text-white transition-all duration-150"
+                            onClick={() => navigate(`/model/${model._id}`)}
+                            type="button"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
 };
 
 // PricingInfo component
-interface PricingModel {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  features: string[];
-  color: string;
-}
 const PricingInfo: React.FC = () => {
   interface PricingModelInfo {
     icon: JSX.Element;
@@ -958,13 +1122,57 @@ const PricingInfo: React.FC = () => {
 const Pricing: React.FC = () => {
   const [pricingData, setPricingData] = useState<PricingModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [calculatedCosts, setCalculatedCosts] = useState<{
+    [modelName: string]: {
+      inputCost: number;
+      outputCost: number;
+      totalCost: number;
+    };
+  }>({});
 
   useEffect(() => {
     const fetchPricingData = async () => {
       try {
         const response = await api.getPricingData();
+        console.log("=== FRONTEND PRICING DATA ===");
+        console.log("API Response:", response);
+        console.log("Total models received:", response.data?.length);
+        console.log("Sample data:", response.data?.slice(0, 3));
+
         if (response.success) {
           setPricingData(response.data);
+          console.log("Pricing data set in state");
+
+          // Auto-select first 3 models sorted by name (default sort)
+          const modelsWithPricing = response.data
+            .filter(
+              (model: PricingModel) =>
+                (model.inputPrice !== null && model.inputPrice !== undefined) ||
+                (model.outputPrice !== null && model.outputPrice !== undefined)
+            )
+            .sort((a: PricingModel, b: PricingModel) =>
+              a.modelName.localeCompare(b.modelName)
+            );
+
+          console.log(
+            "Models with pricing after filter:",
+            modelsWithPricing.length
+          );
+          console.log(
+            "Models with non-zero pricing:",
+            response.data.filter(
+              (m: PricingModel) =>
+                (typeof m.inputPrice === "number" && m.inputPrice > 0) ||
+                (typeof m.outputPrice === "number" && m.outputPrice > 0)
+            ).length
+          );
+
+          const initialSelection = modelsWithPricing
+            .slice(0, 3)
+            .map((m: PricingModel) => m.modelName);
+          console.log("Initial selection:", initialSelection);
+          setSelectedModels(initialSelection);
         }
       } catch (error) {
         console.error("Failed to fetch pricing data:", error);
@@ -975,6 +1183,46 @@ const Pricing: React.FC = () => {
 
     fetchPricingData();
   }, []);
+
+  const handleModelSelectionChange = (models: string[]) => {
+    setSelectedModels(models);
+  };
+
+  const handleCalculate = (
+    inputTokens: number,
+    outputTokens: number,
+    imagesGenerated: number,
+    audioMinutes: number
+  ) => {
+    const costs: typeof calculatedCosts = {};
+
+    selectedModels.forEach((modelName) => {
+      const model = pricingData.find((m) => m.modelName === modelName);
+      if (!model) return;
+
+      const inputPrice =
+        typeof model.inputPrice === "number" ? model.inputPrice : 0;
+      const outputPrice =
+        typeof model.outputPrice === "number" ? model.outputPrice : 0;
+
+      // Calculate costs based on usage
+      // Prices are typically per 1K tokens, so divide by 1000
+      const inputCost = (inputTokens / 1000) * inputPrice;
+      const outputCost = (outputTokens / 1000) * outputPrice;
+
+      // For image and audio models, you might want to add specific pricing
+      // For now, we'll focus on token-based pricing
+      const totalCost = inputCost + outputCost;
+
+      costs[modelName] = {
+        inputCost,
+        outputCost,
+        totalCost,
+      };
+    });
+
+    setCalculatedCosts(costs);
+  };
 
   return (
     <div className="box-border w-full min-h-screen relative bg-white dark:bg-black">
@@ -992,21 +1240,71 @@ const Pricing: React.FC = () => {
           </header>
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-neutral-950 dark:text-white">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+              <p className="text-neutral-950 dark:text-white text-lg">
                 Loading pricing data...
+              </p>
+            </div>
+          ) : pricingData.length === 0 ? (
+            <div className="box-border bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-12 text-center">
+              <svg
+                className="mx-auto h-16 w-16 text-neutral-400 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3 className="text-2xl font-semibold text-neutral-950 dark:text-white mb-3">
+                No Pricing Data Available
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 max-w-md mx-auto mb-4">
+                No models with pricing information were found in the database.
+                This could be because:
+              </p>
+              <ul className="text-left text-neutral-600 dark:text-neutral-400 max-w-md mx-auto mb-6 space-y-2">
+                <li>
+                  • The database hasn't been populated with pricing data yet
+                </li>
+                <li>• All pricing data is stored as non-numeric values</li>
+                <li>• There's a connection issue with the backend</li>
+              </ul>
+              <p className="text-sm text-neutral-500 dark:text-neutral-500">
+                Check the browser console and server logs for more details
               </p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <CostCalculator pricingData={pricingData} />
+                <CostCalculator
+                  pricingData={pricingData}
+                  selectedModels={selectedModels}
+                  onModelSelectionChange={handleModelSelectionChange}
+                  onCalculate={handleCalculate}
+                />
                 <div className="space-y-6">
-                  <CostEstimates pricingData={pricingData} />
-                  <CostComparison />
+                  <CostEstimates
+                    pricingData={pricingData}
+                    selectedModels={selectedModels}
+                    calculatedCosts={calculatedCosts}
+                  />
+                  <CostComparison
+                    pricingData={pricingData}
+                    selectedModels={selectedModels}
+                    calculatedCosts={calculatedCosts}
+                  />
                 </div>
               </div>
               <div className="space-y-6">
-                <PerformanceAnalysis />
+                <PerformanceAnalysis
+                  pricingData={pricingData}
+                  selectedModels={selectedModels}
+                />
                 <PricingInfo />
               </div>
             </>
