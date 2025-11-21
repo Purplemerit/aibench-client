@@ -79,9 +79,9 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
   if (!model) return null;
 
   return (
-    <section className="flex flex-col items-stretch max-md:max-w-full dark:bg-neutral-900 mt-20">
+    <section className="flex flex-col items-stretch max-md:max-w-full dark:bg-neutral-900 mt-20 max-md:mt-16 max-sm:mt-12">
       <button
-        className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none
+        className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none max-sm:px-2 max-sm:py-1.5
           hover:bg-[rgba(177,139,239,0.15)] hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.15)]
           dark:hover:bg-[rgba(177,139,239,0.25)] dark:hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.25)]"
         onClick={() => navigate(-1)}
@@ -114,30 +114,30 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
           Back
         </span>
       </button>
-      <div className="flex w-full items-stretch gap-5 flex-wrap justify-between mt-[34px] max-md:max-w-full">
-        <div className="flex flex-col items-stretch whitespace-nowrap">
-          <h1 className="text-neutral-950 dark:text-white text-3xl font-semibold leading-[1.2]">
+      <div className="flex w-full items-stretch gap-5 flex-wrap justify-between mt-[34px] max-md:mt-6 max-sm:mt-4 max-md:max-w-full">
+        <div className="flex flex-col items-stretch max-sm:whitespace-normal">
+          <h1 className="text-neutral-950 dark:text-white text-3xl font-semibold leading-[1.2] max-md:text-2xl max-sm:text-xl">
             {model.modelName}
           </h1>
-          <div className="flex items-stretch gap-[17px] mt-2">
-            <div className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal grow">
+          <div className="flex items-stretch gap-[17px] mt-2 max-sm:gap-2 max-sm:flex-wrap">
+            <div className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal grow max-sm:text-sm max-sm:w-full">
               {model.organization}
             </div>
             <img
               src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/c7a1c35dc36315f508a4b2a4810cd39fbc514b3f?placeholderIfAbsent=true"
               alt={`${model.organization} Logo`}
-              className="aspect-[2.67] object-contain w-14 shrink-0 rounded-lg"
+              className="aspect-[2.67] object-contain w-14 shrink-0 rounded-lg max-sm:w-10"
             />
-            <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid">
+            <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-sm:px-2 max-sm:py-1">
               <div>{model.openSource === "Yes" ? "Open Source" : "Paid"}</div>
             </div>
-            <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid">
+            <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-sm:px-2 max-sm:py-1">
               <div>{model.modelType || "Text"}</div>
             </div>
           </div>
         </div>
-        <div className="flex items-stretch gap-3 text-sm font-semibold text-center leading-none my-auto">
-          <button className="bg-white dark:bg-neutral-900 border flex items-stretch gap-4 text-neutral-950 dark:text-white px-[13px] py-2.5 rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid hover:bg-gray-50 transition-colors">
+        <div className="flex items-stretch gap-3 text-sm font-semibold text-center leading-none my-auto max-md:w-full max-md:mt-4 max-sm:flex-col max-sm:gap-2">
+          <button className="bg-white dark:bg-neutral-900 border flex items-stretch gap-4 text-neutral-950 dark:text-white px-[13px] py-2.5 rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid hover:bg-gray-50 transition-colors max-sm:w-full max-sm:justify-center max-sm:gap-2 max-sm:px-3 max-sm:py-2">
             <img
               src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/e11eb3dd84d6396ef367ed03e41bf1618201bca2?placeholderIfAbsent=true"
               alt="Documentation icon"
@@ -145,12 +145,12 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
             />
             <div className="my-auto">Official Docs</div>
           </button>
-          <button className="flex flex-col items-stretch justify-center px-4 py-[11px] rounded-lg bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90 transition-all duration-200 text-white font-semibold">
+          <button className="flex flex-col items-stretch justify-center px-4 py-[11px] rounded-lg bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90 transition-all duration-200 text-white font-semibold max-sm:w-full max-sm:px-3 max-sm:py-2">
             <div>Add to Compare</div>
           </button>
         </div>
       </div>
-      <div className="bg-white dark:bg-neutral-900 border flex flex-col text-lg text-neutral-950 dark:text-white font-normal leading-loose justify-center mt-[34px] px-[25px] py-[30px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5">
+      <div className="bg-white dark:bg-neutral-900 border flex flex-col text-lg text-neutral-950 dark:text-white font-normal leading-loose justify-center mt-[34px] px-[25px] py-[30px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-md:mt-6 max-sm:mt-4 max-sm:px-4 max-sm:py-5 max-sm:text-base">
         <div className="max-md:max-w-full">
           {model.specialFeatures ||
             model.modelType ||
@@ -193,11 +193,11 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
 
   return (
     <section className="box-border w-full border bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-[rgba(255,255,255,0.10)] max-md:w-full max-sm:p-4 overflow-x-auto">
-      <header className="mb-6">
-        <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-2">
+      <header className="mb-6 max-sm:mb-4">
+        <h3 className="text-neutral-950 dark:text-white text-xl font-semibold leading-7 mb-2 max-sm:text-lg">
           Performance Radar
         </h3>
-        <p className="text-[#717182] dark:text-neutral-400 text-sm font-normal leading-5">
+        <p className="text-[#717182] dark:text-neutral-400 text-sm font-normal leading-5 max-sm:text-xs">
           Multi-dimensional performance comparison
         </p>
       </header>
@@ -399,11 +399,11 @@ interface PerformanceOverviewProps {
 
 const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ model }) => {
   return (
-    <section className="bg-white dark:bg-neutral-900 border pt-7 pb-[40px] px-[25px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:pb-[40px] max-md:px-5">
-      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none">
+    <section className="bg-white dark:bg-neutral-900 border pt-7 pb-[40px] px-[25px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:pb-[40px] max-md:px-5 max-sm:pt-5 max-sm:pb-6 max-sm:px-4">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-base">
         Performance Overview
       </h2>
-      <p className="text-[rgba(113,113,130,1)] dark:text-white mt-3.5 mb-6">
+      <p className="text-[rgba(113,113,130,1)] dark:text-white mt-3.5 mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
         Benchmark scores across different evaluation metrics
       </p>
       <PerformanceRadar model={model} />
@@ -459,21 +459,25 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
   ].filter((b) => b.score !== "N/A");
 
   return (
-    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch text-sm font-normal mt-8 px-[25px] py-8 rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5">
-      <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none">
+    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch text-sm font-normal mt-8 px-[25px] py-8 rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none max-sm:text-sm">
         Detailed Benchmarks
       </h2>
-      <p className="text-[rgba(113,113,130,1)] dark:text-white text-base mt-3.5">
+      <p className="text-[rgba(113,113,130,1)] dark:text-white text-base mt-3.5 max-sm:text-sm max-sm:mt-2">
         Individual benchmark scores and explanations
       </p>
 
-      <div className="overflow-x-auto">
-        <table className="w-full mt-[25px]">
+      <div className="mt-[25px] max-sm:mt-4">
+        <table className="w-full">
           <thead>
-            <tr className="flex items-stretch gap-[40px_58px] text-neutral-950 dark:text-white font-semibold whitespace-nowrap leading-none px-2 py-[13px] max-md:max-w-full">
-              <th className="text-left">Benchmark</th>
-              <th className="text-left">Score</th>
-              <th className="text-left grow shrink w-[480px] max-md:max-w-full">
+            <tr className="text-neutral-950 dark:text-white font-semibold leading-none border-b border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
+              <th className="text-left px-2 py-[13px] max-sm:text-xs max-sm:px-1 max-sm:py-2">
+                Benchmark
+              </th>
+              <th className="text-left px-2 py-[13px] max-sm:text-xs max-sm:px-1 max-sm:py-2">
+                Score
+              </th>
+              <th className="text-left px-2 py-[13px] max-sm:text-xs max-sm:px-1 max-sm:py-2 max-sm:hidden">
                 Description
               </th>
             </tr>
@@ -482,23 +486,36 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
             {benchmarkData.map((benchmark) => (
               <tr
                 key={benchmark.name}
-                className="flex w-full items-stretch gap-[40px_100px] leading-none flex-wrap pl-2 pr-20 py-3 max-md:max-w-full max-md:pr-5"
+                className="border-b border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] last:border-0"
               >
-                <td className="text-neutral-950 dark:text-white">
+                <td className="text-neutral-950 dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2">
                   {benchmark.name}
                 </td>
-                <td className="flex items-stretch gap-[40px_56px]">
-                  <div className="text-neutral-950 dark:text-white">
-                    {benchmark.score}
-                  </div>
-                  <div className="text-[rgba(113,113,130,1)] dark:text-white basis-auto grow shrink">
-                    {benchmark.description}
-                  </div>
+                <td className="text-neutral-950 dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2">
+                  {benchmark.score}
+                </td>
+                <td className="text-[rgba(113,113,130,1)] dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2 max-sm:hidden">
+                  {benchmark.description}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {/* Mobile description legend */}
+        <div className="mt-4 hidden max-sm:block">
+          <p className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 mb-2 font-semibold">
+            Benchmark Descriptions:
+          </p>
+          {benchmarkData.map((benchmark) => (
+            <p
+              key={benchmark.name}
+              className="text-xs text-[rgba(113,113,130,1)] dark:text-white mb-1"
+            >
+              <span className="font-semibold">{benchmark.name}:</span>{" "}
+              {benchmark.description}
+            </p>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -516,16 +533,16 @@ const ModelInfo: React.FC<ModelInfoProps> = ({ model }) => {
     model.overallBenchmarkScore || model.globalRankScore || 0;
 
   return (
-    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col px-[25px] py-[29px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5">
-      <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none">
+    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col px-[25px] py-[29px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none max-sm:text-sm">
         Model Information
       </h2>
 
-      <div className="mt-[39px]">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none">
+      <div className="mt-[39px] max-sm:mt-5">
+        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
           Released
         </h3>
-        <p className="text-neutral-950 dark:text-white text-base font-normal mt-[13px]">
+        <p className="text-neutral-950 dark:text-white text-base font-normal mt-[13px] max-sm:text-sm max-sm:mt-2">
           {model.releaseDate
             ? new Date(model.releaseDate).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -536,32 +553,32 @@ const ModelInfo: React.FC<ModelInfoProps> = ({ model }) => {
         </p>
       </div>
 
-      <div className="mt-[26px]">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none">
+      <div className="mt-[26px] max-sm:mt-4">
+        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
           Type
         </h3>
-        <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5">
+        <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5 max-sm:text-sm max-sm:mt-2">
           {model.modelType || "N/A"}
         </p>
       </div>
 
       {model.parameters && (
-        <div className="mt-[26px]">
-          <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none">
+        <div className="mt-[26px] max-sm:mt-4">
+          <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
             Parameters
           </h3>
-          <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5">
+          <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5 max-sm:text-sm max-sm:mt-2">
             {model.parameters}
           </p>
         </div>
       )}
 
-      <div className="mt-[26px]">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none">
+      <div className="mt-[26px] max-sm:mt-4">
+        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
           Overall Score
         </h3>
-        <div className="self-stretch flex items-stretch gap-[11px] mt-[15px]">
-          <div className="text-neutral-950 dark:text-white text-2xl font-normal leading-none grow">
+        <div className="self-stretch flex items-stretch gap-[11px] mt-[15px] max-sm:mt-3 max-sm:gap-2">
+          <div className="text-neutral-950 dark:text-white text-2xl font-normal leading-none grow max-sm:text-xl">
             {overallScore.toFixed(1)}
           </div>
           <div className="bg-[rgba(236,236,240,1)] dark:bg-neutral-900 grow shrink-0 basis-0 w-fit my-auto rounded-[22369600px] h-2">
@@ -590,38 +607,38 @@ const PricingCard: React.FC<PricingCardProps> = ({ model }) => {
     model.openSource === "Yes" || inputPrice === "Free (self-hosted)";
 
   return (
-    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch font-semibold mt-6 px-[25px] py-[27px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5">
-      <h2 className="text-neutral-950 dark:text-white text-base leading-none">
+    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch font-semibold mt-6 px-[25px] py-[27px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white text-base leading-none max-sm:text-sm">
         Pricing
       </h2>
-      <p className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal mt-2.5">
+      <p className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal mt-2.5 max-sm:text-sm max-sm:mt-2">
         {isFree
           ? "Open source - Self-hosted"
           : "Cost information for API usage"}
       </p>
 
-      <div className="flex items-stretch gap-4 font-normal text-center mt-[25px]">
-        <div className="border flex flex-col items-stretch flex-1 pt-6 pb-[37px] px-[18px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid">
-          <div className="text-neutral-950 dark:text-white text-2xl leading-none self-center">
+      <div className="flex items-stretch gap-4 font-normal text-center mt-[25px] max-sm:mt-4 max-sm:gap-3 max-sm:flex-col">
+        <div className="border flex flex-col items-stretch flex-1 pt-6 pb-[37px] px-[18px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-sm:pt-4 max-sm:pb-5 max-sm:px-4">
+          <div className="text-neutral-950 dark:text-white text-2xl leading-none self-center max-sm:text-xl">
             {isFree ? "Free" : inputPrice || "N/A"}
           </div>
-          <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-none mt-[9px]">
+          <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-none mt-[9px] max-sm:text-xs max-sm:mt-2">
             {isFree ? "Self-hosted" : "per 1M input tokens"}
           </div>
         </div>
-        <div className="border flex flex-col items-center flex-1 px-8 py-[23px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5">
-          <div className="text-neutral-950 dark:text-white text-2xl leading-none">
+        <div className="border flex flex-col items-center flex-1 px-8 py-[23px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5 max-sm:pt-4 max-sm:pb-5 max-sm:px-4">
+          <div className="text-neutral-950 dark:text-white text-2xl leading-none max-sm:text-xl">
             {isFree ? "Free" : outputPrice || "N/A"}
           </div>
-          <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-5 mt-[9px]">
+          <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-5 mt-[9px] max-sm:text-xs max-sm:mt-2">
             {isFree ? "Self-hosted" : "per 1M output tokens"}
           </div>
         </div>
       </div>
 
       {model.license && (
-        <div className="mt-4 text-center">
-          <p className="text-[rgba(113,113,130,1)] dark:text-white text-sm">
+        <div className="mt-4 text-center max-sm:mt-3">
+          <p className="text-[rgba(113,113,130,1)] dark:text-white text-sm max-sm:text-xs">
             License: <span className="font-semibold">{model.license}</span>
           </p>
         </div>
@@ -662,18 +679,18 @@ const CapabilitiesSection: React.FC<CapabilitiesSectionProps> = ({ model }) => {
   }
 
   return (
-    <section className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 mt-6">
-      <h2 className="text-lg font-normal text-neutral-900 dark:text-white mb-6">
+    <section className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 mt-6 max-sm:p-4 max-sm:mt-4">
+      <h2 className="text-lg font-normal text-neutral-900 dark:text-white mb-6 max-sm:text-base max-sm:mb-4">
         Capabilities
       </h2>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 max-sm:gap-2">
         {capabilities.map((capability, index) => (
           <div
             key={index}
-            className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-3 bg-white dark:bg-neutral-800 text-center"
+            className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-3 bg-white dark:bg-neutral-800 text-center max-sm:px-3 max-sm:py-2"
           >
-            <span className="text-sm font-medium text-neutral-900 dark:text-white">
+            <span className="text-sm font-medium text-neutral-900 dark:text-white max-sm:text-xs">
               {capability}
             </span>
           </div>
@@ -738,12 +755,12 @@ const Index = () => {
         <div className="bg-white dark:bg-neutral-900 w-full max-md:max-w-full">
           <Navigation />
 
-          <main className="bg-[rgba(246,243,255,1)] dark:bg-neutral-900 flex w-full flex-col items-stretch justify-center px-20 py-[37px] max-md:max-w-full max-md:px-5">
+          <main className="bg-[rgba(246,243,255,1)] dark:bg-neutral-900 flex w-full flex-col items-stretch justify-center px-20 py-[37px] max-md:max-w-full max-md:px-5 max-sm:px-4 max-sm:py-5">
             <div className="flex flex-col items-stretch max-md:max-w-full">
               <ModelHeader model={model} />
 
-              <div className="mt-8 max-md:max-w-full">
-                <div className="gap-5 flex max-md:flex-col max-md:items-stretch">
+              <div className="mt-8 max-md:max-w-full max-sm:mt-4">
+                <div className="gap-5 flex max-md:flex-col max-md:items-stretch max-sm:gap-4">
                   <div className="w-[68%] max-md:w-full max-md:ml-0">
                     <div className="w-full max-md:max-w-full max-md:mt-8">
                       <PerformanceOverview model={model} />
@@ -760,11 +777,11 @@ const Index = () => {
                 </div>
               </div>
               {/* Dynamic Capabilities Graph - full width below cards */}
-              <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5">
-                <h2 className="text-neutral-950 dark:text-white font-semibold leading-none">
+              <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+                <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
                   Performance Metrics
                 </h2>
-                <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6">
+                <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
                   Key performance indicators and quality scores
                 </p>
 
@@ -839,168 +856,232 @@ const Index = () => {
 
                     return (
                       <>
-                        <div className="mb-6">
-                          <h3 className="text-neutral-950 dark:text-white text-lg font-semibold mb-1">
+                        <div className="mb-6 max-sm:mb-4">
+                          <h3 className="text-neutral-950 dark:text-white text-lg font-semibold mb-1 max-sm:text-base">
                             Performance Distribution
                           </h3>
-                          <p className="text-[rgba(113,113,130,1)] dark:text-neutral-400 text-sm">
-                            Box plot showing score distribution with quartiles
-                            and current values
+                          <p className="text-[rgba(113,113,130,1)] dark:text-neutral-400 text-sm max-sm:text-xs">
+                            Smooth curve showing performance scores across
+                            different metrics
                           </p>
                         </div>
 
-                        <div
-                          className="relative"
-                          style={{ height: `${chartHeight}px` }}
-                        >
-                          {/* Y-axis labels */}
-                          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 pr-2">
-                            <span>100</span>
-                            <span>75</span>
-                            <span>50</span>
-                            <span>25</span>
-                            <span>0</span>
-                          </div>
+                        <div className="relative bg-white dark:bg-neutral-800 rounded-lg p-6 max-sm:p-4">
+                          <svg
+                            width="100%"
+                            height="350"
+                            viewBox="0 0 800 350"
+                            className="wave-chart w-full"
+                            preserveAspectRatio="xMinYMid meet"
+                          >
+                            <defs>
+                              {/* Gradient for the area under the curve */}
+                              <linearGradient
+                                id="waveGradient"
+                                x1="0%"
+                                y1="0%"
+                                x2="0%"
+                                y2="100%"
+                              >
+                                <stop
+                                  offset="0%"
+                                  stopColor="#B18BEF"
+                                  stopOpacity="0.4"
+                                />
+                                <stop
+                                  offset="100%"
+                                  stopColor="#B18BEF"
+                                  stopOpacity="0.05"
+                                />
+                              </linearGradient>
+                            </defs>
 
-                          {/* Chart area */}
-                          <div className="ml-12 h-full relative border-l-2 border-b-2 border-gray-300 dark:border-neutral-600">
-                            {/* Horizontal grid lines */}
-                            {[0, 25, 50, 75, 100].map((value) => (
-                              <div
-                                key={value}
-                                className="absolute w-full border-t border-gray-200 dark:border-neutral-700"
-                                style={{ bottom: `${value}%` }}
-                              />
-                            ))}
+                            {/* Y-axis */}
+                            <line
+                              x1="60"
+                              y1="30"
+                              x2="60"
+                              y2="280"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="text-gray-300 dark:text-neutral-600"
+                            />
 
-                            {/* Box plots for each metric */}
-                            {metrics.map((metric, index) => {
-                              const xPosition = spacing * (index + 1);
+                            {/* X-axis */}
+                            <line
+                              x1="60"
+                              y1="280"
+                              x2="760"
+                              y2="280"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="text-gray-300 dark:text-neutral-600"
+                            />
+
+                            {/* Y-axis labels and grid lines */}
+                            {[0, 25, 50, 75, 100].map((value, i) => {
+                              const y = 280 - (value * 250) / 100;
                               return (
-                                <div
-                                  key={metric.name}
-                                  className="absolute"
-                                  style={{
-                                    left: `${xPosition}%`,
-                                    transform: "translateX(-50%)",
-                                    bottom: 0,
-                                    height: "100%",
-                                    width: `${boxWidth}px`,
-                                  }}
-                                >
-                                  {/* Whisker line (min to max) */}
-                                  <div
-                                    className="absolute left-1/2 transform -translate-x-1/2 bg-gray-400 dark:bg-neutral-500"
-                                    style={{
-                                      width: "2px",
-                                      bottom: `${metric.min}%`,
-                                      height: `${metric.max - metric.min}%`,
-                                    }}
+                                <g key={value}>
+                                  {/* Grid line */}
+                                  <line
+                                    x1="60"
+                                    y1={y}
+                                    x2="760"
+                                    y2={y}
+                                    stroke="currentColor"
+                                    strokeWidth="1"
+                                    strokeDasharray="5,5"
+                                    className="text-gray-200 dark:text-neutral-700"
+                                    opacity="0.5"
                                   />
-
-                                  {/* Upper whisker cap */}
-                                  <div
-                                    className="absolute left-1/4 right-1/4 bg-gray-400 dark:bg-neutral-500"
-                                    style={{
-                                      bottom: `${metric.max}%`,
-                                      height: "2px",
-                                    }}
-                                  />
-
-                                  {/* Lower whisker cap */}
-                                  <div
-                                    className="absolute left-1/4 right-1/4 bg-gray-400 dark:bg-neutral-500"
-                                    style={{
-                                      bottom: `${metric.min}%`,
-                                      height: "2px",
-                                    }}
-                                  />
-
-                                  {/* Box (Q1 to Q3) */}
-                                  <div
-                                    className={`absolute left-0 right-0 bg-gradient-to-t ${metric.bgColor} opacity-70 border-2 rounded`}
-                                    style={{
-                                      bottom: `${metric.q1}%`,
-                                      height: `${metric.q3 - metric.q1}%`,
-                                      borderColor: metric.color,
-                                    }}
-                                  />
-
-                                  {/* Median line */}
-                                  <div
-                                    className="absolute left-0 right-0 bg-gray-900 dark:bg-white"
-                                    style={{
-                                      bottom: `${metric.median}%`,
-                                      height: "3px",
-                                      zIndex: 10,
-                                    }}
-                                  />
-
-                                  {/* Current value dot */}
-                                  <div
-                                    className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border-3 border-white dark:border-neutral-900 shadow-lg z-20"
-                                    style={{
-                                      bottom: `${metric.value}%`,
-                                      width: "14px",
-                                      height: "14px",
-                                      backgroundColor: metric.color,
-                                    }}
-                                  />
-
-                                  {/* Value label */}
-                                  <div
-                                    className="absolute left-1/2 transform -translate-x-1/2 text-xs font-bold text-neutral-950 dark:text-white bg-white dark:bg-neutral-800 px-2 py-1 rounded shadow-md z-20"
-                                    style={{
-                                      bottom: `${metric.value + 5}%`,
-                                    }}
+                                  {/* Label */}
+                                  <text
+                                    x="45"
+                                    y={y + 5}
+                                    textAnchor="end"
+                                    className="text-xs fill-[#717182] dark:fill-neutral-400"
                                   >
-                                    {metric.value.toFixed(1)}
-                                  </div>
-                                </div>
+                                    {value}
+                                  </text>
+                                </g>
                               );
                             })}
-                          </div>
 
-                          {/* X-axis labels */}
-                          <div className="ml-12 mt-2 relative">
-                            <div className="flex justify-around text-center">
-                              {metrics.map((metric) => (
-                                <div
-                                  key={metric.name}
-                                  className="flex flex-col items-center"
-                                >
-                                  <div
-                                    className="w-4 h-4 rounded mb-1"
-                                    style={{ backgroundColor: metric.color }}
+                            {/* Draw smooth wave curve */}
+                            {(() => {
+                              const points = metrics.map((metric, index) => {
+                                const x =
+                                  100 + (index * 600) / (metrics.length - 1);
+                                const y = 280 - (metric.value * 250) / 100;
+                                return { x, y, metric };
+                              });
+
+                              // Create smooth curve using quadratic bezier curves
+                              let pathData = `M ${points[0].x} ${points[0].y}`;
+
+                              for (let i = 0; i < points.length - 1; i++) {
+                                const current = points[i];
+                                const next = points[i + 1];
+                                const controlX = (current.x + next.x) / 2;
+                                pathData += ` Q ${controlX} ${
+                                  current.y
+                                }, ${controlX} ${(current.y + next.y) / 2}`;
+                                pathData += ` Q ${controlX} ${next.y}, ${next.x} ${next.y}`;
+                              }
+
+                              // Create area path (fill under curve)
+                              const areaPath = `${pathData} L ${
+                                points[points.length - 1].x
+                              } 280 L ${points[0].x} 280 Z`;
+
+                              return (
+                                <>
+                                  {/* Area under the curve */}
+                                  <path
+                                    d={areaPath}
+                                    fill="url(#waveGradient)"
                                   />
-                                  <span className="text-sm font-semibold text-neutral-950 dark:text-white">
-                                    {metric.name}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Legend */}
-                        <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
-                          <div className="flex flex-wrap gap-4 text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full bg-gray-400" />
-                              <span>Min/Max (whiskers)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-70 border border-blue-500 rounded" />
-                              <span>Q1-Q3 (box)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-0.5 bg-gray-900 dark:bg-white" />
-                              <span>Median</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white" />
-                              <span>Current Score</span>
-                            </div>
+                                  {/* The curve line */}
+                                  <path
+                                    d={pathData}
+                                    fill="none"
+                                    stroke="#B18BEF"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+
+                                  {/* Data points */}
+                                  {points.map((point, index) => (
+                                    <g key={index}>
+                                      {/* Outer glow circle */}
+                                      <circle
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r="10"
+                                        fill={point.metric.color}
+                                        opacity="0.2"
+                                      />
+                                      {/* Main dot */}
+                                      <circle
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r="6"
+                                        fill={point.metric.color}
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        className="dark:stroke-neutral-900"
+                                      />
+
+                                      {/* Value label above point */}
+                                      <text
+                                        x={point.x}
+                                        y={point.y - 20}
+                                        textAnchor="middle"
+                                        className="text-xs font-bold fill-neutral-950 dark:fill-white"
+                                      >
+                                        {point.metric.value.toFixed(1)}
+                                      </text>
+                                    </g>
+                                  ))}
+
+                                  {/* X-axis labels */}
+                                  {points.map((point, index) => (
+                                    <g key={`label-${index}`}>
+                                      <text
+                                        x={point.x}
+                                        y="305"
+                                        textAnchor="middle"
+                                        className="text-sm font-semibold fill-neutral-950 dark:fill-white"
+                                      >
+                                        {point.metric.name}
+                                      </text>
+                                    </g>
+                                  ))}
+                                </>
+                              );
+                            })()}
+
+                            {/* Y-axis label */}
+                            <text
+                              x="20"
+                              y="155"
+                              textAnchor="middle"
+                              transform="rotate(-90, 20, 155)"
+                              className="text-sm font-semibold fill-[#717182] dark:fill-neutral-400"
+                            >
+                              Score
+                            </text>
+
+                            {/* X-axis label */}
+                            <text
+                              x="410"
+                              y="340"
+                              textAnchor="middle"
+                              className="text-sm font-semibold fill-[#717182] dark:fill-neutral-400"
+                            >
+                              Metrics
+                            </text>
+                          </svg>
+
+                          {/* Legend */}
+                          <div className="mt-4 flex flex-wrap justify-center gap-4 max-sm:mt-3 max-sm:gap-2">
+                            {metrics.map((metric, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2 max-sm:gap-1"
+                              >
+                                <div
+                                  className="w-3 h-3 rounded-full max-sm:w-2 max-sm:h-2"
+                                  style={{ backgroundColor: metric.color }}
+                                />
+                                <span className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+                                  {metric.name}: {metric.value.toFixed(1)}%
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </>
@@ -1010,46 +1091,46 @@ const Index = () => {
 
                 {/* Additional Scores if available */}
                 {(model.fIdScore || model.cLipScore || model.mOsScore) && (
-                  <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
-                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-4">
+                  <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] max-sm:mt-4 max-sm:pt-4">
+                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-4 max-sm:text-xs max-sm:mb-3">
                       Multimodal Scores
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-sm:gap-3">
                       {model.fIdScore && (
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-                          <span className="text-2xl font-bold text-neutral-950 dark:text-white">
+                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg max-sm:p-3">
+                          <span className="text-2xl font-bold text-neutral-950 dark:text-white max-sm:text-xl">
                             {model.fIdScore}
                           </span>
-                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1">
+                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1 max-sm:text-xs">
                             FID Score
                           </span>
-                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1">
+                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1 max-sm:text-[10px]">
                             Image quality
                           </span>
                         </div>
                       )}
                       {model.cLipScore && (
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-                          <span className="text-2xl font-bold text-neutral-950 dark:text-white">
+                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg max-sm:p-3">
+                          <span className="text-2xl font-bold text-neutral-950 dark:text-white max-sm:text-xl">
                             {model.cLipScore}
                           </span>
-                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1">
+                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1 max-sm:text-xs">
                             CLIP Score
                           </span>
-                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1">
+                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1 max-sm:text-[10px]">
                             Image-text alignment
                           </span>
                         </div>
                       )}
                       {model.mOsScore && (
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-                          <span className="text-2xl font-bold text-neutral-950 dark:text-white">
+                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg max-sm:p-3">
+                          <span className="text-2xl font-bold text-neutral-950 dark:text-white max-sm:text-xl">
                             {model.mOsScore}
                           </span>
-                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1">
+                          <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1 max-sm:text-xs">
                             MOS Score
                           </span>
-                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1">
+                          <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center mt-1 max-sm:text-[10px]">
                             Audio quality
                           </span>
                         </div>
@@ -1060,21 +1141,21 @@ const Index = () => {
               </section>
 
               {/* Technical Specifications */}
-              <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5">
-                <h2 className="text-neutral-950 dark:text-white font-semibold leading-none">
+              <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+                <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
                   Technical Specifications
                 </h2>
-                <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6">
+                <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
                   Deployment requirements and performance characteristics
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-sm:gap-4">
                   {model.contextWindow && (
-                    <div className="flex flex-col gap-2">
-                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                    <div className="flex flex-col gap-2 max-sm:gap-1">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400 max-sm:text-xs">
                         Context Window
                       </span>
-                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white max-sm:text-base">
                         {model.contextWindow}
                       </span>
                     </div>
@@ -1171,11 +1252,11 @@ const Index = () => {
 
                 {/* Ecosystem Support */}
                 {model.ecosystemSupport && (
-                  <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
-                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3">
+                  <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] max-sm:mt-4 max-sm:pt-4">
+                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3 max-sm:text-xs max-sm:mb-2">
                       Ecosystem Support
                     </h3>
-                    <p className="text-neutral-950 dark:text-white text-base">
+                    <p className="text-neutral-950 dark:text-white text-base max-sm:text-sm">
                       {model.ecosystemSupport}
                     </p>
                   </div>
@@ -1183,11 +1264,11 @@ const Index = () => {
 
                 {/* Training Dataset */}
                 {model.trainingDatasetNames && (
-                  <div className="mt-4">
-                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3">
+                  <div className="mt-4 max-sm:mt-3">
+                    <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3 max-sm:text-xs max-sm:mb-2">
                       Training Datasets
                     </h3>
-                    <p className="text-neutral-950 dark:text-white text-base">
+                    <p className="text-neutral-950 dark:text-white text-base max-sm:text-sm">
                       {model.trainingDatasetNames}
                     </p>
                   </div>
