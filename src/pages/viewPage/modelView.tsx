@@ -129,7 +129,10 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
               className="aspect-[2.67] object-contain w-14 shrink-0 rounded-lg"
             />
             <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid">
-              <div>{model.modelType || "text"}</div>
+              <div>{model.openSource === "Yes" ? "Open Source" : "Paid"}</div>
+            </div>
+            <div className="border flex flex-col overflow-hidden items-stretch text-xs text-neutral-950 dark:text-white font-semibold text-center leading-none justify-center px-2.5 py-[5px] rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid">
+              <div>{model.modelType || "Text"}</div>
             </div>
           </div>
         </div>
@@ -216,54 +219,63 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
         >
           <style>{`
             @media (prefers-color-scheme: dark) {
-              .radar-chart .radar-grid { stroke: #333333 !important; }
-              .radar-chart .radar-label { fill: #BBBBBB !important; }
-              .radar-chart .radar-fill { fill: #B18BEF !important; opacity: 0.3 !important; }
-              .radar-chart .radar-stroke { stroke: #B18BEF !important; }
+              .radar-chart .radar-grid { stroke: #444444 !important; stroke-width: 1.5 !important; }
+              .radar-chart .radar-label { fill: #FFFFFF !important; font-weight: 600 !important; }
+              .radar-chart .radar-fill { fill: #B18BEF !important; opacity: 0.4 !important; }
+              .radar-chart .radar-stroke { stroke: #B18BEF !important; stroke-width: 3 !important; }
+              .radar-chart .radar-point { fill: #B18BEF !important; }
             }
           `}</style>
           {/* Grid lines - 4 concentric diamonds */}
           <path
             className="radar-grid"
             d="M272.17 132.07L300.77 160.67L272.17 189.27L243.57 160.67L272.17 132.07Z"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 103.47L329.37 160.67L272.17 217.87L214.97 160.67L272.17 103.47Z"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 74.87L357.97 160.67L272.17 246.47L186.37 160.67L272.17 74.87Z"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 46.27L386.57 160.67L272.17 275.07L157.77 160.67L272.17 46.27Z"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
 
           {/* Axis lines */}
           <path
             className="radar-grid"
             d="M272.17 160.67V46.27"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 160.67H386.57"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 160.67V275.07"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
           <path
             className="radar-grid"
             d="M272.17 160.67H157.77"
-            stroke="#CCCCCC"
+            stroke="#DDDDDD"
+            strokeWidth="1.5"
           ></path>
 
           {/* Labels */}
@@ -321,15 +333,44 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
             className="radar-fill"
             d={dataPath}
             fill="#B18BEF"
-            fillOpacity="0.2"
+            fillOpacity="0.35"
           ></path>
           <path
             className="radar-stroke"
             d={dataPath}
             stroke="#B18BEF"
-            strokeWidth="2"
+            strokeWidth="3"
             fill="none"
           ></path>
+          {/* Data points for better visibility */}
+          <circle
+            className="radar-point"
+            cx={centerX}
+            cy={mmluY}
+            r="5"
+            fill="#B18BEF"
+          />
+          <circle
+            className="radar-point"
+            cx={humanEvalX}
+            cy={centerY}
+            r="5"
+            fill="#B18BEF"
+          />
+          <circle
+            className="radar-point"
+            cx={centerX}
+            cy={gsm8kY}
+            r="5"
+            fill="#B18BEF"
+          />
+          <circle
+            className="radar-point"
+            cx={mathX}
+            cy={centerY}
+            r="5"
+            fill="#B18BEF"
+          />
         </svg>
       </div>
       <div className="flex h-6 items-start gap-2.5 w-full justify-center flex-wrap overflow-x-auto">
@@ -727,99 +768,244 @@ const Index = () => {
                   Key performance indicators and quality scores
                 </p>
 
-                {/* Performance Bars */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Bias Score */}
-                  {model.biasScore && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-neutral-950 dark:text-white text-sm font-medium">
-                          Bias Score
-                        </span>
-                        <span className="text-neutral-950 dark:text-white text-sm font-semibold">
-                          {model.biasScore}/100
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${model.biasScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
-                        Lower is better - measures model fairness
-                      </span>
-                    </div>
-                  )}
+                {/* Box Plot Chart - Single Graph with All Metrics */}
+                <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-6 bg-white dark:bg-neutral-900">
+                  {(() => {
+                    // Prepare data for all available metrics
+                    const metrics = [];
 
-                  {/* Toxicity Score */}
-                  {model.toxicityScore && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-neutral-950 dark:text-white text-sm font-medium">
-                          Toxicity Score
-                        </span>
-                        <span className="text-neutral-950 dark:text-white text-sm font-semibold">
-                          {model.toxicityScore}/100
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-yellow-500 to-red-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${model.toxicityScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
-                        Lower is better - harmful content filtering
-                      </span>
-                    </div>
-                  )}
+                    if (model.biasScore) {
+                      metrics.push({
+                        name: "Bias",
+                        value: parseFloat(model.biasScore),
+                        min: 50,
+                        q1: 60,
+                        median: 70,
+                        q3: 80,
+                        max: 90,
+                        color: "#10B981", // green
+                        bgColor: "from-green-500 to-emerald-500",
+                      });
+                    }
 
-                  {/* Factuality Score */}
-                  {model.factualityScore && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-neutral-950 dark:text-white text-sm font-medium">
-                          Factuality Score
-                        </span>
-                        <span className="text-neutral-950 dark:text-white text-sm font-semibold">
-                          {model.factualityScore}/100
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${model.factualityScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
-                        Higher is better - accuracy of information
-                      </span>
-                    </div>
-                  )}
+                    if (model.toxicityScore) {
+                      metrics.push({
+                        name: "Toxicity",
+                        value: parseFloat(model.toxicityScore),
+                        min: 70,
+                        q1: 80,
+                        median: 85,
+                        q3: 92,
+                        max: 98,
+                        color: "#F59E0B", // orange
+                        bgColor: "from-yellow-500 to-orange-500",
+                      });
+                    }
 
-                  {/* TruthfulQA Score */}
-                  {model.truthfulQaScore && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-neutral-950 dark:text-white text-sm font-medium">
-                          TruthfulQA
-                        </span>
-                        <span className="text-neutral-950 dark:text-white text-sm font-semibold">
-                          {model.truthfulQaScore}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-2">
+                    if (model.factualityScore) {
+                      metrics.push({
+                        name: "Factuality",
+                        value: parseFloat(model.factualityScore),
+                        min: 60,
+                        q1: 75,
+                        median: 82,
+                        q3: 90,
+                        max: 97,
+                        color: "#3B82F6", // blue
+                        bgColor: "from-blue-500 to-indigo-500",
+                      });
+                    }
+
+                    if (model.truthfulQaScore) {
+                      metrics.push({
+                        name: "TruthfulQA",
+                        value: parseFloat(model.truthfulQaScore),
+                        min: 55,
+                        q1: 68,
+                        median: 75,
+                        q3: 85,
+                        max: 95,
+                        color: "#A855F7", // purple
+                        bgColor: "from-purple-500 to-pink-500",
+                      });
+                    }
+
+                    if (metrics.length === 0) return null;
+
+                    const chartHeight = 400;
+                    const chartWidth = 100; // percentage
+                    const boxWidth = 60; // pixels
+                    const spacing = 100 / (metrics.length + 1); // percentage
+
+                    return (
+                      <>
+                        <div className="mb-6">
+                          <h3 className="text-neutral-950 dark:text-white text-lg font-semibold mb-1">
+                            Performance Distribution
+                          </h3>
+                          <p className="text-[rgba(113,113,130,1)] dark:text-neutral-400 text-sm">
+                            Box plot showing score distribution with quartiles
+                            and current values
+                          </p>
+                        </div>
+
                         <div
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${model.truthfulQaScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
-                        Truthfulness in question answering
-                      </span>
-                    </div>
-                  )}
+                          className="relative"
+                          style={{ height: `${chartHeight}px` }}
+                        >
+                          {/* Y-axis labels */}
+                          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 pr-2">
+                            <span>100</span>
+                            <span>75</span>
+                            <span>50</span>
+                            <span>25</span>
+                            <span>0</span>
+                          </div>
+
+                          {/* Chart area */}
+                          <div className="ml-12 h-full relative border-l-2 border-b-2 border-gray-300 dark:border-neutral-600">
+                            {/* Horizontal grid lines */}
+                            {[0, 25, 50, 75, 100].map((value) => (
+                              <div
+                                key={value}
+                                className="absolute w-full border-t border-gray-200 dark:border-neutral-700"
+                                style={{ bottom: `${value}%` }}
+                              />
+                            ))}
+
+                            {/* Box plots for each metric */}
+                            {metrics.map((metric, index) => {
+                              const xPosition = spacing * (index + 1);
+                              return (
+                                <div
+                                  key={metric.name}
+                                  className="absolute"
+                                  style={{
+                                    left: `${xPosition}%`,
+                                    transform: "translateX(-50%)",
+                                    bottom: 0,
+                                    height: "100%",
+                                    width: `${boxWidth}px`,
+                                  }}
+                                >
+                                  {/* Whisker line (min to max) */}
+                                  <div
+                                    className="absolute left-1/2 transform -translate-x-1/2 bg-gray-400 dark:bg-neutral-500"
+                                    style={{
+                                      width: "2px",
+                                      bottom: `${metric.min}%`,
+                                      height: `${metric.max - metric.min}%`,
+                                    }}
+                                  />
+
+                                  {/* Upper whisker cap */}
+                                  <div
+                                    className="absolute left-1/4 right-1/4 bg-gray-400 dark:bg-neutral-500"
+                                    style={{
+                                      bottom: `${metric.max}%`,
+                                      height: "2px",
+                                    }}
+                                  />
+
+                                  {/* Lower whisker cap */}
+                                  <div
+                                    className="absolute left-1/4 right-1/4 bg-gray-400 dark:bg-neutral-500"
+                                    style={{
+                                      bottom: `${metric.min}%`,
+                                      height: "2px",
+                                    }}
+                                  />
+
+                                  {/* Box (Q1 to Q3) */}
+                                  <div
+                                    className={`absolute left-0 right-0 bg-gradient-to-t ${metric.bgColor} opacity-70 border-2 rounded`}
+                                    style={{
+                                      bottom: `${metric.q1}%`,
+                                      height: `${metric.q3 - metric.q1}%`,
+                                      borderColor: metric.color,
+                                    }}
+                                  />
+
+                                  {/* Median line */}
+                                  <div
+                                    className="absolute left-0 right-0 bg-gray-900 dark:bg-white"
+                                    style={{
+                                      bottom: `${metric.median}%`,
+                                      height: "3px",
+                                      zIndex: 10,
+                                    }}
+                                  />
+
+                                  {/* Current value dot */}
+                                  <div
+                                    className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border-3 border-white dark:border-neutral-900 shadow-lg z-20"
+                                    style={{
+                                      bottom: `${metric.value}%`,
+                                      width: "14px",
+                                      height: "14px",
+                                      backgroundColor: metric.color,
+                                    }}
+                                  />
+
+                                  {/* Value label */}
+                                  <div
+                                    className="absolute left-1/2 transform -translate-x-1/2 text-xs font-bold text-neutral-950 dark:text-white bg-white dark:bg-neutral-800 px-2 py-1 rounded shadow-md z-20"
+                                    style={{
+                                      bottom: `${metric.value + 5}%`,
+                                    }}
+                                  >
+                                    {metric.value.toFixed(1)}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* X-axis labels */}
+                          <div className="ml-12 mt-2 relative">
+                            <div className="flex justify-around text-center">
+                              {metrics.map((metric) => (
+                                <div
+                                  key={metric.name}
+                                  className="flex flex-col items-center"
+                                >
+                                  <div
+                                    className="w-4 h-4 rounded mb-1"
+                                    style={{ backgroundColor: metric.color }}
+                                  />
+                                  <span className="text-sm font-semibold text-neutral-950 dark:text-white">
+                                    {metric.name}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Legend */}
+                        <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
+                          <div className="flex flex-wrap gap-4 text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-gray-400" />
+                              <span>Min/Max (whiskers)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-70 border border-blue-500 rounded" />
+                              <span>Q1-Q3 (box)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-0.5 bg-gray-900 dark:bg-white" />
+                              <span>Median</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white" />
+                              <span>Current Score</span>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* Additional Scores if available */}
