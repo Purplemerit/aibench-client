@@ -243,9 +243,9 @@ const FeaturedModels = () => {
 
   if (loading) {
     return (
-      <section className="w-full flex flex-col items-center bg-[#F6F3FF] dark:bg-[#232136] px-20 py-16 max-md:px-10 max-md:py-12 max-sm:px-4 max-sm:py-6">
+      <section className="w-full flex flex-col items-center bg-[#F6F3FF] dark:bg-[#232136] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-8 sm:py-10 md:py-12 lg:py-16">
         <div className="w-full max-w-screen-xl">
-          <h2 className="text-3xl font-semibold leading-9 text-neutral-950 dark:text-white text-center mb-4">
+          <h2 className="text-2xl sm:text-3xl font-semibold leading-8 sm:leading-9 text-neutral-950 dark:text-white text-center mb-4">
             Featured Models
           </h2>
           <p className="text-center text-[#717182] dark:text-white">
@@ -257,23 +257,23 @@ const FeaturedModels = () => {
   }
 
   return (
-    <section className="w-full flex flex-col items-center bg-[#F6F3FF] dark:bg-[#232136] px-20 py-16 max-md:px-10 max-md:py-12 max-sm:px-4 max-sm:py-6">
+    <section className="w-full flex flex-col items-center bg-[#F6F3FF] dark:bg-[#232136] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-8 sm:py-10 md:py-12 lg:py-16">
       <div className="w-full max-w-screen-xl">
-        <h2 className="text-3xl font-semibold leading-9 text-neutral-950 dark:text-white text-center mb-4 max-sm:text-2xl max-sm:leading-[30px]">
+        <h2 className="text-2xl sm:text-3xl font-semibold leading-7 sm:leading-9 text-neutral-950 dark:text-white text-center mb-3 sm:mb-4 px-2">
           Featured Models
         </h2>
 
-        <p className="text-base font-normal leading-6 text-[#717182] dark:text-white text-center mb-[76px]">
+        <p className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-[#717182] dark:text-white text-center mb-8 sm:mb-12 md:mb-16 lg:mb-[76px] px-4">
           Discover the best AI models across different categories and use cases
         </p>
 
-        <div className="flex gap-6 justify-center items-start max-md:flex-col max-md:items-center max-md:gap-8 w-full">
+        <div className="flex gap-4 sm:gap-5 md:gap-6 justify-center items-stretch flex-col lg:flex-row lg:items-start w-full">
           {models.map((model, index) => (
             <div
               key={index}
-              className="flex flex-col items-start w-full max-w-md"
+              className="flex flex-col items-start w-full lg:max-w-md"
             >
-              <h3 className="text-lg font-normal leading-7 text-neutral-950 dark:text-white mb-4">
+              <h3 className="text-base sm:text-lg font-normal leading-6 sm:leading-7 text-neutral-950 dark:text-white mb-3 sm:mb-4">
                 {model.categoryTitle}
               </h3>
               <ModelCard
@@ -306,21 +306,21 @@ const FeaturedModels = () => {
 
         {/* Compare Bucket */}
         {compareModels.length > 0 && (
-          <div className="flex items-center justify-between mt-8 bg-[#F1EBFF] dark:bg-[#23232b] border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 rounded-[10px] px-6 py-3 max-md:flex-col max-md:gap-4">
-            <div className="flex gap-2 flex-wrap items-center">
-              <span className="text-sm font-semibold text-neutral-950 dark:text-white mr-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-6 sm:mt-8 bg-[#F1EBFF] dark:bg-[#23232b] border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 rounded-[10px] px-4 sm:px-6 py-3 sm:py-4 gap-3 sm:gap-4">
+            <div className="flex gap-2 flex-wrap items-center w-full sm:w-auto">
+              <span className="text-xs sm:text-sm font-semibold text-neutral-950 dark:text-white mr-1 sm:mr-2">
                 Compare Models ({compareModels.length}/3)
               </span>
               {compareModels.map((selectedModel) => (
                 <div
                   key={selectedModel.id}
-                  className="flex items-center bg-white dark:bg-neutral-800 rounded-lg px-3 py-1 mr-1 border border-[#B18BEF] dark:border-[#7c3aed]"
+                  className="flex items-center bg-white dark:bg-neutral-800 rounded-lg px-2 sm:px-3 py-1 border border-[#B18BEF] dark:border-[#7c3aed]"
                 >
-                  <span className="text-xs font-medium text-[#4B00A8] dark:text-purple-400 mr-2">
+                  <span className="text-xs font-medium text-[#4B00A8] dark:text-purple-400 mr-1 sm:mr-2 truncate max-w-[120px] sm:max-w-none">
                     {selectedModel.model}
                   </span>
                   <button
-                    className="ml-1 text-xs text-[#717182] hover:text-red-500"
+                    className="ml-1 text-sm sm:text-xs text-[#717182] hover:text-red-500"
                     onClick={() => removeModel(selectedModel.id)}
                     title="Remove"
                   >
@@ -329,20 +329,15 @@ const FeaturedModels = () => {
                 </div>
               ))}
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center w-full sm:w-auto justify-end">
               <button
-                className="text-xs font-semibold text-[#4B00A8] dark:text-purple-400 px-3 py-1 rounded hover:bg-white dark:hover:bg-neutral-900 border border-transparent hover:border-[#B18BEF] dark:hover:border-[#7c3aed] transition"
+                className="text-xs sm:text-sm font-semibold text-[#4B00A8] dark:text-purple-400 px-3 py-2 sm:py-1 rounded hover:bg-white dark:hover:bg-neutral-900 border border-transparent hover:border-[#B18BEF] dark:hover:border-[#7c3aed] transition"
                 onClick={clearAll}
               >
                 Clear All
               </button>
               <button
-                className={`min-w-[90px] px-5 h-9 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 text-sm font-semibold leading-5 text-center text-white${
-                  compareModels.length >= 2 ? " pr-6" : ""
-                }`}
-                style={{
-                  minWidth: compareModels.length > 0 ? 110 : 90,
-                }}
+                className="min-w-[100px] sm:min-w-[110px] px-4 sm:px-5 h-9 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 text-xs sm:text-sm font-semibold leading-5 text-center text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={compareModels.length < 2}
                 onClick={() => navigate("/comparison")}
               >

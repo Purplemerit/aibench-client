@@ -101,12 +101,12 @@ const ModelCard: React.FC<ModelCardProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start w-full">
       <div className="mb-2">{icon}</div>
 
-      <div className="w-[368px] h-[337px] relative bg-white dark:bg-black p-[25px] rounded-xl border border-gray-300 dark:border-gray-700 max-sm:w-full max-sm:max-w-[350px]">
+      <div className="w-full max-w-[368px] mx-auto h-auto min-h-[337px] relative bg-white dark:bg-black p-5 sm:p-[25px] rounded-xl border border-gray-300 dark:border-gray-700 flex flex-col">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="text-lg font-semibold leading-7 text-neutral-950 dark:text-white">
+          <h4 className="text-base sm:text-lg font-semibold leading-6 sm:leading-7 text-neutral-950 dark:text-white pr-8">
             {title}
           </h4>
 
@@ -136,7 +136,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
         </p>
 
         <div
-          className={`absolute h-[21px] flex items-center gap-1 px-[8.66px] py-[2.66px] rounded-lg right-[25px] top-[25px] ${
+          className={`absolute h-[21px] flex items-center gap-1 px-[8.66px] py-[2.66px] rounded-lg right-5 sm:right-[25px] top-5 sm:top-[25px] ${
             badgeColors[badge.type]
           }`}
         >
@@ -144,22 +144,24 @@ const ModelCard: React.FC<ModelCardProps> = ({
           <span className="text-xs font-semibold leading-4">{badge.label}</span>
         </div>
 
-        <div className="h-10 mb-5">
-          <p className="text-sm font-normal leading-5 text-[#717182] dark:text-white">
+        <div className="mb-5 flex-grow">
+          <p className="text-sm font-normal leading-5 text-[#717182] dark:text-white line-clamp-2">
             {description}
           </p>
         </div>
 
         <div className="mb-2">
-          <span className="text-sm font-normal leading-5 text-[#717182] dark:text-white">
-            Overall Score
-          </span>
-          <span className="text-sm font-semibold leading-5 text-neutral-950 dark:text-white absolute right-[25px]">
-            {score}
-          </span>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-normal leading-5 text-[#717182] dark:text-white">
+              Overall Score
+            </span>
+            <span className="text-sm font-semibold leading-5 text-neutral-950 dark:text-white">
+              {score}
+            </span>
+          </div>
         </div>
 
-        <div className="w-[319px] h-2 relative bg-[#F6F3FF] dark:bg-black mb-4 rounded-full">
+        <div className="w-full h-2 relative bg-[#F6F3FF] dark:bg-black mb-4 rounded-full">
           <div
             className="h-2 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-full border border-[#8A4DDF]"
             style={{ width: `${progressWidth}%` }}
@@ -179,17 +181,18 @@ const ModelCard: React.FC<ModelCardProps> = ({
           ))}
         </div>
 
-        <div className="flex gap-2 absolute left-[25px] bottom-[25px]">
+        <div className="flex gap-2 mt-auto w-full">
           <button
             onClick={() => modelId && navigate(`/model/${modelId}`)}
-            className="w-[154px] h-8 border flex items-center justify-center gap-2.5 cursor-pointer transition-all duration-200 bg-white dark:bg-black rounded-lg border-solid border-[#6931C9] hover:bg-gray-50 dark:hover:bg-black"
+            className="flex-1 h-8 border flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer transition-all duration-200 bg-white dark:bg-black rounded-lg border-solid border-[#6931C9] hover:bg-gray-50 dark:hover:bg-black"
           >
             <svg
-              width="16"
-              height="16"
+              width="14"
+              height="14"
               viewBox="0 0 17 16"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="sm:w-4 sm:h-4"
             >
               <path
                 d="M10.0598 2H14.0598V6"
@@ -213,20 +216,20 @@ const ModelCard: React.FC<ModelCardProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="text-sm font-semibold leading-5 text-center text-[#212121] dark:text-white">
+            <span className="text-xs sm:text-sm font-semibold leading-5 text-center text-[#212121] dark:text-white">
               Details
             </span>
           </button>
 
           <button
             onClick={onCompareToggle}
-            className={`w-[157px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
+            className={`flex-1 h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
               isSelected
                 ? "bg-green-500 hover:bg-green-600"
                 : "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90"
             }`}
           >
-            <span className="text-sm font-semibold leading-5 text-center text-white">
+            <span className="text-xs sm:text-sm font-semibold leading-5 text-center text-white">
               {isSelected ? "Selected" : "Compare"}
             </span>
           </button>

@@ -97,7 +97,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
   return (
     <div ref={dropdownRef} className="w-full h-full relative">
       <div
-        className={`w-full h-full flex items-center px-4 py-0 rounded-lg transition-colors duration-300 border ${
+        className={`w-full h-full flex items-center px-3 sm:px-4 py-3 sm:py-0 rounded-lg transition-colors duration-300 border ${
           isDark
             ? "bg-[#232136] border-[rgba(255,255,255,0.10)]"
             : "bg-white border-[rgba(0,0,0,0.10)] shadow-sm"
@@ -109,7 +109,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
           viewBox="0 0 17 17"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="mr-3"
+          className="mr-2 sm:mr-3 flex-shrink-0"
         >
           <path
             d="M14.5401 14.33L11.6467 11.4367"
@@ -132,7 +132,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
           value={searchValue}
           onChange={handleInputChange}
           placeholder={placeholder}
-          className="flex-1 text-sm font-normal text-[#717182] dark:text-white bg-transparent border-none outline-none placeholder:text-[#717182]"
+          className="flex-1 text-sm sm:text-base font-normal text-[#717182] dark:text-white bg-transparent border-none outline-none placeholder:text-[#717182]"
         />
 
         {loading && (
@@ -164,7 +164,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
       {/* Dropdown */}
       {isOpen && suggestions.length > 0 && (
         <div
-          className={`absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg border overflow-hidden z-50 max-h-96 overflow-y-auto ${
+          className={`absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg border overflow-hidden z-50 max-h-[60vh] sm:max-h-96 overflow-y-auto ${
             isDark
               ? "bg-[#232136] border-[rgba(255,255,255,0.10)]"
               : "bg-white border-[rgba(0,0,0,0.10)]"
@@ -174,30 +174,30 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
             <div
               key={model._id}
               onClick={() => handleModelClick(model._id)}
-              className={`p-4 cursor-pointer transition-colors border-b last:border-b-0 ${
+              className={`p-3 sm:p-4 cursor-pointer transition-colors border-b last:border-b-0 ${
                 isDark
                   ? "border-[rgba(255,255,255,0.05)] hover:bg-[rgba(177,139,239,0.15)]"
                   : "border-[rgba(0,0,0,0.05)] hover:bg-[rgba(177,139,239,0.08)]"
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <h4
-                    className={`text-sm font-semibold mb-1 truncate ${
+                    className={`text-xs sm:text-sm font-semibold mb-1 truncate ${
                       isDark ? "text-white" : "text-neutral-950"
                     }`}
                   >
                     {model.modelName}
                   </h4>
-                  <p className="text-xs text-[#717182] dark:text-neutral-400">
+                  <p className="text-[10px] sm:text-xs text-[#717182] dark:text-neutral-400 truncate">
                     {model.organization}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2 flex-shrink-0">
                   {model.globalRankPosition && (
                     <div
-                      className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                      className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold ${
                         model.globalRankPosition <= 3
                           ? "bg-gradient-to-b from-brand-500 via-brand-600 to-brand-800 text-white"
                           : "bg-brand-50 text-brand-900"
@@ -209,7 +209,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
 
                   {model.modelType && (
                     <div
-                      className={`px-2 py-1 rounded-md text-xs font-medium border ${
+                      className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-medium border ${
                         isDark
                           ? "border-[rgba(255,255,255,0.10)] text-white"
                           : "border-[rgba(0,0,0,0.10)] text-neutral-950"
@@ -223,10 +223,10 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
 
               {model.overallBenchmarkScore !== undefined && (
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-xs text-[#717182] dark:text-neutral-400">
+                  <span className="text-[10px] sm:text-xs text-[#717182] dark:text-neutral-400">
                     Score:
                   </span>
-                  <div className="flex-1 max-w-[120px] h-1.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                  <div className="flex-1 max-w-[80px] sm:max-w-[120px] h-1 sm:h-1.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-brand-500 via-brand-600 to-brand-800 rounded-full"
                       style={{
@@ -234,7 +234,7 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
                       }}
                     />
                   </div>
-                  <span className="text-xs font-medium text-neutral-950 dark:text-white">
+                  <span className="text-[10px] sm:text-xs font-medium text-neutral-950 dark:text-white">
                     {model.overallBenchmarkScore.toFixed(1)}
                   </span>
                 </div>
