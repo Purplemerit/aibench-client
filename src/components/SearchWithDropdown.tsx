@@ -1,0 +1,250 @@
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../lib/api";
+
+interface Model {
+  _id: string;
+  modelName: string;
+  organization: string;
+  modelType?: string;
+  overallBenchmarkScore?: number;
+  globalRankPosition?: number;
+  openSource?: string;
+}
+
+interface SearchWithDropdownProps {
+  placeholder?: string;
+  isDark?: boolean;
+  onSearch?: (value: string) => void;
+}
+
+const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
+  placeholder = "Search by model name...",
+  isDark = false,
+  onSearch,
+}) => {
+  const [searchValue, setSearchValue] = useState("");
+  const [suggestions, setSuggestions] = useState<Model[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch suggestions when search value changes
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!searchValue.trim()) {
+        setSuggestions([]);
+        setIsOpen(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await api.getAllModels({ limit: 10 });
+        if (response.success && response.data) {
+          const filtered = response.data.filter(
+            (model: Model) =>
+              model.modelName
+                ?.toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
+              model.organization
+                ?.toLowerCase()
+                .includes(searchValue.toLowerCase())
+          );
+          setSuggestions(filtered);
+          setIsOpen(filtered.length > 0);
+        }
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [searchValue]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    onSearch?.(value);
+  };
+
+  const handleModelClick = (modelId: string) => {
+    navigate(`/model/${modelId}`);
+    setIsOpen(false);
+    setSearchValue("");
+  };
+
+  return (
+    <div ref={dropdownRef} className="w-full h-full relative">
+      <div
+        className={`w-full h-full flex items-center px-4 py-0 rounded-lg transition-colors duration-300 border ${
+          isDark
+            ? "bg-[#232136] border-[rgba(255,255,255,0.10)]"
+            : "bg-white border-[rgba(0,0,0,0.10)] shadow-sm"
+        }`}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 17 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="mr-3"
+        >
+          <path
+            d="M14.5401 14.33L11.6467 11.4367"
+            stroke="#717182"
+            strokeWidth="1.33333"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M7.87337 12.9967C10.8189 12.9967 13.2067 10.6089 13.2067 7.66335C13.2067 4.71783 10.8189 2.33002 7.87337 2.33002C4.92785 2.33002 2.54004 4.71783 2.54004 7.66335C2.54004 10.6089 4.92785 12.9967 7.87337 12.9967Z"
+            stroke="#717182"
+            strokeWidth="1.33333"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+
+        <input
+          type="text"
+          value={searchValue}
+          onChange={handleInputChange}
+          placeholder={placeholder}
+          className="flex-1 text-sm font-normal text-[#717182] dark:text-white bg-transparent border-none outline-none placeholder:text-[#717182]"
+        />
+
+        {loading && (
+          <div className="ml-2">
+            <svg
+              className="animate-spin h-4 w-4 text-[#717182]"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+        )}
+      </div>
+
+      {/* Dropdown */}
+      {isOpen && suggestions.length > 0 && (
+        <div
+          className={`absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg border overflow-hidden z-50 max-h-96 overflow-y-auto ${
+            isDark
+              ? "bg-[#232136] border-[rgba(255,255,255,0.10)]"
+              : "bg-white border-[rgba(0,0,0,0.10)]"
+          }`}
+        >
+          {suggestions.map((model) => (
+            <div
+              key={model._id}
+              onClick={() => handleModelClick(model._id)}
+              className={`p-4 cursor-pointer transition-colors border-b last:border-b-0 ${
+                isDark
+                  ? "border-[rgba(255,255,255,0.05)] hover:bg-[rgba(177,139,239,0.15)]"
+                  : "border-[rgba(0,0,0,0.05)] hover:bg-[rgba(177,139,239,0.08)]"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h4
+                    className={`text-sm font-semibold mb-1 truncate ${
+                      isDark ? "text-white" : "text-neutral-950"
+                    }`}
+                  >
+                    {model.modelName}
+                  </h4>
+                  <p className="text-xs text-[#717182] dark:text-neutral-400">
+                    {model.organization}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {model.globalRankPosition && (
+                    <div
+                      className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                        model.globalRankPosition <= 3
+                          ? "bg-gradient-to-b from-brand-500 via-brand-600 to-brand-800 text-white"
+                          : "bg-brand-50 text-brand-900"
+                      }`}
+                    >
+                      #{model.globalRankPosition}
+                    </div>
+                  )}
+
+                  {model.modelType && (
+                    <div
+                      className={`px-2 py-1 rounded-md text-xs font-medium border ${
+                        isDark
+                          ? "border-[rgba(255,255,255,0.10)] text-white"
+                          : "border-[rgba(0,0,0,0.10)] text-neutral-950"
+                      }`}
+                    >
+                      {model.modelType}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {model.overallBenchmarkScore !== undefined && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-[#717182] dark:text-neutral-400">
+                    Score:
+                  </span>
+                  <div className="flex-1 max-w-[120px] h-1.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-brand-500 via-brand-600 to-brand-800 rounded-full"
+                      style={{
+                        width: `${Math.min(model.overallBenchmarkScore, 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-neutral-950 dark:text-white">
+                    {model.overallBenchmarkScore.toFixed(1)}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SearchWithDropdown;

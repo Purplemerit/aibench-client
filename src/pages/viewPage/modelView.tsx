@@ -79,7 +79,7 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
   if (!model) return null;
 
   return (
-    <section className="flex flex-col items-stretch max-md:max-w-full dark:bg-neutral-900">
+    <section className="flex flex-col items-stretch max-md:max-w-full dark:bg-neutral-900 mt-20">
       <button
         className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none
           hover:bg-[rgba(177,139,239,0.15)] hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.15)]

@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SearchWithDropdown from "@/components/SearchWithDropdown";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
@@ -289,13 +290,10 @@ export default function Leaderboard() {
             </div>
 
             {/* Search */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
+            <div className="relative mb-6 h-12">
+              <SearchWithDropdown
                 placeholder="Search models or organizations..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg"
+                onSearch={setSearchQuery}
               />
             </div>
 

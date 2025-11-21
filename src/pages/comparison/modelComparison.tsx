@@ -962,7 +962,7 @@ const ModelComparisonPage = () => {
       <div className="box-border flex w-full min-h-screen flex-col justify-center items-start bg-white dark:bg-black">
         <div className="box-border flex w-full flex-col justify-start items-start bg-white dark:bg-black">
           <Navigation />
-          <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px_-_309px)] bg-[#F6F3FF] dark:bg-neutral-950 px-8 py-8 max-md:px-4 max-md:py-8 max-sm:px-2 max-sm:py-4">
+          <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px_-_309px)] bg-[#F6F3FF] dark:bg-neutral-950 px-8 py-8 pt-24 max-md:px-4 max-md:py-8 max-sm:px-2 max-sm:py-4">
             <div className="box-border w-full max-w-screen-xl relative">
               {/* Back Button */}
               <button

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SearchInput from "./SearchInput";
+import SearchWithDropdown from "./SearchWithDropdown";
 import CategoryFilter from "./CategoryFilter";
 
 const HeroSection = () => {
@@ -66,7 +66,7 @@ const HeroSection = () => {
       </p>
 
       <div className="w-[672px] h-12 mb-6 max-md:w-full max-md:max-w-[500px] max-sm:w-full">
-        <SearchInput onSearch={handleSearch} isDark={isDark} />
+        <SearchWithDropdown onSearch={handleSearch} isDark={isDark} />
       </div>
     </section>
   );
