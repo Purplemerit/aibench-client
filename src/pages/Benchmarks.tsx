@@ -104,7 +104,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 }) => {
   return (
     <aside
-      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-6 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
+      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-6 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid h-full max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
     >
       <div className="flex items-stretch gap-2 text-base text-neutral-950 dark:text-white font-normal leading-none mb-9">
         <svg
@@ -269,7 +269,7 @@ const BenchmarkChart: React.FC<BenchmarkChartProps> = ({
                 }}
                 labelStyle={{ color: "#000" }}
               />
-              <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+              <Bar dataKey="score" radius={[8, 8, 0, 0]} barSize={60}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index]} />
                 ))}
@@ -428,8 +428,8 @@ const BenchmarksPage = () => {
                 </p>
               </header>
               <section className="self-stretch max-md:max-w-full">
-                <div className="gap-5 flex max-md:flex-col max-md:items-stretch">
-                  <div className="w-[24%] max-lg:w-[35%] max-md:w-full max-md:ml-0">
+                <div className="gap-5 flex items-stretch max-md:flex-col">
+                  <div className="w-[24%] max-lg:w-[35%] max-md:w-full max-md:ml-0 flex">
                     <ChartControls
                       selectedBenchmark={selectedBenchmark}
                       onBenchmarkChange={setSelectedBenchmark}
@@ -438,7 +438,7 @@ const BenchmarksPage = () => {
                       onToggleModel={toggleModel}
                     />
                   </div>
-                  <div className="w-[76%] ml-5 max-lg:w-[65%] max-md:w-full max-md:ml-0">
+                  <div className="w-[76%] ml-5 max-lg:w-[65%] max-md:w-full max-md:ml-0 flex">
                     <BenchmarkChart selectedModels={selectedModels} />
                   </div>
                 </div>
