@@ -102,9 +102,11 @@ const ChartControls: React.FC<ChartControlsProps> = ({
   onToggleModel,
   className = "",
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <aside
-      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-6 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid h-full max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
+      className={`bg-white dark:bg-neutral-900 border flex w-full flex-col mx-auto pt-6 pb-6 px-6 rounded-[14px] border-[rgba(0,0,0,0.1)] border-solid h-full overflow-visible max-md:mt-6 max-md:px-4 max-sm:px-2 ${className}`}
     >
       <div className="flex items-stretch gap-2 text-base text-neutral-950 dark:text-white font-normal leading-none mb-9">
         <svg
@@ -130,32 +132,58 @@ const ChartControls: React.FC<ChartControlsProps> = ({
           Benchmark Type
         </label>
         <div className="relative">
-          <select
-            id="benchmark-select"
-            value={selectedBenchmark}
-            onChange={(e) => onBenchmarkChange(e.target.value)}
-            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-800 w-full flex items-stretch gap-5 text-sm text-neutral-950 dark:text-white font-normal leading-none justify-between px-3 py-2.5 rounded-lg appearance-none cursor-pointer border border-gray-300 dark:border-gray-600"
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-800 w-full flex items-center gap-5 text-sm text-neutral-950 dark:text-white font-normal leading-none justify-between px-3 py-2.5 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600 text-left"
           >
-            <option value="All">All Models</option>
-            {modelTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-600 dark:text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+            <span>
+              {selectedBenchmark === "All" ? "All Models" : selectedBenchmark}
+            </span>
+            <svg
+              className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${
+                isOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          {isOpen && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  onBenchmarkChange("All");
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-3 py-2.5 text-sm text-neutral-950 dark:text-white hover:bg-[rgba(246,243,255,1)] dark:hover:bg-neutral-700 transition-colors"
+              >
+                All Models
+              </button>
+              {modelTypes.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => {
+                    onBenchmarkChange(type);
+                    setIsOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm text-neutral-950 dark:text-white hover:bg-[rgba(246,243,255,1)] dark:hover:bg-neutral-700 transition-colors"
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <ModelSelector models={models} onToggleModel={onToggleModel} />
