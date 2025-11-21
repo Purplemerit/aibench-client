@@ -707,41 +707,80 @@ const PerformanceAnalysis: React.FC<PerformanceAnalysisProps> = ({
     fetchDetailedData();
   }, [selectedModels]);
 
-  // Calculate efficiency (score per dollar)
+  // Calculate efficiency (score per dollar for 1M tokens)
   const getEfficiency = (model: DetailedModel) => {
-    const inputPrice =
-      typeof model.inputPrice === "string"
-        ? parseFloat(model.inputPrice)
-        : model.inputPrice || 0;
-    const outputPrice =
-      typeof model.outputPrice === "string"
-        ? parseFloat(model.outputPrice)
-        : model.outputPrice || 0;
+    // Helper to parse price strings
+    const parsePriceString = (price: string | number | undefined): number => {
+      if (typeof price === "number") return price;
+      if (!price || typeof price !== "string") return 0;
 
-    const input = isNaN(inputPrice) ? 0 : inputPrice;
-    const output = isNaN(outputPrice) ? 0 : outputPrice;
-    const totalCost = input + output;
+      const trimmed = price.trim();
+
+      // Check for free models
+      if (
+        trimmed.toLowerCase().includes("free") ||
+        trimmed.toLowerCase().includes("self-hosted")
+      ) {
+        return 0;
+      }
+
+      // Remove $ and extract first number
+      const cleaned = trimmed.replace(/\$/g, "");
+      const match = cleaned.match(/(\d+\.?\d*)/);
+
+      if (match) {
+        const parsed = parseFloat(match[1]);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+
+      return 0;
+    };
+
+    const inputPrice = parsePriceString(model.inputPrice);
+    const outputPrice = parsePriceString(model.outputPrice);
+
+    // Convert to cost per 1M tokens
+    const totalCost = (inputPrice + outputPrice) * 1000;
     const score = model.overallBenchmarkScore || 0;
 
-    if (totalCost === 0) return "Free";
+    if (totalCost === 0) return "N/A";
     return (score / totalCost).toFixed(1);
   };
 
-  // Get cost per 1M tokens
+  // Get cost per 1M tokens (prices in DB are per 1K tokens)
   const getTotalCost = (model: DetailedModel) => {
-    const inputPrice =
-      typeof model.inputPrice === "string"
-        ? parseFloat(model.inputPrice)
-        : model.inputPrice || 0;
-    const outputPrice =
-      typeof model.outputPrice === "string"
-        ? parseFloat(model.outputPrice)
-        : model.outputPrice || 0;
+    // Helper to parse price strings
+    const parsePriceString = (price: string | number | undefined): number => {
+      if (typeof price === "number") return price;
+      if (!price || typeof price !== "string") return 0;
 
-    const input = isNaN(inputPrice) ? 0 : inputPrice;
-    const output = isNaN(outputPrice) ? 0 : outputPrice;
+      const trimmed = price.trim();
 
-    return input + output;
+      // Check for free models
+      if (
+        trimmed.toLowerCase().includes("free") ||
+        trimmed.toLowerCase().includes("self-hosted")
+      ) {
+        return 0;
+      }
+
+      // Remove $ and extract first number
+      const cleaned = trimmed.replace(/\$/g, "");
+      const match = cleaned.match(/(\d+\.?\d*)/);
+
+      if (match) {
+        const parsed = parseFloat(match[1]);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+
+      return 0;
+    };
+
+    const inputPrice = parsePriceString(model.inputPrice);
+    const outputPrice = parsePriceString(model.outputPrice);
+
+    // Multiply by 1000 to convert from per 1K tokens to per 1M tokens
+    return (inputPrice + outputPrice) * 1000;
   };
 
   return (
