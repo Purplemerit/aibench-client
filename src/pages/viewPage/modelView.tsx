@@ -84,7 +84,7 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
         className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none
           hover:bg-[rgba(177,139,239,0.15)] hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.15)]
           dark:hover:bg-[rgba(177,139,239,0.25)] dark:hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.25)]"
-        onClick={() => navigate("/leaderboard")}
+        onClick={() => navigate(-1)}
         type="button"
       >
         <span
@@ -111,7 +111,7 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
           </svg>
         </span>
         <span className="transition-colors duration-200 group-hover:underline">
-          Back to Leaderboard
+          Back
         </span>
       </button>
       <div className="flex w-full items-stretch gap-5 flex-wrap justify-between mt-[34px] max-md:max-w-full">
