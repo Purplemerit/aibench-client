@@ -108,6 +108,8 @@ export default function Leaderboard() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLicense, setSelectedLicense] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const modelsPerPage = 20;
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -238,6 +240,22 @@ export default function Leaderboard() {
     return matchesSearch && matchesCategory && matchesLicense && matchesYear;
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredModels.length / modelsPerPage);
+  const startIndex = (currentPage - 1) * modelsPerPage;
+  const endIndex = startIndex + modelsPerPage;
+  const paginatedModels = filteredModels.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedLicense, selectedYear]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
@@ -265,32 +283,32 @@ export default function Leaderboard() {
     <div className="min-h-screen bg-[#F1EBFF] dark:bg-black dark:text-white">
       <Navigation />
 
-      <main className="px-8 py-8 pt-24 max-md:px-4 max-sm:px-2">
+      <main className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
         <div className="max-w-7xl mx-auto">
           {/* Title Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
               AI Model Leaderboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
               Comprehensive rankings of AI models across different modalities
               and benchmarks
             </p>
           </div>
 
           {/* Filters Card */}
-          <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 mb-8 max-md:p-4 max-sm:p-2">
-            <div className="mb-6">
-              <h3 className="text-base font-semibold text-neutral-950 dark:text-white mb-1">
+          <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 mb-6 sm:mb-8">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-sm sm:text-base font-semibold text-neutral-950 dark:text-white mb-1">
                 Filters
               </h3>
-              <p className="text-base font-normal leading-6 text-[#717182] dark:text-gray-400">
+              <p className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-[#717182] dark:text-gray-400">
                 Refine the leaderboard based on your preferences
               </p>
             </div>
 
             {/* Search */}
-            <div className="relative mb-6 h-12">
+            <div className="relative mb-4 sm:mb-6 h-10 sm:h-12">
               <SearchWithDropdown
                 placeholder="Search models or organizations..."
                 onSearch={setSearchQuery}
@@ -298,12 +316,12 @@ export default function Leaderboard() {
             </div>
 
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
               {categories.map((category, index) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 h-8 text-xs font-semibold rounded-lg border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 transition-all duration-200 ${
+                  className={`px-3 sm:px-4 h-7 sm:h-8 text-xs font-semibold rounded-lg border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 transition-all duration-200 ${
                     selectedCategory === category
                       ? "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] text-white"
                       : "bg-[#F1EBFF] dark:bg-[#23232b] text-[#030213] dark:text-white"
@@ -315,16 +333,16 @@ export default function Leaderboard() {
             </div>
 
             {/* Dropdowns */}
-            <div className="flex gap-4 max-md:flex-col">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
-                <label className="block text-sm text-neutral-950 dark:text-white mb-2">
+                <label className="block text-xs sm:text-sm text-neutral-950 dark:text-white mb-2">
                   License
                 </label>
                 <Select
                   value={selectedLicense}
                   onValueChange={setSelectedLicense}
                 >
-                  <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9">
+                  <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9 text-sm">
                     <SelectValue placeholder="All Licenses" />
                   </SelectTrigger>
                   <SelectContent>
@@ -339,11 +357,11 @@ export default function Leaderboard() {
               </div>
 
               <div className="flex-1">
-                <label className="block text-sm text-neutral-950 dark:text-white mb-2">
+                <label className="block text-xs sm:text-sm text-neutral-950 dark:text-white mb-2">
                   Release Year
                 </label>
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9">
+                  <SelectTrigger className="bg-[#F6F4FA] dark:bg-[#23232b] border-0 rounded-lg h-9 text-sm">
                     <SelectValue placeholder="All Years" />
                   </SelectTrigger>
                   <SelectContent>
@@ -360,17 +378,69 @@ export default function Leaderboard() {
           </div>
 
           {/* Results Card */}
-          <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 overflow-hidden max-md:p-4 max-sm:p-2">
+          <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 overflow-hidden">
             <div className="pb-0">
-              <h3 className="text-base font-semibold text-neutral-950 dark:text-white mb-1">
+              <h3 className="text-sm sm:text-base font-semibold text-neutral-950 dark:text-white mb-1">
                 Results ({filteredModels.length} models)
               </h3>
-              <p className="text-base font-normal leading-6 text-[#717182] dark:text-gray-400 mb-6">
-                Click column headers to sort
+              <p className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-[#717182] dark:text-gray-400 mb-4 sm:mb-6">
+                Showing {startIndex + 1}-
+                {Math.min(endIndex, filteredModels.length)} of{" "}
+                {filteredModels.length} models
               </p>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Compare Bucket - Mobile */}
+            {compareModels.length > 0 && (
+              <div className="md:hidden mb-4">
+                <div className="bg-[#F1EBFF] dark:bg-[#23232b] border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 rounded-[10px] px-4 py-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-neutral-950 dark:text-white">
+                      Compare ({compareModels.length}/4)
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        className="text-xs font-semibold text-[#4B00A8] dark:text-purple-400 px-3 py-1 rounded hover:bg-white/50 dark:hover:bg-neutral-900/50 transition"
+                        onClick={handleClearAll}
+                      >
+                        Clear
+                      </button>
+                      <button
+                        className={`px-4 h-8 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 text-xs font-semibold text-white ${
+                          compareModels.length < 2 ? "opacity-50" : ""
+                        }`}
+                        disabled={compareModels.length < 2}
+                        onClick={handleCompare}
+                      >
+                        Compare ({compareModels.length})
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {compareModels.map((selectedModel) => (
+                      <div
+                        key={selectedModel.id}
+                        className="flex items-center bg-white dark:bg-neutral-800 rounded-lg px-2 py-1 border border-[#B18BEF] dark:border-[#7c3aed]"
+                      >
+                        <span className="text-xs font-medium text-[#4B00A8] dark:text-purple-400 mr-1">
+                          {selectedModel.model}
+                        </span>
+                        <button
+                          className="text-sm text-[#717182] hover:text-red-500"
+                          onClick={() => handleRemoveModel(selectedModel.id)}
+                          title="Remove"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full min-w-[900px]">
                 <thead className="border-b-[0.667px] border-b-[rgba(0,0,0,0.10)] border-solid">
                   <tr>
@@ -402,10 +472,10 @@ export default function Leaderboard() {
                 </thead>
                 <tbody>
                   {(() => {
-                    const firstSelectedIndex = filteredModels.findIndex(
+                    const firstSelectedIndex = paginatedModels.findIndex(
                       (model) => compareModels.some((m) => m.id === model.id)
                     );
-                    return filteredModels.map((model, index) => (
+                    return paginatedModels.map((model, index) => (
                       <React.Fragment key={model.rank}>
                         {/* Insert compare bucket row only once, before the first selected model */}
                         {compareModels.length > 0 &&
@@ -558,6 +628,202 @@ export default function Leaderboard() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden w-full space-y-3">
+              {paginatedModels.map((model, index) => (
+                <div
+                  key={model.rank}
+                  className="bg-gray-50 dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`h-[21px] px-2 py-1 flex items-center justify-center rounded-lg ${
+                          model.rank === 1
+                            ? "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)]"
+                            : "bg-[#F1EBFF] dark:bg-[#232136]"
+                        }`}
+                      >
+                        <span
+                          className={`text-xs font-semibold ${
+                            model.rank === 1
+                              ? "text-white"
+                              : "text-[#232136] dark:text-[#C3C2D4]"
+                          }`}
+                        >
+                          #{model.rank}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-semibold text-neutral-950 dark:text-white">
+                        {model.model}
+                      </h4>
+                    </div>
+                    <div
+                      className={`h-[21px] px-2 py-1 flex items-center justify-center rounded-lg border ${
+                        model.license === "Open Source"
+                          ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                          : "border-gray-300 dark:border-gray-700 bg-[#F1EBFF] dark:bg-[#232136]"
+                      }`}
+                    >
+                      <span
+                        className={`text-xs font-semibold ${
+                          model.license === "Open Source"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-neutral-950 dark:text-white"
+                        }`}
+                      >
+                        {model.license}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#717182] dark:text-neutral-400">
+                        Organization
+                      </span>
+                      <span className="text-sm font-medium text-neutral-950 dark:text-white">
+                        {model.organization}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#717182] dark:text-neutral-400">
+                        Score
+                      </span>
+                      <span className="text-lg font-bold text-[#4B00A8] dark:text-purple-400">
+                        {model.score}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#717182] dark:text-neutral-400">
+                        Cost
+                      </span>
+                      <span className="text-sm font-medium text-neutral-950 dark:text-white">
+                        {model.cost}
+                        {model.cost !== "Free" && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {" "}
+                            tokens
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#717182] dark:text-neutral-400">
+                        Released
+                      </span>
+                      <span className="text-sm font-medium text-neutral-950 dark:text-white">
+                        {model.released}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/model/${model.id}`)}
+                      className="flex-1 h-8 border flex items-center justify-center cursor-pointer transition-all duration-200 bg-white dark:bg-black rounded-lg border-solid border-[rgba(0,0,0,0.10)] hover:bg-gray-50 dark:hover:bg-neutral-800"
+                    >
+                      <span className="text-xs font-semibold text-neutral-950 dark:text-white">
+                        View Details
+                      </span>
+                    </button>
+
+                    <button
+                      className={`flex-1 h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
+                        isSelected(model.id)
+                          ? "bg-[#717182] opacity-80"
+                          : "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90"
+                      }`}
+                      disabled={!isSelected(model.id) && !canAddMore}
+                      onClick={() => handleCompareClick(model)}
+                    >
+                      <span className="text-xs font-semibold text-white">
+                        {isSelected(model.id) ? "Remove" : "Compare"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+                <div className="text-sm text-[#717182] dark:text-gray-400">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
+                    disabled={currentPage === 1}
+                    className={`px-4 h-9 flex items-center justify-center rounded-lg border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 transition-all duration-200 ${
+                      currentPage === 1
+                        ? "bg-gray-100 dark:bg-neutral-800 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                        : "bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white hover:bg-gray-50 dark:hover:bg-neutral-800"
+                    }`}
+                  >
+                    <span className="text-sm font-semibold">Previous</span>
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((page) => {
+                        // Show first page, last page, current page, and pages around current
+                        return (
+                          page === 1 ||
+                          page === totalPages ||
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        );
+                      })
+                      .map((page, idx, arr) => {
+                        // Add ellipsis if there's a gap
+                        const prevPage = arr[idx - 1];
+                        const showEllipsis = prevPage && page - prevPage > 1;
+
+                        return (
+                          <React.Fragment key={page}>
+                            {showEllipsis && (
+                              <span className="px-2 h-9 flex items-center text-[#717182] dark:text-gray-400">
+                                ...
+                              </span>
+                            )}
+                            <button
+                              onClick={() => setCurrentPage(page)}
+                              className={`min-w-[36px] h-9 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                                currentPage === page
+                                  ? "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] text-white"
+                                  : "bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                              }`}
+                            >
+                              <span className="text-sm font-semibold">
+                                {page}
+                              </span>
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className={`px-4 h-9 flex items-center justify-center rounded-lg border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 transition-all duration-200 ${
+                      currentPage === totalPages
+                        ? "bg-gray-100 dark:bg-neutral-800 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                        : "bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white hover:bg-gray-50 dark:hover:bg-neutral-800"
+                    }`}
+                  >
+                    <span className="text-sm font-semibold">Next</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
