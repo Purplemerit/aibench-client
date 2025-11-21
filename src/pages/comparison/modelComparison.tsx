@@ -41,6 +41,7 @@ interface ModelDetail {
 
 // ModelCard component
 interface ModelCardProps {
+  modelId: string;
   name: string;
   company: string;
   score: string;
@@ -54,6 +55,7 @@ interface ModelCardProps {
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({
+  modelId,
   name,
   company,
   score,
@@ -171,7 +173,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
 
       <button
         className="flex w-full justify-center items-center gap-2.5 cursor-pointer border bg-white dark:bg-neutral-900 py-2 px-4 rounded-lg border-solid border-[#6931C9] dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/40 transition-colors"
-        onClick={() => navigate("/viewPage/modelView")}
+        onClick={() => navigate(`/model/${modelId}`)}
         type="button"
       >
         <div
@@ -1032,6 +1034,7 @@ const ModelComparisonPage = () => {
                 {compareModels.map((model) => (
                   <ModelCard
                     key={model.id}
+                    modelId={model.id}
                     name={model.model}
                     company={model.organization}
                     score={model.score.toString()}
