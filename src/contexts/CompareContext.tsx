@@ -29,7 +29,7 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
   const [compareModels, setCompareModels] = useState<CompareModel[]>([]);
 
   const addModel = (model: CompareModel): boolean => {
-    if (compareModels.length >= 4) {
+    if (compareModels.length >= 3) {
       return false;
     }
     if (compareModels.some((m) => m.id === model.id)) {
@@ -51,7 +51,7 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
     return compareModels.some((m) => m.id === id);
   };
 
-  const canAddMore = compareModels.length < 4;
+  const canAddMore = compareModels.length < 3;
 
   return (
     <CompareContext.Provider

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import SearchInput from "./SearchInput";
 import CategoryFilter from "./CategoryFilter";
@@ -22,7 +21,10 @@ const HeroSection = () => {
     const observer = new MutationObserver(() => {
       setIsDark(document.body.classList.contains("dark"));
     });
-    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -40,7 +42,12 @@ const HeroSection = () => {
       style={
         isDark
           ? { backgroundColor: "#000" }
-          : { backgroundImage: "url('https://api.builder.io/api/v1/image/assets/TEMP/d3493e73b42d3cb1b32aa3c6bbb80f34174df5f0?width=2880')", backgroundSize: "cover", backgroundPosition: "center" }
+          : {
+              backgroundImage:
+                "url('https://api.builder.io/api/v1/image/assets/TEMP/d3493e73b42d3cb1b32aa3c6bbb80f34174df5f0?width=2880')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
       }
     >
       <h1 className="text-6xl font-semibold leading-[60px] tracking-[-1.5px] text-center max-w-[932px] mb-[15px] max-md:text-5xl max-md:leading-[52px] max-sm:text-4xl max-sm:leading-10">
@@ -48,7 +55,9 @@ const HeroSection = () => {
         <span className="bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] bg-clip-text text-transparent">
           AI Models{" "}
         </span>
-        <span className="text-neutral-950 dark:text-white">Across Modalities</span>
+        <span className="text-neutral-950 dark:text-white">
+          Across Modalities
+        </span>
       </h1>
 
       <p className="text-xl font-normal leading-7 text-[#717182] dark:text-gray-300 text-center max-w-[670px] mb-10 max-md:text-lg max-md:leading-6 max-sm:text-base max-sm:leading-5">
@@ -58,14 +67,6 @@ const HeroSection = () => {
 
       <div className="w-[672px] h-12 mb-6 max-md:w-full max-md:max-w-[500px] max-sm:w-full">
         <SearchInput onSearch={handleSearch} isDark={isDark} />
-      </div>
-
-      <div className="w-full flex justify-center">
-        <CategoryFilter
-          categories={categories}
-          onCategoryChange={handleCategoryChange}
-          isDark={isDark}
-        />
       </div>
     </section>
   );

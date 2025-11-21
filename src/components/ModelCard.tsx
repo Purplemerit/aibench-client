@@ -15,6 +15,8 @@ interface ModelCardProps {
   icon: React.ReactNode;
   featured?: boolean;
   modelId?: string;
+  isSelected?: boolean;
+  onCompareToggle?: () => void;
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({
@@ -28,6 +30,8 @@ const ModelCard: React.FC<ModelCardProps> = ({
   icon,
   featured = false,
   modelId,
+  isSelected = false,
+  onCompareToggle,
 }) => {
   const navigate = useNavigate();
   const progressWidth = (score / maxScore) * 100;
@@ -214,9 +218,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
             </span>
           </button>
 
-          <button className="w-[157px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90">
+          <button
+            onClick={onCompareToggle}
+            className={`w-[157px] h-8 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-lg ${
+              isSelected
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90"
+            }`}
+          >
             <span className="text-sm font-semibold leading-5 text-center text-white">
-              Compare
+              {isSelected ? "Selected" : "Compare"}
             </span>
           </button>
         </div>

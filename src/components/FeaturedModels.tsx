@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ModelCard from "./ModelCard";
 import { api } from "@/lib/api";
+import { useCompare } from "@/contexts/CompareContext";
 
 const FeaturedModels = () => {
+  const navigate = useNavigate();
+  const { compareModels, addModel, removeModel, clearAll, isSelected } =
+    useCompare();
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -87,6 +92,14 @@ const FeaturedModels = () => {
             categoryTitle: item.categoryTitle,
             featured: index === 0,
             modelId: item.model._id,
+            // Add data needed for comparison
+            rank: index + 1,
+            type: item.model.modelType || "N/A",
+            cost: item.model.inputPrice
+              ? `$${item.model.inputPrice}/1M tokens`
+              : "Free",
+            license: item.model.openSource === "Yes" ? "Open Source" : "API",
+            released: item.model.releaseDate || "N/A",
           }));
 
           setModels(formattedModels);
@@ -263,10 +276,82 @@ const FeaturedModels = () => {
               <h3 className="text-lg font-normal leading-7 text-neutral-950 dark:text-white mb-4">
                 {model.categoryTitle}
               </h3>
-              <ModelCard {...model} />
+              <ModelCard
+                {...model}
+                isSelected={isSelected(model.modelId)}
+                onCompareToggle={() => {
+                  if (isSelected(model.modelId)) {
+                    removeModel(model.modelId);
+                  } else {
+                    const success = addModel({
+                      id: model.modelId,
+                      rank: model.rank,
+                      model: model.title,
+                      organization: model.organization,
+                      score: model.score,
+                      type: model.type,
+                      cost: model.cost,
+                      license: model.license,
+                      released: model.released,
+                    });
+                    if (!success) {
+                      alert("You can only compare up to 3 models at a time.");
+                    }
+                  }
+                }}
+              />
             </div>
           ))}
         </div>
+
+        {/* Compare Bucket */}
+        {compareModels.length > 0 && (
+          <div className="flex items-center justify-between mt-8 bg-[#F1EBFF] dark:bg-[#23232b] border border-[rgba(0,0,0,0.10)] dark:border-neutral-800 rounded-[10px] px-6 py-3 max-md:flex-col max-md:gap-4">
+            <div className="flex gap-2 flex-wrap items-center">
+              <span className="text-sm font-semibold text-neutral-950 dark:text-white mr-2">
+                Compare Models ({compareModels.length}/3)
+              </span>
+              {compareModels.map((selectedModel) => (
+                <div
+                  key={selectedModel.id}
+                  className="flex items-center bg-white dark:bg-neutral-800 rounded-lg px-3 py-1 mr-1 border border-[#B18BEF] dark:border-[#7c3aed]"
+                >
+                  <span className="text-xs font-medium text-[#4B00A8] dark:text-purple-400 mr-2">
+                    {selectedModel.model}
+                  </span>
+                  <button
+                    className="ml-1 text-xs text-[#717182] hover:text-red-500"
+                    onClick={() => removeModel(selectedModel.id)}
+                    title="Remove"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 items-center">
+              <button
+                className="text-xs font-semibold text-[#4B00A8] dark:text-purple-400 px-3 py-1 rounded hover:bg-white dark:hover:bg-neutral-900 border border-transparent hover:border-[#B18BEF] dark:hover:border-[#7c3aed] transition"
+                onClick={clearAll}
+              >
+                Clear All
+              </button>
+              <button
+                className={`min-w-[90px] px-5 h-9 flex items-center justify-center cursor-pointer transition-all duration-200 bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 text-sm font-semibold leading-5 text-center text-white${
+                  compareModels.length >= 2 ? " pr-6" : ""
+                }`}
+                style={{
+                  minWidth: compareModels.length > 0 ? 110 : 90,
+                }}
+                disabled={compareModels.length < 2}
+                onClick={() => navigate("/comparison")}
+              >
+                Compare
+                {compareModels.length > 0 ? ` (${compareModels.length})` : ""}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

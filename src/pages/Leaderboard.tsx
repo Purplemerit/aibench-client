@@ -233,7 +233,7 @@ export default function Leaderboard() {
   // Navigate to comparison page
   const handleCompare = () => {
     if (compareModels.length >= 2 && compareModels.length <= 4) {
-      navigate("/comparison/modelComparison");
+      navigate("/comparison");
     } else {
       alert("Please select 2-4 models to compare");
     }
