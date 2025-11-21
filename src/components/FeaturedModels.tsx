@@ -86,6 +86,7 @@ const FeaturedModels = () => {
             icon: item.icon,
             categoryTitle: item.categoryTitle,
             featured: index === 0,
+            modelId: item.model._id,
           }));
 
           setModels(formattedModels);

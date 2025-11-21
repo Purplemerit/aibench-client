@@ -275,7 +275,10 @@ const LeaderboardPreview = () => {
                 </div>
 
                 <div className="flex-1 flex gap-2 justify-end">
-                  <button className="w-14 h-8 border flex items-center justify-center cursor-pointer transition-all duration-200 bg-white dark:bg-black rounded-lg border-solid border-[rgba(0,0,0,0.10)] hover:bg-gray-50 dark:hover:bg-black">
+                  <button
+                    onClick={() => navigate(`/model/${item.id}`)}
+                    className="w-14 h-8 border flex items-center justify-center cursor-pointer transition-all duration-200 bg-white dark:bg-black rounded-lg border-solid border-[rgba(0,0,0,0.10)] hover:bg-gray-50 dark:hover:bg-black"
+                  >
                     <span className="text-sm font-semibold leading-5 text-center text-neutral-950 dark:text-white">
                       View
                     </span>

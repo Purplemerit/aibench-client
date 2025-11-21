@@ -494,7 +494,7 @@ export default function Leaderboard() {
                           <td className="flex gap-2 justify-end py-3">
                             <button
                               className="w-14 h-8 border flex items-center justify-center cursor-pointer transition-all duration-200 bg-white dark:bg-neutral-800 rounded-lg border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700"
-                              onClick={() => navigate("/viewPage/modelView")}
+                              onClick={() => navigate(`/model/${model.id}`)}
                             >
                               <span className="text-sm font-semibold leading-5 text-center text-neutral-950 dark:text-white">
                                 View
