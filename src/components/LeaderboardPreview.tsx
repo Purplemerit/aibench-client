@@ -375,10 +375,10 @@ const LeaderboardPreview = () => {
         </div>
 
         <button
-          className="w-full sm:w-[197px] h-9 sm:h-10 flex items-center justify-center gap-2 sm:gap-[15.691px] cursor-pointer transition-all duration-200 mt-6 sm:mt-8 md:mt-10 mx-auto bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 px-4"
+          className="w-full sm:w-auto h-9 sm:h-10 flex items-center justify-center gap-2 sm:gap-[15.691px] cursor-pointer transition-all duration-200 mt-6 sm:mt-8 md:mt-10 mx-auto bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] rounded-lg hover:opacity-90 px-4 sm:px-6"
           onClick={() => navigate("/leaderboard")}
         >
-          <span className="text-xs sm:text-sm font-semibold leading-4 sm:leading-5 text-center text-white">
+          <span className="text-xs sm:text-sm font-semibold leading-4 sm:leading-5 text-center text-white whitespace-nowrap">
             View Full Leaderboard
           </span>
           <svg
