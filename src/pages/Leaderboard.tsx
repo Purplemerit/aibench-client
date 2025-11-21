@@ -194,20 +194,41 @@ export default function Leaderboard() {
       model.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
       model.organization.toLowerCase().includes(searchQuery.toLowerCase());
 
+    // Normalize model type for matching
+    const normalizedType = model.type.toLowerCase();
+
     const matchesCategory =
       selectedCategory === "All" ||
-      model.type.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+      (selectedCategory === "Text" &&
+        (normalizedType === "text" ||
+          normalizedType.startsWith("text ") ||
+          normalizedType.startsWith("text("))) ||
+      (selectedCategory === "Image" &&
+        (normalizedType === "image" || normalizedType.includes("image"))) ||
+      (selectedCategory === "Audio" &&
+        (normalizedType === "audio" || normalizedType.includes("audio"))) ||
+      (selectedCategory === "Video" &&
+        (normalizedType === "video" || normalizedType.includes("video"))) ||
+      (selectedCategory === "Reasoning" &&
+        normalizedType.includes("reasoning")) ||
       (selectedCategory === "Multi-Modal" &&
-        model.type.toLowerCase().includes("multimodal"));
+        normalizedType.includes("multimodal"));
+
+    // Normalize license for matching
+    const normalizedLicense = model.license.toLowerCase();
 
     const matchesLicense =
       selectedLicense === "all" ||
       (selectedLicense === "api" &&
-        (model.license === "API" || model.license.includes("Proprietary"))) ||
-      (selectedLicense === "open" && model.license === "Open Source") ||
-      (selectedLicense === "apache" && model.license.includes("Apache")) ||
-      (selectedLicense === "mit" && model.license.includes("MIT")) ||
-      (selectedLicense === "commercial" && model.license === "Commercial");
+        (normalizedLicense === "api" ||
+          normalizedLicense.includes("proprietary"))) ||
+      (selectedLicense === "open" &&
+        (normalizedLicense.includes("open") ||
+          model.organization === "Open Source")) ||
+      (selectedLicense === "apache" && normalizedLicense.includes("apache")) ||
+      (selectedLicense === "mit" && normalizedLicense.includes("mit")) ||
+      (selectedLicense === "commercial" &&
+        normalizedLicense.includes("commercial"));
 
     const matchesYear =
       selectedYear === "all" ||
