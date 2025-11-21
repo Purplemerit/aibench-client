@@ -131,9 +131,90 @@ const Navigation = () => {
         </div>
       )}
 
-      {/* Mobile hamburger and sheet */}
-      {isMobile && (
-        <div className="ml-auto flex items-center z-10">
+      {/* Dark mode toggle and hamburger menu */}
+      <div className="ml-auto flex items-center gap-3 z-10">
+        {/* Dark mode toggle */}
+        <div className="flex items-center">
+          <button
+            onClick={toggleDarkMode}
+            className={`relative flex items-center focus:outline-none w-20 h-10 rounded-full p-1 transition-colors duration-300
+            max-md:w-14 max-md:h-8 max-md:p-1
+            ${isDarkMode ? "bg-[#232136]" : "bg-[#F1EBFF] dark:bg-black"}`}
+            aria-label={
+              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
+          >
+            {/* Sliding indicator */}
+            <div
+              className={`absolute w-8 h-8 rounded-full shadow-md flex items-center justify-center transition-all duration-300
+              max-md:w-6 max-md:h-6
+              ${
+                isDarkMode
+                  ? "bg-gray-800 left-1 transform translate-x-10 max-md:translate-x-6"
+                  : "bg-white dark:bg-black left-1 transform translate-x-0"
+              }`}
+            >
+              {isDarkMode ? (
+                <svg
+                  className="w-4 h-4 max-md:w-3 max-md:h-3"
+                  fill="none"
+                  stroke="yellow"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-4 h-4 max-md:w-3 max-md:h-3"
+                  fill="none"
+                  stroke="orange"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.07l-1.41-1.41M6.34 6.34L4.93 4.93m12.02 0l-1.41 1.41M6.34 17.66l-1.41 1.41"
+                  />
+                </svg>
+              )}
+            </div>
+
+            {/* Text labels */}
+            <div className="flex w-full justify-between px-2">
+              <span
+                className={`text-xs font-semibold transition-colors duration-300 ${
+                  isDarkMode ? "text-gray-400" : "text-neutral-950"
+                }`}
+              >
+                L
+              </span>
+              <span
+                className={`text-xs font-semibold transition-colors duration-300 ${
+                  isDarkMode ? "text-yellow-200" : "text-gray-400"
+                }`}
+              >
+                D
+              </span>
+            </div>
+          </button>
+        </div>
+
+        {/* Mobile hamburger menu */}
+        {isMobile && (
           <Sheet>
             <SheetTrigger asChild>
               <button
@@ -154,90 +235,7 @@ const Navigation = () => {
               <NavLinks />
             </SheetContent>
           </Sheet>
-        </div>
-      )}
-
-      {/* Dark mode toggle always on right */}
-      <div
-        className="ml-auto flex items-center z-10"
-        style={isMobile ? { marginLeft: 0 } : {}}
-      >
-        <button
-          onClick={toggleDarkMode}
-          className={`relative flex items-center focus:outline-none w-20 h-10 rounded-full p-1 transition-colors duration-300
-            max-md:w-14 max-md:h-8 max-md:p-0.5
-            ${isDarkMode ? "bg-[#232136]" : "bg-[#F1EBFF] dark:bg-black"}`}
-          aria-label={
-            isDarkMode ? "Switch to light mode" : "Switch to dark mode"
-          }
-        >
-          {/* Sliding indicator */}
-          <div
-            className={`absolute top-1 w-8 h-8 rounded-full shadow-md flex items-center justify-center transition-all duration-300
-              max-md:w-6 max-md:h-6 max-md:top-1.5
-              ${
-                isDarkMode
-                  ? "bg-gray-800 left-1 transform translate-x-10 max-md:translate-x-6"
-                  : "bg-white dark:bg-black left-1 transform translate-x-0"
-              }`}
-          >
-            {isDarkMode ? (
-              <svg
-                className="w-4 h-4 max-md:w-3 max-md:h-3"
-                fill="none"
-                stroke="yellow"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-4 h-4 max-md:w-3 max-md:h-3"
-                fill="none"
-                stroke="orange"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.07l-1.41-1.41M6.34 6.34L4.93 4.93m12.02 0l-1.41 1.41M6.34 17.66l-1.41 1.41"
-                />
-              </svg>
-            )}
-          </div>
-
-          {/* Text labels */}
-          <div className="flex w-full justify-between px-2">
-            <span
-              className={`text-xs font-semibold transition-colors duration-300 ${
-                isDarkMode ? "text-gray-400" : "text-neutral-950"
-              }`}
-            >
-              L
-            </span>
-            <span
-              className={`text-xs font-semibold transition-colors duration-300 ${
-                isDarkMode ? "text-yellow-200" : "text-gray-400"
-              }`}
-            >
-              D
-            </span>
-          </div>
-        </button>
+        )}
       </div>
     </nav>
   );

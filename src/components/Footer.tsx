@@ -53,10 +53,10 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Tablet & Desktop Layout: Resources left, Company right, Connect below Resources, AIBench spans */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
-          {/* AIBench - spans full width on tablet, 1 col on desktop */}
-          <div className="sm:col-span-2 lg:col-span-1">
+        {/* Tablet & Desktop Layout: 2 columns on tablet, 4 on desktop */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 mb-6 sm:mb-8">
+          {/* AIBench - takes full row on tablet, 1 col on desktop */}
+          <div className="sm:col-span-2 lg:col-span-1 sm:order-1">
             <h4 className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-neutral-950 dark:text-white mb-3 sm:mb-4">
               AIBench
             </h4>
@@ -66,8 +66,8 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Resources - left side on tablet */}
-          <div>
+          {/* Resources - left side second row on tablet */}
+          <div className="sm:order-2">
             <h4 className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-neutral-950 dark:text-white mb-3 sm:mb-4">
               Resources
             </h4>
@@ -85,8 +85,8 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Company - right side on tablet */}
-          <div>
+          {/* Company - right side second row on tablet */}
+          <div className="sm:order-3">
             <h4 className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-neutral-950 dark:text-white mb-3 sm:mb-4">
               Company
             </h4>
@@ -104,8 +104,8 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Connect - below Resources on tablet, regular position on desktop */}
-          <div>
+          {/* Connect - third row on tablet, 4th column on desktop */}
+          <div className="sm:col-span-2 lg:col-span-1 sm:order-4">
             <h4 className="text-sm sm:text-base font-normal leading-5 sm:leading-6 text-neutral-950 dark:text-white mb-3 sm:mb-4">
               Connect
             </h4>
