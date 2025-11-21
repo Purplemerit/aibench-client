@@ -19,6 +19,8 @@ interface CompareContextType {
   clearAll: () => void;
   isSelected: (id: string) => boolean;
   canAddMore: boolean;
+  initializeWithModel: (model: CompareModel) => void;
+  replaceModel: (index: number, model: CompareModel) => void;
 }
 
 const CompareContext = createContext<CompareContextType | undefined>(undefined);
@@ -53,6 +55,18 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
 
   const canAddMore = compareModels.length < 3;
 
+  const initializeWithModel = (model: CompareModel) => {
+    setCompareModels([model]);
+  };
+
+  const replaceModel = (index: number, model: CompareModel) => {
+    setCompareModels((prev) => {
+      const newModels = [...prev];
+      newModels[index] = model;
+      return newModels;
+    });
+  };
+
   return (
     <CompareContext.Provider
       value={{
@@ -62,6 +76,8 @@ export const CompareProvider: React.FC<{ children: ReactNode }> = ({
         clearAll,
         isSelected,
         canAddMore,
+        initializeWithModel,
+        replaceModel,
       }}
     >
       {children}

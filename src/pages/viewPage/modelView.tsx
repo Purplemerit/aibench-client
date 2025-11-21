@@ -4,10 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { api } from "@/lib/api";
+import { useCompare } from "@/contexts/CompareContext";
 
 // Model interface
 interface Model {
   id?: string;
+  _id?: string;
   modelName?: string;
   organization?: string;
   releaseDate?: string;
@@ -75,6 +77,26 @@ interface ModelHeaderProps {
 
 const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
   const navigate = useNavigate();
+  const { initializeWithModel } = useCompare();
+
+  const handleAddToCompare = () => {
+    const compareModel = {
+      id: model._id || model.id || "",
+      rank: 0,
+      model: model.modelName || "",
+      organization: model.organization || "",
+      score: model.overallBenchmarkScore || 0,
+      type: model.modelType || "text",
+      cost: model.inputPricePerM1Tokens
+        ? `$${model.inputPricePerM1Tokens}/$${model.outputPricePerM1Tokens}`
+        : "Free",
+      license: model.openSource === "Yes" ? "Open Source" : "Proprietary",
+      released: model.releaseDate || "N/A",
+    };
+
+    initializeWithModel(compareModel);
+    navigate("/comparison");
+  };
 
   if (!model) return null;
 
@@ -145,7 +167,10 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
             />
             <div className="my-auto">Official Docs</div>
           </button>
-          <button className="flex flex-col items-stretch justify-center px-4 py-[11px] rounded-lg bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90 transition-all duration-200 text-white font-semibold max-sm:w-full max-sm:px-3 max-sm:py-2">
+          <button
+            onClick={handleAddToCompare}
+            className="flex flex-col items-stretch justify-center px-4 py-[11px] rounded-lg bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] hover:opacity-90 transition-all duration-200 text-white font-semibold max-sm:w-full max-sm:px-3 max-sm:py-2"
+          >
             <div>Add to Compare</div>
           </button>
         </div>

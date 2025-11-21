@@ -14,6 +14,14 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type TabType = "performance" | "pricing" | "features";
 
@@ -939,38 +947,111 @@ const DetailedComparison: React.FC<DetailedComparisonProps> = ({ models }) => {
 // Main page component
 const ModelComparisonPage = () => {
   const navigate = useNavigate();
-  const { compareModels } = useCompare();
+  const { compareModels, addModel, replaceModel } = useCompare();
   const [detailedModels, setDetailedModels] = useState<ModelDetail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allModels, setAllModels] = useState<ModelDetail[]>([]);
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+  const [selectedPlaceholderIndex, setSelectedPlaceholderIndex] = useState<
+    number | null
+  >(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch detailed model data
+  // Fetch all models once on mount
   useEffect(() => {
-    const fetchModelDetails = async () => {
-      if (compareModels.length === 0) {
-        navigate("/leaderboard");
-        return;
-      }
-
+    const fetchAllModels = async () => {
       try {
         setLoading(true);
         const response = await api.getAllModels();
         if (response.success) {
-          // Filter to get only the selected models with full details
-          const modelIds = compareModels.map((m) => m.id);
-          const fullModels = response.data.filter((model: ModelDetail) =>
-            modelIds.includes(model._id)
-          );
-          setDetailedModels(fullModels);
+          setAllModels(response.data);
+
+          // Initialize detailedModels with compareModels data
+          if (compareModels.length > 0) {
+            const modelIds = compareModels.map((m) => m.id);
+            const fullModels = response.data.filter((model: ModelDetail) =>
+              modelIds.includes(model._id)
+            );
+            setDetailedModels(fullModels);
+          }
         }
       } catch (error) {
-        console.error("Failed to fetch model details:", error);
+        console.error("Failed to fetch all models:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchModelDetails();
-  }, [compareModels, navigate]);
+    fetchAllModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update detailed models when compareModels changes (after initial load)
+  useEffect(() => {
+    if (compareModels.length === 0) {
+      navigate("/leaderboard");
+      return;
+    }
+
+    if (allModels.length > 0) {
+      const modelIds = compareModels.map((m) => m.id);
+      const fullModels = allModels.filter((model: ModelDetail) =>
+        modelIds.includes(model._id)
+      );
+      setDetailedModels(fullModels);
+    }
+  }, [compareModels, allModels, navigate]);
+
+  // Handle placeholder click
+  const handlePlaceholderClick = (index: number) => {
+    setSelectedPlaceholderIndex(index);
+    setIsModelSelectorOpen(true);
+  };
+
+  // Handle model selection from dialog
+  const handleModelSelect = (model: ModelDetail) => {
+    if (selectedPlaceholderIndex === null) return;
+
+    const compareModel = {
+      id: model._id,
+      rank: 0,
+      model: model.modelName,
+      organization: model.organization,
+      score: model.overallBenchmarkScore || 0,
+      type: "text",
+      cost: model.inputPrice
+        ? `$${model.inputPrice}/$${model.outputPrice}`
+        : "Free",
+      license: model.openSource ? "Open Source" : "Proprietary",
+      released: "N/A",
+    };
+
+    // Update context - this will trigger the useEffect to update detailedModels
+    if (selectedPlaceholderIndex >= compareModels.length) {
+      addModel(compareModel);
+    } else {
+      replaceModel(selectedPlaceholderIndex, compareModel);
+    }
+
+    setIsModelSelectorOpen(false);
+    setSearchQuery("");
+    setSelectedPlaceholderIndex(null);
+  };
+
+  // Filter models based on search query
+  const filteredModels = allModels.filter((model) => {
+    const query = searchQuery.toLowerCase();
+    const alreadySelected = compareModels.some((m) => m.id === model._id);
+    return (
+      !alreadySelected &&
+      (model.modelName.toLowerCase().includes(query) ||
+        model.organization.toLowerCase().includes(query))
+    );
+  });
+
+  // Create placeholder slots (total 3 cards)
+  const totalSlots = 3;
+  const placeholders = Array(totalSlots - compareModels.length).fill(null);
 
   // If no models to compare, redirect to leaderboard
   if (compareModels.length === 0) {
@@ -1039,7 +1120,9 @@ const ModelComparisonPage = () => {
                   Model Comparison
                 </h1>
                 <p className="text-[#717182] dark:text-neutral-400 text-lg max-md:text-base max-sm:text-sm font-normal leading-7 max-sm:leading-6">
-                  Side-by-side comparison of {compareModels.length} AI models
+                  {compareModels.length === 1
+                    ? "Select up to 2 more models to compare"
+                    : `Side-by-side comparison of ${compareModels.length} AI models`}
                 </p>
               </header>
 
@@ -1056,15 +1139,7 @@ const ModelComparisonPage = () => {
               </div>
 
               {/* Model Cards Grid */}
-              <section
-                className={`grid grid-cols-1 ${
-                  compareModels.length === 2
-                    ? "sm:grid-cols-2"
-                    : compareModels.length === 3
-                    ? "sm:grid-cols-2 lg:grid-cols-3"
-                    : "sm:grid-cols-2 lg:grid-cols-4"
-                } gap-4 max-md:gap-3 mb-8 max-md:mb-6`}
-              >
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-md:gap-3 mb-8 max-md:mb-6">
                 {compareModels.map((model) => (
                   <ModelCard
                     key={model.id}
@@ -1081,18 +1156,124 @@ const ModelComparisonPage = () => {
                     isFree={model.cost.toLowerCase().includes("free")}
                   />
                 ))}
+                {placeholders.map((_, index) => (
+                  <article
+                    key={`placeholder-${index}`}
+                    className="box-border w-full max-w-md bg-white dark:bg-neutral-900 p-6 max-md:p-5 max-sm:p-4 rounded-[14px] border-dashed border-2 border-[rgba(105,49,201,0.3)] dark:border-[rgba(177,139,239,0.3)] flex flex-col justify-center items-center min-h-[400px] cursor-pointer hover:border-[rgba(105,49,201,0.6)] dark:hover:border-[rgba(177,139,239,0.6)] hover:bg-[rgba(105,49,201,0.02)] dark:hover:bg-[rgba(177,139,239,0.05)] transition-all max-md:w-full"
+                    onClick={() =>
+                      handlePlaceholderClick(compareModels.length + index)
+                    }
+                  >
+                    <div className="flex flex-col items-center gap-4 text-center">
+                      <div className="w-16 h-16 rounded-full bg-[rgba(105,49,201,0.1)] dark:bg-[rgba(177,139,239,0.1)] flex items-center justify-center">
+                        <svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 5V19M5 12H19"
+                            stroke="#6931C9"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-neutral-950 dark:text-white text-lg font-semibold mb-2">
+                          Add Model to Compare
+                        </h3>
+                        <p className="text-[#717182] dark:text-neutral-400 text-sm">
+                          Click to select a model from the available list
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
               </section>
 
-              {/* Charts Grid */}
-              <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-md:gap-3 mb-8 max-md:mb-6">
-                <PerformanceRadar models={detailedModels} />
-                <OverallScores models={detailedModels} />
-              </section>
+              {/* Model Selector Dialog */}
+              <Dialog
+                open={isModelSelectorOpen}
+                onOpenChange={setIsModelSelectorOpen}
+              >
+                <DialogContent className="max-w-2xl max-h-[80vh] bg-white dark:bg-neutral-900">
+                  <DialogHeader>
+                    <DialogTitle className="text-neutral-950 dark:text-white text-xl font-semibold">
+                      Select a Model to Compare
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <Input
+                      type="text"
+                      placeholder="Search models..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full"
+                    />
+                    <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+                      <div className="space-y-2">
+                        {filteredModels.length === 0 ? (
+                          <p className="text-center text-[#717182] dark:text-neutral-400 py-8">
+                            No models found
+                          </p>
+                        ) : (
+                          filteredModels.map((model) => (
+                            <div
+                              key={model._id}
+                              className="flex items-center justify-between p-4 rounded-lg border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] hover:bg-[rgba(105,49,201,0.05)] dark:hover:bg-[rgba(177,139,239,0.1)] cursor-pointer transition-colors"
+                              onClick={() => handleModelSelect(model)}
+                            >
+                              <div className="flex-1">
+                                <h4 className="text-neutral-950 dark:text-white text-base font-semibold">
+                                  {model.modelName}
+                                </h4>
+                                <p className="text-[#717182] dark:text-neutral-400 text-sm">
+                                  {model.organization}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="text-right">
+                                  <p className="text-neutral-950 dark:text-white text-sm font-semibold">
+                                    {model.overallBenchmarkScore?.toFixed(1) ||
+                                      "N/A"}
+                                  </p>
+                                  <p className="text-[#717182] dark:text-neutral-400 text-xs">
+                                    Score
+                                  </p>
+                                </div>
+                                {model.openSource && (
+                                  <div className="bg-green-100 dark:bg-green-900 px-2 py-1 rounded text-xs text-green-700 dark:text-green-200">
+                                    Open Source
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              {/* Detailed Comparison */}
-              <section className="mb-8 max-md:mb-6">
-                <DetailedComparison models={detailedModels} />
-              </section>
+              {/* Charts Grid - Only show when we have at least 2 models */}
+              {detailedModels.length >= 2 && (
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-md:gap-3 mb-8 max-md:mb-6">
+                  <PerformanceRadar models={detailedModels} />
+                  <OverallScores models={detailedModels} />
+                </section>
+              )}
+
+              {/* Detailed Comparison - Only show when we have at least 2 models */}
+              {detailedModels.length >= 2 && (
+                <section className="mb-8 max-md:mb-6">
+                  <DetailedComparison models={detailedModels} />
+                </section>
+              )}
             </div>
           </main>
           <Footer />
