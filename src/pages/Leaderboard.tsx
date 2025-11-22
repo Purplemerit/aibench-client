@@ -310,8 +310,6 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-[#F1EBFF] dark:bg-black dark:text-white">
-      <Navigation />
-
       <main className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 pt-24 sm:pt-28">
         <div className="max-w-7xl mx-auto">
           {/* Title Section */}

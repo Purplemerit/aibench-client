@@ -449,8 +449,7 @@ const BenchmarksPage = () => {
   if (error) {
     return (
       <div className="bg-[rgba(246,243,255,1)] dark:bg-black min-h-screen">
-        <Navigation />
-        <div className="flex items-center justify-center h-[60vh]">
+        <div className="flex items-center justify-center h-[60vh] pt-16">
           <div className="text-center text-red-600 dark:text-red-400">
             <p className="text-xl mb-2">⚠️ {error}</p>
           </div>
@@ -464,7 +463,6 @@ const BenchmarksPage = () => {
     <div className="bg-[rgba(246,243,255,1)] dark:bg-black">
       <div className="bg-white dark:bg-black w-full max-md:max-w-full">
         <div className="bg-white dark:bg-black w-full max-md:max-w-full">
-          <Navigation />
           <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-24 sm:pt-28 md:pt-32 pb-6 sm:pb-8 md:pb-10 max-md:max-w-full">
             <div className="self-center flex w-full max-w-[1216px] flex-col px-4 sm:px-6 md:px-8 max-md:max-w-full">
               <header className="mb-8 sm:mb-10 md:mb-12 text-center sm:text-left">

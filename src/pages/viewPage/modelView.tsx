@@ -1259,7 +1259,6 @@ const Index = () => {
   if (loading) {
     return (
       <>
-        <Navigation />
         <ModelViewSkeleton />
         <Footer />
       </>
@@ -1274,9 +1273,7 @@ const Index = () => {
     <div className="bg-white dark:bg-neutral-900">
       <div className="bg-white dark:bg-neutral-900 w-full max-md:max-w-full">
         <div className="bg-white dark:bg-neutral-900 w-full max-md:max-w-full">
-          <Navigation />
-
-          <main className="bg-[rgba(246,243,255,1)] dark:bg-neutral-900 flex w-full flex-col items-stretch justify-center px-20 py-[37px] max-md:max-w-full max-md:px-5 max-sm:px-4 max-sm:py-5">
+          <main className="bg-[rgba(246,243,255,1)] dark:bg-neutral-900 flex w-full flex-col items-stretch justify-center px-20 py-[37px] pt-24 max-md:max-w-full max-md:px-5 max-sm:px-4 max-sm:py-5 max-sm:pt-20">
             <div className="flex flex-col items-stretch max-md:max-w-full">
               <ModelHeader model={model} />
 

@@ -103,6 +103,11 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
+  /* Ensure navbar stays fixed */
+  nav {
+    position: fixed !important;
+  }
+
   /* Ensure smooth page transitions */
   #root {
     position: relative;

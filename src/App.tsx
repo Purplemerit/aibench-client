@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { CompareProvider } from "./contexts/CompareContext";
 import AnimatedRoute from "./components/AnimatedRoute";
+import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
 import Leaderboard from "./pages/Leaderboard";
@@ -20,70 +21,72 @@ const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <AnimatedRoute>
-              <Index />
-            </AnimatedRoute>
-          }
-        />
-        <Route
-          path="/leaderboard"
-          element={
-            <AnimatedRoute>
-              <Leaderboard />
-            </AnimatedRoute>
-          }
-        />
-        <Route
-          path="/benchmarks"
-          element={
-            <AnimatedRoute>
-              <BenchmarksPage />
-            </AnimatedRoute>
-          }
-        />
-        <Route
-          path="/pricing"
-          element={
-            <AnimatedRoute>
-              <Pricing />
-            </AnimatedRoute>
-          }
-        />
-        <Route
-          path="/comparison"
-          element={
-            <AnimatedRoute>
-              <ModelComparisonPage />
-            </AnimatedRoute>
-          }
-        />
-        <Route
-          path="/model/:id"
-          element={
-            <AnimatedRoute>
-              <ModelView />
-            </AnimatedRoute>
-          }
-        />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route
-          path="*"
-          element={
-            <AnimatedRoute>
-              <NotFound />
-            </AnimatedRoute>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
+    <>
+      <Navigation />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              <AnimatedRoute>
+                <Index />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <AnimatedRoute>
+                <Leaderboard />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/benchmarks"
+            element={
+              <AnimatedRoute>
+                <BenchmarksPage />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={
+              <AnimatedRoute>
+                <Pricing />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/comparison"
+            element={
+              <AnimatedRoute>
+                <ModelComparisonPage />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/model/:id"
+            element={
+              <AnimatedRoute>
+                <ModelView />
+              </AnimatedRoute>
+            }
+          />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route
+            path="*"
+            element={
+              <AnimatedRoute>
+                <NotFound />
+              </AnimatedRoute>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+    </>
   );
 };
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>

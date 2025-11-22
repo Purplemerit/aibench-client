@@ -8,6 +8,7 @@ const Navigation = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.body.classList.contains("dark");
   });
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const toggleDarkMode = () => {
@@ -109,11 +110,12 @@ const Navigation = () => {
   };
 
   // Nav links as a component for reuse
-  const NavLinks = () => (
+  const NavLinks = ({ closeSheet }: { closeSheet?: () => void }) => (
     <>
       <NavLink
         to="/"
         end
+        onClick={closeSheet}
         className={({ isActive }) =>
           `text-base font-normal leading-6 cursor-pointer transition-colors duration-200
           ${
@@ -131,6 +133,7 @@ const Navigation = () => {
       </NavLink>
       <NavLink
         to="/leaderboard"
+        onClick={closeSheet}
         className={({ isActive }) =>
           `text-base font-normal leading-6 cursor-pointer transition-colors duration-200
           ${
@@ -148,6 +151,7 @@ const Navigation = () => {
       </NavLink>
       <NavLink
         to="/benchmarks"
+        onClick={closeSheet}
         className={({ isActive }) =>
           `text-base font-normal leading-6 cursor-pointer transition-colors duration-200
           ${
@@ -165,6 +169,7 @@ const Navigation = () => {
       </NavLink>
       <NavLink
         to="/pricing"
+        onClick={closeSheet}
         className={({ isActive }) =>
           `text-base font-normal leading-6 cursor-pointer transition-colors duration-200
           ${
@@ -184,7 +189,7 @@ const Navigation = () => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 box-border flex items-center w-full h-16 px-20 py-4 max-md:px-10 max-sm:px-5 bg-white dark:bg-black text-neutral-950 dark:text-white border-b border-gray-200 dark:border-gray-700">
+    <nav className="!fixed !top-0 !left-0 !right-0 !z-[9999] box-border flex items-center w-full h-16 px-20 py-4 max-md:px-10 max-sm:px-5 bg-white/95 dark:bg-black/95 backdrop-blur-sm text-neutral-950 dark:text-white border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center z-10">
         <div className="box-border w-8 h-8 flex items-center justify-center rounded-[10px] bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] mr-2">
           <svg
@@ -301,7 +306,7 @@ const Navigation = () => {
 
         {/* Mobile hamburger menu */}
         {isMobile && (
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <button
                 className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-transparent"
@@ -341,7 +346,7 @@ const Navigation = () => {
                   AIBench
                 </div>
               </div>
-              <NavLinks />
+              <NavLinks closeSheet={() => setIsSheetOpen(false)} />
             </SheetContent>
           </Sheet>
         )}

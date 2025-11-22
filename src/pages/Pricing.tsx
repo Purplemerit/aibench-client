@@ -1341,7 +1341,6 @@ const Pricing: React.FC = () => {
 
   return (
     <div className="box-border w-full min-h-screen relative bg-white dark:bg-black">
-      <Navigation />
       <main className="box-border w-full min-h-[calc(100vh_-_65px)] bg-[#F6F3FF] dark:bg-black pt-28 sm:pt-32 pb-8 px-4 sm:px-6 md:px-8 max-sm:px-4">
         <div className="box-border max-w-screen-xl relative mx-auto">
           <header className="mb-10 sm:mb-12 text-center sm:text-left">

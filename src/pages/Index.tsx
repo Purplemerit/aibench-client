@@ -1,5 +1,4 @@
 import React from "react";
-import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import FeaturedModels from "@/components/FeaturedModels";
 import LeaderboardPreview from "@/components/LeaderboardPreview";
@@ -13,11 +12,7 @@ const Index = () => {
         href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap"
       />
 
-      <header>
-        <Navigation />
-      </header>
-
-      <main>
+      <main className="pt-16">
         <HeroSection />
         <FeaturedModels />
         <LeaderboardPreview />
