@@ -13,11 +13,91 @@ const Navigation = () => {
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => {
       const next = !prev;
-      if (next) {
-        document.body.classList.add("dark");
-      } else {
-        document.body.classList.remove("dark");
+
+      // Create ripple effect overlay
+      const overlay = document.createElement("div");
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+      `;
+
+      document.body.appendChild(overlay);
+
+      // Create multiple ripple circles for organic effect
+      const rippleCount = 8;
+      const button = document.activeElement as HTMLElement;
+      const rect = button?.getBoundingClientRect();
+      const startX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+      const startY = rect ? rect.top + rect.height / 2 : 50;
+
+      for (let i = 0; i < rippleCount; i++) {
+        const ripple = document.createElement("div");
+        const delay = i * 50;
+        const maxSize = Math.max(window.innerWidth, window.innerHeight) * 3;
+
+        ripple.style.cssText = `
+          position: absolute;
+          left: ${startX}px;
+          top: ${startY}px;
+          width: 0;
+          height: 0;
+          border-radius: 50%;
+          background: ${
+            next ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.95)"
+          };
+          transform: translate(-50%, -50%);
+          animation: rippleExpand ${800 + delay}ms ease-out forwards;
+          animation-delay: ${delay}ms;
+          opacity: ${1 - i * 0.1};
+        `;
+
+        overlay.appendChild(ripple);
       }
+
+      // Add keyframe animation
+      if (!document.querySelector("#ripple-animation-style")) {
+        const style = document.createElement("style");
+        style.id = "ripple-animation-style";
+        style.textContent = `
+          @keyframes rippleExpand {
+            0% {
+              width: 0;
+              height: 0;
+              opacity: 0.8;
+            }
+            50% {
+              opacity: 0.6;
+            }
+            100% {
+              width: ${Math.max(window.innerWidth, window.innerHeight) * 3}px;
+              height: ${Math.max(window.innerWidth, window.innerHeight) * 3}px;
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Toggle dark mode class with slight delay for smoother transition
+      setTimeout(() => {
+        if (next) {
+          document.body.classList.add("dark");
+        } else {
+          document.body.classList.remove("dark");
+        }
+      }, 200);
+
+      // Clean up overlay
+      setTimeout(() => {
+        overlay.remove();
+      }, 1200);
+
       return next;
     });
   };
