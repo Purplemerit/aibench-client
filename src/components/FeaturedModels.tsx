@@ -39,17 +39,36 @@ const FeaturedModels = () => {
             );
           });
 
-          // Randomly select one from each category
+          // Randomly select one from each category, ensuring uniqueness
           const recommended =
             topRated[Math.floor(Math.random() * Math.min(topRated.length, 5))];
+
+          // Filter out the recommended model from open source options
+          const openSourceFiltered = openSource.filter(
+            (m: any) => m._id !== recommended._id
+          );
           const openSourceModel =
-            openSource.length > 0
-              ? openSource[Math.floor(Math.random() * openSource.length)]
-              : topRated[1];
+            openSourceFiltered.length > 0
+              ? openSourceFiltered[
+                  Math.floor(Math.random() * openSourceFiltered.length)
+                ]
+              : topRated.find((m: any) => m._id !== recommended._id) ||
+                topRated[1];
+
+          // Filter out both recommended and open source models from cost effective options
+          const costEffectiveFiltered = costEffective.filter(
+            (m: any) =>
+              m._id !== recommended._id && m._id !== openSourceModel._id
+          );
           const costEffectiveModel =
-            costEffective.length > 0
-              ? costEffective[Math.floor(Math.random() * costEffective.length)]
-              : topRated[2];
+            costEffectiveFiltered.length > 0
+              ? costEffectiveFiltered[
+                  Math.floor(Math.random() * costEffectiveFiltered.length)
+                ]
+              : topRated.find(
+                  (m: any) =>
+                    m._id !== recommended._id && m._id !== openSourceModel._id
+                ) || topRated[2];
 
           // Map API data to component format
           const formattedModels = [
@@ -273,9 +292,12 @@ const FeaturedModels = () => {
               key={index}
               className="flex flex-col items-start w-full lg:max-w-md"
             >
-              <h3 className="text-base sm:text-lg font-normal leading-6 sm:leading-7 text-neutral-950 dark:text-white mb-3 sm:mb-4">
-                {model.categoryTitle}
-              </h3>
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                {model.icon}
+                <h3 className="text-base sm:text-lg font-normal leading-6 sm:leading-7 text-neutral-950 dark:text-white">
+                  {model.categoryTitle}
+                </h3>
+              </div>
               <ModelCard
                 {...model}
                 isSelected={isSelected(model.modelId)}

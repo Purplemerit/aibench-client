@@ -102,33 +102,11 @@ const ModelCard: React.FC<ModelCardProps> = ({
 
   return (
     <div className="flex flex-col items-start w-full">
-      <div className="mb-2">{icon}</div>
-
       <div className="w-full max-w-[368px] mx-auto h-auto min-h-[337px] relative bg-white dark:bg-black p-5 sm:p-[25px] rounded-xl border border-gray-300 dark:border-gray-700 flex flex-col">
         <div className="flex items-start justify-between mb-2">
           <h4 className="text-base sm:text-lg font-semibold leading-6 sm:leading-7 text-neutral-950 dark:text-white pr-8">
             {title}
           </h4>
-
-          {featured && (
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 17 17"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute top-[31px] right-[25px]"
-            >
-              <path
-                d="M8.66321 2.20001C8.69243 2.14099 8.73756 2.0913 8.79351 2.05656C8.84947 2.02183 8.91402 2.00342 8.97988 2.00342C9.04574 2.00342 9.11029 2.02183 9.16624 2.05656C9.2222 2.0913 9.26733 2.14099 9.29655 2.20001L10.8365 5.31935C10.938 5.52466 11.0878 5.70229 11.273 5.83698C11.4582 5.97168 11.6733 6.05942 11.8999 6.09268L15.3439 6.59668C15.4091 6.60614 15.4704 6.63366 15.5209 6.67615C15.5713 6.71863 15.6088 6.77438 15.6292 6.83708C15.6496 6.89979 15.6521 6.96695 15.6363 7.03097C15.6205 7.09499 15.5871 7.15332 15.5399 7.19935L13.0492 9.62468C12.885 9.78475 12.7621 9.98234 12.6911 10.2004C12.6201 10.4185 12.6033 10.6506 12.6419 10.8767L13.2299 14.3033C13.2414 14.3686 13.2344 14.4357 13.2095 14.4971C13.1847 14.5586 13.1432 14.6118 13.0896 14.6507C13.036 14.6896 12.9725 14.7127 12.9065 14.7173C12.8404 14.7219 12.7743 14.7078 12.7159 14.6767L9.63721 13.058C9.43436 12.9515 9.20866 12.8958 8.97955 12.8958C8.75043 12.8958 8.52473 12.9515 8.32188 13.058L5.24388 14.6767C5.18543 14.7076 5.11948 14.7215 5.05351 14.7169C4.98755 14.7122 4.92422 14.6891 4.87074 14.6502C4.81726 14.6113 4.77577 14.5581 4.75098 14.4968C4.7262 14.4355 4.71912 14.3685 4.73054 14.3033L5.31788 10.8773C5.35668 10.6512 5.33987 10.4189 5.2689 10.2007C5.19794 9.98248 5.07495 9.78478 4.91054 9.62468L2.41988 7.20001C2.37227 7.15404 2.33854 7.09561 2.32252 7.0314C2.3065 6.96718 2.30884 6.89976 2.32926 6.83681C2.34969 6.77386 2.38739 6.71791 2.43806 6.67534C2.48874 6.63276 2.55035 6.60528 2.61588 6.59601L6.05921 6.09268C6.28605 6.05968 6.50147 5.97205 6.68693 5.83734C6.8724 5.70263 7.02235 5.52486 7.12388 5.31935L8.66321 2.20001Z"
-                fill="#EFB100"
-                stroke="#EFB100"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
         </div>
 
         <p className="text-base font-normal leading-6 text-[#717182] dark:text-white mb-5">
@@ -136,7 +114,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
         </p>
 
         <div
-          className={`absolute h-[21px] flex items-center gap-1 px-[8.66px] py-[2.66px] rounded-lg right-5 sm:right-[25px] top-5 sm:top-[25px] ${
+          className={`absolute h-[21px] flex items-center gap-1 px-[8.66px] py-[2.66px] rounded-lg right-5 sm:right-[25px] top-5 sm:top-[25px] z-20 ${
             badgeColors[badge.type]
           }`}
         >
