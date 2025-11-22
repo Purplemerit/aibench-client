@@ -280,9 +280,9 @@ const FeaturedModels = () => {
           {models.map((model, index) => (
             <div
               key={index}
-              className="flex flex-col items-start w-full lg:max-w-md"
+              className="flex flex-col items-center w-full lg:max-w-md"
             >
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+              <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4 lg:justify-start lg:self-start">
                 {model.icon}
                 <h3 className="text-base sm:text-lg font-normal leading-6 sm:leading-7 text-neutral-950 dark:text-white">
                   {model.categoryTitle}
