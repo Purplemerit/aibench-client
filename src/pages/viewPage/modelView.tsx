@@ -922,7 +922,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
   ].filter((b) => b.score !== "N/A");
 
   return (
-    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch text-sm font-normal mt-8 px-[25px] py-8 rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+    <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col text-sm font-normal mt-8 px-[25px] py-8 rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
       <h2 className="text-neutral-950 dark:text-white text-base font-semibold leading-none max-sm:text-sm">
         Detailed Benchmarks
       </h2>
@@ -930,7 +930,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
         Individual benchmark scores and explanations
       </p>
 
-      <div className="mt-[25px] max-sm:mt-4">
+      <div className="mt-[25px] flex-1 max-sm:mt-4">
         <table className="w-full">
           <thead>
             <tr className="text-neutral-950 dark:text-white font-semibold leading-none border-b border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)]">
@@ -951,13 +951,13 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
                 key={benchmark.name}
                 className="border-b border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] last:border-0"
               >
-                <td className="text-neutral-950 dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2">
+                <td className="text-neutral-950 dark:text-white px-2 py-[28px] max-sm:text-xs max-sm:px-1 max-sm:py-2">
                   {benchmark.name}
                 </td>
-                <td className="text-neutral-950 dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2">
+                <td className="text-neutral-950 dark:text-white px-2 py-[28px] max-sm:text-xs max-sm:px-1 max-sm:py-2">
                   {benchmark.score}
                 </td>
-                <td className="text-[rgba(113,113,130,1)] dark:text-white px-2 py-3 max-sm:text-xs max-sm:px-1 max-sm:py-2 max-sm:hidden">
+                <td className="text-[rgba(113,113,130,1)] dark:text-white px-2 py-[28px] max-sm:text-xs max-sm:px-1 max-sm:py-2 max-sm:hidden">
                   {benchmark.description}
                 </td>
               </tr>
@@ -1036,21 +1036,7 @@ const ModelInfo: React.FC<ModelInfoProps> = ({ model }) => {
         {model.parameters && (
           <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/10 max-sm:p-4">
             <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
-              <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center max-sm:w-8 max-sm:h-8">
-                <svg
-                  className="w-5 h-5 text-green-600 dark:text-green-400 max-sm:w-4 max-sm:h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
+
               <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
                 Parameters
               </h3>
