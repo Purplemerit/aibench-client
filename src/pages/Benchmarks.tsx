@@ -51,7 +51,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   return (
     <div className={className}>
-      <label className="text-neutral-950 dark:text-white text-[10px] sm:text-xs md:text-sm font-normal leading-tight block mb-2 sm:mb-3">
+      <label className="text-neutral-950 dark:text-white text-xs sm:text-sm md:text-sm font-normal leading-tight block mb-2 sm:mb-3">
         Models to Compare (Max 4 - {selectedCount}/4 selected)
       </label>
       <div className="space-y-2 sm:space-y-[15px] max-h-[300px] sm:max-h-[400px] overflow-y-auto pr-2">
@@ -60,14 +60,14 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
           return (
             <div
               key={model.id}
-              className={`flex items-start gap-2 text-[10px] sm:text-xs md:text-sm text-neutral-950 dark:text-white font-normal leading-tight ${
+              className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-sm text-neutral-950 dark:text-white font-normal leading-tight ${
                 isDisabled ? "opacity-50" : ""
               }`}
             >
               <button
                 onClick={() => !isDisabled && onToggleModel(model.id)}
                 disabled={isDisabled}
-                className={`flex w-4 sm:w-[13px] shrink-0 h-4 sm:h-[13px] mt-0.5 rounded-[3px] border transition-colors ${
+                className={`flex w-5 sm:w-[13px] shrink-0 h-5 sm:h-[13px] mt-0.5 rounded-[3px] border transition-colors ${
                   model.selected
                     ? "bg-[rgba(117,71,207,1)] border-[rgba(117,71,207,1)]"
                     : "bg-white dark:bg-neutral-800 border-[rgba(118,118,118,1)] border-solid"
@@ -130,7 +130,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
       <div className="mb-4 sm:mb-5 md:mb-[30px]">
         <label
           htmlFor="benchmark-select"
-          className="text-neutral-950 dark:text-white text-[10px] sm:text-xs md:text-sm font-normal leading-tight block mb-2 sm:mb-3"
+          className="text-neutral-950 dark:text-white text-xs sm:text-sm md:text-sm font-normal leading-tight block mb-2 sm:mb-3"
         >
           Benchmark Type
         </label>
@@ -139,7 +139,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-800 w-full flex items-center gap-2 sm:gap-3 md:gap-5 text-[10px] sm:text-xs md:text-sm text-neutral-950 dark:text-white font-normal leading-tight justify-between px-2.5 sm:px-3 py-2 sm:py-2.5 md:py-3 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600 text-left"
+            className="bg-[rgba(246,243,255,1)] dark:bg-neutral-800 w-full flex items-center gap-2 sm:gap-3 md:gap-5 text-xs sm:text-sm md:text-sm text-neutral-950 dark:text-white font-normal leading-tight justify-between px-2.5 sm:px-3 py-2 sm:py-2.5 md:py-3 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600 text-left"
           >
             <span>
               {selectedBenchmark === "All" ? "All Models" : selectedBenchmark}
