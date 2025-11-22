@@ -50,7 +50,7 @@ const HeroSection = () => {
             }
       }
     >
-      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight sm:leading-[44px] md:leading-[52px] lg:leading-[60px] tracking-tight md:tracking-[-1.5px] text-center max-w-[932px] mb-4 sm:mb-5 md:mb-6 px-2">
+      <h1 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight sm:leading-[44px] md:leading-[52px] lg:leading-[60px] tracking-tight md:tracking-[-1.5px] text-center max-w-[932px] mb-4 sm:mb-5 md:mb-6 px-2">
         <span className="text-neutral-950 dark:text-white">Compare </span>
         <span className="bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] bg-clip-text text-transparent">
           AI Models{" "}

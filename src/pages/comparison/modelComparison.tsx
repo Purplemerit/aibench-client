@@ -1075,11 +1075,11 @@ const ModelComparisonPage = () => {
       <div className="box-border flex w-full min-h-screen flex-col justify-center items-start bg-white dark:bg-black">
         <div className="box-border flex w-full flex-col justify-start items-start bg-white dark:bg-black">
           <Navigation />
-          <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px_-_309px)] bg-[#F6F3FF] dark:bg-neutral-950 px-8 py-8 pt-24 max-md:px-4 max-md:py-8 max-sm:px-2 max-sm:py-4">
+          <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px_-_309px)] bg-[#F6F3FF] dark:bg-neutral-950 pt-28 sm:pt-32 pb-8 px-4 sm:px-6 md:px-8">
             <div className="box-border w-full max-w-screen-xl relative">
               {/* Back Button */}
               <button
-                className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none mb-4
+                className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none mb-6
                   hover:bg-[rgba(177,139,239,0.15)] hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.15)]
                   dark:hover:bg-[rgba(177,139,239,0.25)] dark:hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.25)]"
                 onClick={() => navigate(-1)}
@@ -1113,11 +1113,11 @@ const ModelComparisonPage = () => {
               </button>
 
               {/* Page Header */}
-              <header className="mb-6 max-md:mb-4">
-                <h1 className="text-neutral-950 dark:text-white text-4xl max-md:text-3xl max-sm:text-2xl font-bold leading-10 max-sm:leading-8 mb-2">
+              <header className="mb-8 sm:mb-10 text-center sm:text-left">
+                <h1 className="text-neutral-950 dark:text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-3 sm:mb-4">
                   Model Comparison
                 </h1>
-                <p className="text-[#717182] dark:text-neutral-400 text-lg max-md:text-base max-sm:text-sm font-normal leading-7 max-sm:leading-6">
+                <p className="text-[#717182] dark:text-neutral-400 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-3xl mx-auto sm:mx-0">
                   {compareModels.length === 1
                     ? "Select up to 2 more models to compare"
                     : `Side-by-side comparison of ${compareModels.length} AI models`}

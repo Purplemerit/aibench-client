@@ -301,21 +301,21 @@ export default function Leaderboard() {
     <div className="min-h-screen bg-[#F1EBFF] dark:bg-black dark:text-white">
       <Navigation />
 
-      <main className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
+      <main className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 pt-24 sm:pt-28">
         <div className="max-w-7xl mx-auto">
           {/* Title Section */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
+          <div className="mb-8 sm:mb-10 text-center sm:text-left">
+            <h1 className="text-xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               AI Model Leaderboard
             </h1>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-3xl mx-auto sm:mx-0">
               Comprehensive rankings of AI models across different modalities
               and benchmarks
             </p>
           </div>
 
           {/* Filters Card */}
-          <div className="w-full max-w-6xl mx-auto border relative bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 mb-6 sm:mb-8">
+          <div className="w-full border relative bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[14px] border-solid border-[rgba(0,0,0,0.10)] dark:border-neutral-800 mb-6 sm:mb-8">
             <div className="mb-4 sm:mb-6">
               <h3 className="text-sm sm:text-base font-semibold text-neutral-950 dark:text-white mb-1">
                 Filters

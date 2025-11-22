@@ -140,7 +140,7 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
   return (
     <section className="flex flex-col items-stretch max-md:max-w-full dark:bg-neutral-900 mt-20 max-md:mt-16 max-sm:mt-12">
       <button
-        className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none max-sm:px-2 max-sm:py-1.5
+        className="flex items-center gap-2 text-sm text-neutral-950 dark:text-white font-semibold text-center leading-none ml-0 px-3 py-2 rounded-lg transition-all duration-200 w-fit group focus:outline-none
           hover:bg-[rgba(177,139,239,0.15)] hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.15)]
           dark:hover:bg-[rgba(177,139,239,0.25)] dark:hover:shadow-[0_2px_8px_0_rgba(177,139,239,0.25)]"
         onClick={() => navigate(-1)}
@@ -173,13 +173,13 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
           Back
         </span>
       </button>
-      <div className="flex w-full items-stretch gap-5 flex-wrap justify-between mt-[34px] max-md:mt-6 max-sm:mt-4 max-md:max-w-full">
-        <div className="flex flex-col items-stretch max-sm:whitespace-normal">
+      <div className="flex w-full items-stretch gap-5 flex-wrap justify-between mt-[34px] max-md:mt-6 max-sm:mt-4 max-md:max-w-full max-sm:flex-col max-sm:items-center">
+        <div className="flex flex-col items-stretch max-sm:whitespace-normal max-sm:items-center max-sm:text-center">
           <h1 className="text-neutral-950 dark:text-white text-3xl font-semibold leading-[1.2] max-md:text-2xl max-sm:text-xl">
             {model.modelName}
           </h1>
-          <div className="flex items-stretch gap-[17px] mt-2 max-sm:gap-2 max-sm:flex-wrap">
-            <div className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal grow max-sm:text-sm max-sm:w-full">
+          <div className="flex items-stretch gap-[17px] mt-2 max-sm:gap-2 max-sm:flex-wrap max-sm:justify-center">
+            <div className="text-[rgba(113,113,130,1)] dark:text-white text-base font-normal grow max-sm:text-sm max-sm:grow-0">
               {model.organization}
             </div>
             <img
@@ -195,7 +195,7 @@ const ModelHeader: React.FC<ModelHeaderProps> = ({ model }) => {
             </div>
           </div>
         </div>
-        <div className="flex items-stretch gap-3 text-sm font-semibold text-center leading-none my-auto max-md:w-full max-md:mt-4 max-sm:flex-col max-sm:gap-2">
+        <div className="flex items-stretch gap-3 text-sm font-semibold text-center leading-none my-auto max-md:w-full max-md:mt-4 max-sm:gap-2 max-sm:flex-col">
           <button className="bg-white dark:bg-neutral-900 border flex items-stretch gap-4 text-neutral-950 dark:text-white px-[13px] py-2.5 rounded-lg border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid hover:bg-gray-50 transition-colors max-sm:w-full max-sm:justify-center max-sm:gap-2 max-sm:px-3 max-sm:py-2">
             <img
               src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/e11eb3dd84d6396ef367ed03e41bf1618201bca2?placeholderIfAbsent=true"

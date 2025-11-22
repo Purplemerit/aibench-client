@@ -1342,13 +1342,13 @@ const Pricing: React.FC = () => {
   return (
     <div className="box-border w-full min-h-screen relative bg-white dark:bg-black">
       <Navigation />
-      <main className="box-border w-full min-h-[calc(100vh_-_65px)] bg-[#F6F3FF] dark:bg-black mt-[65px] px-8 py-8 max-md:px-4 max-md:py-8 max-sm:px-2 max-sm:py-4">
+      <main className="box-border w-full min-h-[calc(100vh_-_65px)] bg-[#F6F3FF] dark:bg-black pt-28 sm:pt-32 pb-8 px-4 sm:px-6 md:px-8 max-sm:px-4">
         <div className="box-border max-w-screen-xl relative mx-auto">
-          <header className="mb-12 max-md:mb-8 max-sm:mb-6">
-            <h1 className="box-border text-neutral-950 dark:text-white text-3xl font-semibold leading-9 mb-4 max-md:text-2xl max-md:leading-8 max-sm:text-xl max-sm:leading-7 max-sm:mb-3">
+          <header className="mb-10 sm:mb-12 text-center sm:text-left">
+            <h1 className="box-border text-neutral-950 dark:text-white text-xl sm:text-2xl md:text-3xl font-semibold leading-tight mb-3 sm:mb-4">
               AI Model Pricing & Cost Analysis
             </h1>
-            <p className="box-border text-[#717182] text-base font-normal leading-6 max-w-[660px] max-md:text-sm max-md:leading-5 max-sm:text-xs">
+            <p className="box-border text-[#717182] text-sm sm:text-base font-normal leading-relaxed max-w-3xl mx-auto sm:mx-0">
               Compare costs, calculate usage estimates, and find the most
               cost-effective AI models for your needs
             </p>

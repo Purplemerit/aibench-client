@@ -465,13 +465,13 @@ const BenchmarksPage = () => {
       <div className="bg-white dark:bg-black w-full max-md:max-w-full">
         <div className="bg-white dark:bg-black w-full max-md:max-w-full">
           <Navigation />
-          <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-16 sm:pt-20 md:pt-24 pb-6 sm:pb-8 md:pb-10 max-md:max-w-full">
-            <div className="self-center flex w-full max-w-[1216px] flex-col px-3 sm:px-4 md:px-6 max-md:max-w-full">
-              <header className="mb-4 sm:mb-6 md:mb-8 lg:mb-[34px]">
-                <h1 className="text-neutral-950 dark:text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight mb-2 sm:mb-3 md:mb-4 lg:mb-[29px]">
+          <main className="bg-[rgba(246,243,255,1)] dark:bg-black flex w-full flex-col items-stretch pt-24 sm:pt-28 md:pt-32 pb-6 sm:pb-8 md:pb-10 max-md:max-w-full">
+            <div className="self-center flex w-full max-w-[1216px] flex-col px-4 sm:px-6 md:px-8 max-md:max-w-full">
+              <header className="mb-8 sm:mb-10 md:mb-12 text-center sm:text-left">
+                <h1 className="text-neutral-950 dark:text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight mb-3 sm:mb-4">
                   AI Model Benchmarks
                 </h1>
-                <p className="text-[rgba(113,113,130,1)] dark:text-neutral-400 text-xs sm:text-sm md:text-base font-normal leading-relaxed max-md:max-w-full">
+                <p className="text-[rgba(113,113,130,1)] dark:text-neutral-400 text-xs sm:text-sm md:text-base font-normal leading-relaxed max-w-3xl mx-auto sm:mx-0">
                   Explore and compare AI model performance across various
                   standardized benchmarks. Select up to 4 models to compare.
                 </p>
