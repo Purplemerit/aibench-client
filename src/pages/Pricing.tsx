@@ -847,19 +847,19 @@ const PerformanceAnalysis: React.FC<PerformanceAnalysisProps> = ({
       ) : (
         <>
           {activeTab === "Cost vs Score" && (
-            <div className="mt-6 relative pb-4 overflow-hidden max-sm:mt-4">
+            <div className="mt-6 relative pb-4 overflow-hidden max-sm:mt-4 max-sm:pb-2">
               {/* Y-axis label (Score) */}
-              <div className="absolute -left-2 top-0 bottom-20 flex items-center max-sm:-left-1">
+              <div className="absolute -left-2 top-0 bottom-20 flex items-center max-sm:-left-4 max-sm:bottom-12">
                 <span className="text-xs text-neutral-600 dark:text-neutral-400 -rotate-90 whitespace-nowrap max-sm:text-[10px]">
                   Benchmark Score
                 </span>
               </div>
 
               {/* Chart area */}
-              <div className="ml-10 mr-4 max-sm:ml-8 max-sm:mr-2">
+              <div className="ml-10 mr-4 max-sm:ml-10 max-sm:mr-2">
                 {/* Y-axis scale */}
                 <div
-                  className="flex flex-col-reverse justify-between absolute left-10 top-0 text-xs text-neutral-600 dark:text-neutral-400 max-sm:left-8 max-sm:text-[10px]"
+                  className="flex flex-col-reverse justify-between absolute left-10 top-0 text-xs text-neutral-600 dark:text-neutral-400 max-sm:left-10 max-sm:text-[10px]"
                   style={{ height: "240px" }}
                 >
                   <span>0</span>
@@ -870,7 +870,7 @@ const PerformanceAnalysis: React.FC<PerformanceAnalysisProps> = ({
                 </div>
 
                 {/* Single unified graph with all models */}
-                <div className="ml-12 pb-20 max-sm:ml-10 max-sm:pb-16">
+                <div className="ml-12 pb-20 max-sm:ml-10 max-sm:pb-10">
                   <div
                     className="flex items-end justify-around gap-4 border-b-2 border-neutral-300 dark:border-neutral-700 max-sm:gap-2"
                     style={{ height: "240px" }}
@@ -1201,12 +1201,12 @@ const PricingInfo: React.FC = () => {
           key={index}
           className="box-border flex flex-col gap-3 max-sm:gap-2"
         >
-          <div className="mb-2 max-sm:mb-1 max-sm:scale-90 max-sm:origin-left">
-            {model.icon}
+          <div className="flex items-center gap-2 mb-2 max-sm:mb-1">
+            <div className="max-sm:scale-90">{model.icon}</div>
+            <h3 className="box-border text-neutral-950 dark:text-white text-base font-normal leading-6 max-sm:text-sm max-sm:leading-5">
+              {model.title}
+            </h3>
           </div>
-          <h3 className="box-border text-neutral-950 dark:text-white text-base font-normal leading-6 max-sm:text-sm max-sm:leading-5">
-            {model.title}
-          </h3>
           <p className="box-border text-[#717182] text-sm font-normal leading-5 mb-3 max-sm:text-xs max-sm:mb-2">
             {model.description}
           </p>
