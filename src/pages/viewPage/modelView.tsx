@@ -21,8 +21,8 @@ interface Model {
   contextWindow?: string;
   maxOutputTokens?: string;
   aPiAvailable?: string;
-  inputPricePerM1Tokens?: string;
-  outputPricePerM1Tokens?: string;
+  inputPrice?: string;
+  outputPrice?: string;
   mMlUScore?: string;
   humanEvalScore?: string;
   gSm8KScore?: string;
@@ -68,6 +68,42 @@ interface Model {
   llamaIndexSupport?: string;
   safetyCertifications?: string;
   modelTier?: string;
+  trainingComputeFlops?: string;
+  energyEfficiency?: string;
+  gitHubStars?: string;
+  huggingFaceDownloads?: string;
+  paperCitations?: string;
+  commercialUseAllowed?: string;
+  derivativeUseAllowed?: string;
+  modelArchitecture?: string;
+  modelVersion?: string;
+  supportsVllm?: string;
+  supportsOllama?: string;
+  supportsLmStudio?: string;
+  aPiOnly?: string;
+  researchPaperUrl?: string;
+  modelCardUrl?: string;
+  dOi?: string;
+  licenseSpdx?: string;
+  dataSource?: string;
+  datasetLastUpdated?: string;
+  trainingDataComposition?: string;
+  evaluationFramework?: string;
+  releaseNotes?: string;
+  modelFootprintParamsDisk?: string;
+  globalRankPosition?: number;
+  dataConfidenceScore?: number;
+  dataConfidenceRating?: string;
+  masterRankScore?: number;
+  masterRankPosition?: number;
+  dOiLink?: string;
+  dOiVerificationStatus?: string;
+  exactDiskSizeGb?: number;
+  historicalChangelog?: string;
+  confidenceSourceBreakdown?: string;
+  verifiedSources?: string;
+  estimatedFields?: string;
+  paramsCount?: number;
   [key: string]: string | number | undefined;
 }
 
@@ -195,11 +231,11 @@ interface PerformanceRadarProps {
 const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
   if (!model) return null;
 
-  // Calculate normalized scores (0-100 scale)
-  const mmluScore = parseFloat(model.mMlUScore || "0");
-  const humanEvalScore = parseFloat(model.humanEvalScore || "0");
-  const gsm8kScore = parseFloat(model.gSm8KScore || "0");
-  const mathScore = parseFloat(model.mAthScore || "0");
+  // Calculate normalized scores (0-100 scale) with proper fallback
+  const mmluScore = parseFloat(model.mMlUScore || "0") || 0;
+  const humanEvalScore = parseFloat(model.humanEvalScore || "0") || 0;
+  const gsm8kScore = parseFloat(model.gSm8KScore || "0") || 0;
+  const mathScore = parseFloat(model.mAthScore || "0") || 0;
 
   // For radar chart positioning (the scores need to be converted to coordinates)
   // Center point is at (272.17, 160.67)
@@ -209,6 +245,7 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
   const maxRadius = 114.4;
 
   // Calculate positions for 4 axes (MMLU: top, HumanEval: right, GSM8K: bottom, MATH/CLIP: left)
+  // Ensure values are never NaN
   const mmluY = centerY - (mmluScore / 100) * maxRadius;
   const humanEvalX = centerX + (humanEvalScore / 100) * maxRadius;
   const gsm8kY = centerY + (gsm8kScore / 100) * maxRadius;
@@ -224,7 +261,9 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
           Performance Radar
         </h3>
         <p className="text-[#717182] dark:text-neutral-400 text-sm font-normal leading-5 max-sm:text-xs">
-          Multi-dimensional performance comparison
+          Benchmark scores (0-100%) across MMLU (language understanding),
+          HumanEval (code generation), GSM8K (math reasoning), and MATH
+          (advanced mathematics)
         </p>
       </header>
       <div className="mb-6 w-full overflow-x-auto">
@@ -244,11 +283,19 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
           }}
         >
           <style>{`
+            .radar-chart .radar-grid { stroke: #DDDDDD; stroke-width: 1.5; }
+            .radar-chart .radar-label { fill: #808080; }
+            .radar-chart .radar-scale-label { fill: #999999; }
+            .radar-chart .radar-fill { fill: #B18BEF; opacity: 0.35; }
+            .radar-chart .radar-stroke { stroke: #B18BEF; stroke-width: 3; }
+            .radar-chart .radar-point { fill: #B18BEF; }
+            
             @media (prefers-color-scheme: dark) {
-              .radar-chart .radar-grid { stroke: #444444 !important; stroke-width: 1.5 !important; }
-              .radar-chart .radar-label { fill: #FFFFFF !important; font-weight: 600 !important; }
+              .radar-chart .radar-grid { stroke: #555555 !important; }
+              .radar-chart .radar-label { fill: #E0E0E0 !important; }
+              .radar-chart .radar-scale-label { fill: #999999 !important; }
               .radar-chart .radar-fill { fill: #B18BEF !important; opacity: 0.4 !important; }
-              .radar-chart .radar-stroke { stroke: #B18BEF !important; stroke-width: 3 !important; }
+              .radar-chart .radar-stroke { stroke: #B18BEF !important; }
               .radar-chart .radar-point { fill: #B18BEF !important; }
             }
           `}</style>
@@ -304,53 +351,111 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ model }) => {
             strokeWidth="1.5"
           ></path>
 
-          {/* Labels */}
+          {/* Axis Labels with benchmark names */}
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
             fontSize="16"
             letterSpacing="0em"
+            textAnchor="middle"
           >
-            <tspan x="247.506" y="37.5882">
-              MMLU
+            <tspan x={centerX} y="30">
+              MMLU: {mmluScore.toFixed(1)}%
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
             fontSize="16"
             letterSpacing="0em"
+            textAnchor="start"
           >
-            <tspan x="394.57" y="164.248">
-              HumanEval
+            <tspan x="400" y={centerY + 5}>
+              HumanEval: {humanEvalScore.toFixed(1)}%
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
             fontSize="16"
             letterSpacing="0em"
+            textAnchor="middle"
           >
-            <tspan x="243.857" y="290.908">
-              GSM8K
+            <tspan x={centerX} y="300">
+              GSM8K: {gsm8kScore.toFixed(1)}%
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
             fontSize="16"
             letterSpacing="0em"
+            textAnchor="end"
           >
-            <tspan x="66.5513" y="164.248">
-              MATH Score
+            <tspan x="144" y={centerY + 5}>
+              MATH: {mathScore.toFixed(1)}%
+            </tspan>
+          </text>
+
+          {/* Scale value labels (grid reference) */}
+          <text
+            className="radar-scale-label"
+            fill="#999999"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="11"
+            letterSpacing="0em"
+            textAnchor="end"
+          >
+            <tspan x="265" y="135">
+              25
+            </tspan>
+          </text>
+          <text
+            className="radar-scale-label"
+            fill="#999999"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="11"
+            letterSpacing="0em"
+            textAnchor="end"
+          >
+            <tspan x="265" y="107">
+              50
+            </tspan>
+          </text>
+          <text
+            className="radar-scale-label"
+            fill="#999999"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="11"
+            letterSpacing="0em"
+            textAnchor="end"
+          >
+            <tspan x="265" y="78">
+              75
+            </tspan>
+          </text>
+          <text
+            className="radar-scale-label"
+            fill="#999999"
+            style={{ whiteSpace: "pre" }}
+            fontFamily="Inter"
+            fontSize="11"
+            letterSpacing="0em"
+            textAnchor="end"
+          >
+            <tspan x="265" y="50">
+              100
             </tspan>
           </text>
 
@@ -437,6 +542,323 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ model }) => {
   );
 };
 
+// Training Details Section
+interface TrainingDetailsSectionProps {
+  model: Model;
+}
+
+const TrainingDetailsSection: React.FC<TrainingDetailsSectionProps> = ({
+  model,
+}) => {
+  const trainingDetails = [];
+
+  if (model.trainingDatasetSize)
+    trainingDetails.push({
+      label: "Dataset Size",
+      value: model.trainingDatasetSize,
+    });
+  if (model.trainingDatasetNames)
+    trainingDetails.push({
+      label: "Dataset Names",
+      value: model.trainingDatasetNames,
+    });
+  if (model.trainingDataCutoff)
+    trainingDetails.push({
+      label: "Data Cutoff",
+      value: model.trainingDataCutoff,
+    });
+
+  if (trainingDetails.length === 0) return null;
+
+  return (
+    <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+        Training Details
+      </h2>
+      <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+        Information about model training and datasets
+      </p>
+
+      <div className="grid grid-cols-1 gap-5 max-sm:gap-3">
+        {trainingDetails.map((detail, index) => (
+          <div
+            key={index}
+            className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-4 max-sm:p-3"
+          >
+            <h3 className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400 mb-2 max-sm:text-xs">
+              {detail.label}
+            </h3>
+            <p className="text-base font-normal text-neutral-950 dark:text-white max-sm:text-sm">
+              {detail.value}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// Ecosystem & Platform Support Section
+interface EcosystemSectionProps {
+  model: Model;
+}
+
+const EcosystemSection: React.FC<EcosystemSectionProps> = ({ model }) => {
+  const platforms = [];
+
+  if (model.supportsVllm === "Yes" || model.supportsVllm === "Possible")
+    platforms.push({ name: "vLLM", supported: model.supportsVllm });
+  if (model.supportsOllama === "Yes" || model.supportsOllama === "Possible")
+    platforms.push({ name: "Ollama", supported: model.supportsOllama });
+  if (model.supportsLmStudio === "Yes" || model.supportsLmStudio === "Possible")
+    platforms.push({ name: "LM Studio", supported: model.supportsLmStudio });
+  if (model.langChainSupport === "Yes" || model.langChainSupport === "Possible")
+    platforms.push({ name: "LangChain", supported: model.langChainSupport });
+  if (
+    model.llamaIndexSupport === "Yes" ||
+    model.llamaIndexSupport === "Possible"
+  )
+    platforms.push({ name: "LlamaIndex", supported: model.llamaIndexSupport });
+
+  if (platforms.length === 0 && !model.ecosystemSupport) return null;
+
+  return (
+    <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+        Ecosystem & Platform Support
+      </h2>
+      <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+        Compatible platforms and integration support
+      </p>
+
+      {platforms.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 max-sm:gap-3 max-sm:mb-4 max-sm:grid-cols-2">
+          {platforms.map((platform, index) => (
+            <div
+              key={index}
+              className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-lg p-4 flex flex-col items-center justify-center max-sm:p-3"
+            >
+              <div
+                className={`w-3 h-3 rounded-full mb-2 ${
+                  platform.supported === "Yes"
+                    ? "bg-green-500"
+                    : platform.supported === "Possible"
+                    ? "bg-yellow-500"
+                    : "bg-gray-400"
+                } max-sm:w-2 max-sm:h-2`}
+              />
+              <span className="text-sm font-semibold text-neutral-950 dark:text-white text-center max-sm:text-xs">
+                {platform.name}
+              </span>
+              <span className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1 max-sm:text-[10px]">
+                {platform.supported}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {model.ecosystemSupport && (
+        <div className="border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] pt-4 max-sm:pt-3">
+          <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+            {model.ecosystemSupport}
+          </p>
+        </div>
+      )}
+    </section>
+  );
+};
+
+// Community Metrics Section
+interface CommunityMetricsSectionProps {
+  model: Model;
+}
+
+const CommunityMetricsSection: React.FC<CommunityMetricsSectionProps> = ({
+  model,
+}) => {
+  const metrics = [];
+
+  if (model.gitHubStars)
+    metrics.push({
+      label: "GitHub Stars",
+      value: model.gitHubStars,
+      icon: "⭐",
+    });
+  if (model.huggingFaceDownloads)
+    metrics.push({
+      label: "HuggingFace Downloads",
+      value: model.huggingFaceDownloads,
+      icon: "📥",
+    });
+  if (model.paperCitations)
+    metrics.push({
+      label: "Paper Citations",
+      value: model.paperCitations,
+      icon: "📄",
+    });
+
+  if (metrics.length === 0) return null;
+
+  return (
+    <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+        Community Metrics
+      </h2>
+      <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+        Adoption and research impact indicators
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-sm:gap-4">
+        {metrics.map((metric, index) => (
+          <div
+            key={index}
+            className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-6 flex flex-col items-center max-sm:p-4"
+          >
+            <span className="text-4xl mb-3 max-sm:text-3xl max-sm:mb-2">
+              {metric.icon}
+            </span>
+            <span className="text-2xl font-bold text-neutral-950 dark:text-white mb-1 max-sm:text-xl">
+              {metric.value}
+            </span>
+            <span className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 text-center max-sm:text-xs">
+              {metric.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// Safety & Compliance Section
+interface SafetyComplianceSectionProps {
+  model: Model;
+}
+
+const SafetyComplianceSection: React.FC<SafetyComplianceSectionProps> = ({
+  model,
+}) => {
+  const hasData =
+    model.commercialUseAllowed ||
+    model.derivativeUseAllowed ||
+    model.safetyCertifications;
+
+  if (!hasData) return null;
+
+  return (
+    <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+        Safety & Compliance
+      </h2>
+      <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+        Usage rights and safety certifications
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-sm:gap-3">
+        {model.commercialUseAllowed && (
+          <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg max-sm:p-3">
+            <span className="text-2xl max-sm:text-xl">
+              {model.commercialUseAllowed === "Yes" ? "✅" : "❌"}
+            </span>
+            <div>
+              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                Commercial Use
+              </h3>
+              <p className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 max-sm:text-xs">
+                {model.commercialUseAllowed === "Yes"
+                  ? "Allowed"
+                  : "Not Allowed"}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {model.derivativeUseAllowed && (
+          <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg max-sm:p-3">
+            <span className="text-2xl max-sm:text-xl">
+              {model.derivativeUseAllowed === "Yes" ? "✅" : "❌"}
+            </span>
+            <div>
+              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                Derivative Works
+              </h3>
+              <p className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 max-sm:text-xs">
+                {model.derivativeUseAllowed === "Yes"
+                  ? "Allowed"
+                  : "Not Allowed"}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {model.safetyCertifications && (
+        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 max-sm:mt-3 max-sm:p-3">
+          <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-2 max-sm:text-xs">
+            Safety Certifications
+          </h3>
+          <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+            {model.safetyCertifications}
+          </p>
+        </div>
+      )}
+    </section>
+  );
+};
+
+// Language Support Section
+interface LanguageSupportSectionProps {
+  model: Model;
+}
+
+const LanguageSupportSection: React.FC<LanguageSupportSectionProps> = ({
+  model,
+}) => {
+  const hasLanguageData = model.codingLanguages || model.naturalLanguages;
+
+  if (!hasLanguageData) return null;
+
+  return (
+    <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+      <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+        Language Support
+      </h2>
+      <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+        Supported programming and natural languages
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-sm:gap-4">
+        {model.codingLanguages && (
+          <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-4 max-sm:p-3">
+            <div className="flex items-center gap-2 mb-3 max-sm:mb-2">
+              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white max-sm:text-xs">
+                Coding Languages
+              </h3>
+            </div>
+            <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+              {model.codingLanguages}
+            </p>
+          </div>
+        )}
+
+        {model.naturalLanguages && (
+          <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-4 max-sm:p-3">
+            <div className="flex items-center gap-2 mb-3 max-sm:mb-2">
+              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white max-sm:text-xs">
+                Natural Languages
+              </h3>
+            </div>
+            <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+              {model.naturalLanguages}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 // Inline BenchmarkTable
 interface BenchmarkData {
   name: string;
@@ -473,6 +895,11 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
       description: "Advanced mathematics problems",
     },
     {
+      name: "TruthfulQA",
+      score: model.truthfulQaScore ? `${model.truthfulQaScore}%` : "N/A",
+      description: "Truthfulness in responses",
+    },
+    {
       name: "ARC",
       score: model.aRcScore ? `${model.aRcScore}%` : "N/A",
       description: "AI2 Reasoning Challenge",
@@ -481,6 +908,16 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ model }) => {
       name: "HellaSwag",
       score: model.hellaSwagScore ? `${model.hellaSwagScore}%` : "N/A",
       description: "Commonsense reasoning",
+    },
+    {
+      name: "Winogrande",
+      score: model.winograndeScore ? `${model.winograndeScore}%` : "N/A",
+      description: "Commonsense reasoning challenge",
+    },
+    {
+      name: "BBH",
+      score: model.bBhScore ? `${model.bBhScore}%` : "N/A",
+      description: "Big-Bench Hard benchmark",
     },
   ].filter((b) => b.score !== "N/A");
 
@@ -564,54 +1001,95 @@ const ModelInfo: React.FC<ModelInfoProps> = ({ model }) => {
         Model Information
       </h2>
 
-      <div className="mt-[39px] max-sm:mt-5">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
-          Released
-        </h3>
-        <p className="text-neutral-950 dark:text-white text-base font-normal mt-[13px] max-sm:text-sm max-sm:mt-2">
-          {model.releaseDate
-            ? new Date(model.releaseDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            : "N/A"}
-        </p>
-      </div>
-
-      <div className="mt-[26px] max-sm:mt-4">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
-          Type
-        </h3>
-        <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5 max-sm:text-sm max-sm:mt-2">
-          {model.modelType || "N/A"}
-        </p>
-      </div>
-
-      {model.parameters && (
-        <div className="mt-[26px] max-sm:mt-4">
-          <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
-            Parameters
-          </h3>
-          <p className="text-neutral-950 dark:text-white text-base font-normal mt-2.5 max-sm:text-sm max-sm:mt-2">
-            {model.parameters}
+      <div className="grid grid-cols-1 gap-6 mt-6 max-sm:gap-4 max-sm:mt-4">
+        {/* Release Date Card */}
+        <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-900/10 max-sm:p-4">
+          <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
+            <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
+              Release Date
+            </h3>
+          </div>
+          <p className="text-neutral-950 dark:text-white text-lg font-medium max-sm:text-base">
+            {model.releaseDate
+              ? new Date(model.releaseDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : "N/A"}
           </p>
         </div>
-      )}
 
-      <div className="mt-[26px] max-sm:mt-4">
-        <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
-          Overall Score
-        </h3>
-        <div className="self-stretch flex items-stretch gap-[11px] mt-[15px] max-sm:mt-3 max-sm:gap-2">
-          <div className="text-neutral-950 dark:text-white text-2xl font-normal leading-none grow max-sm:text-xl">
-            {overallScore.toFixed(1)}
+        {/* Model Type Card */}
+        <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-900/10 max-sm:p-4">
+          <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
+            <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
+              Model Type
+            </h3>
           </div>
-          <div className="bg-[rgba(236,236,240,1)] dark:bg-neutral-900 grow shrink-0 basis-0 w-fit my-auto rounded-[22369600px] h-2">
-            <div
-              className="bg-[rgba(3,2,19,1)] dark:bg-white flex shrink-0 h-2 rounded-[22369600px]"
-              style={{ width: `${overallScore}%` }}
-            />
+          <p className="text-neutral-950 dark:text-white text-lg font-medium max-sm:text-base">
+            {model.modelType || "N/A"}
+          </p>
+        </div>
+
+        {/* Parameters Card */}
+        {model.parameters && (
+          <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/10 max-sm:p-4">
+            <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
+              <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center max-sm:w-8 max-sm:h-8">
+                <svg
+                  className="w-5 h-5 text-green-600 dark:text-green-400 max-sm:w-4 max-sm:h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
+                Parameters
+              </h3>
+            </div>
+            <p className="text-neutral-950 dark:text-white text-lg font-medium max-sm:text-base">
+              {model.parameters}
+            </p>
+          </div>
+        )}
+
+        {/* Overall Score Card */}
+        <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-amber-50/50 to-transparent dark:from-amber-900/10 max-sm:p-4">
+          <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
+            <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
+              Overall Score
+            </h3>
+          </div>
+          <div className="flex items-center gap-4 max-sm:gap-3">
+            <div className="text-neutral-950 dark:text-white text-3xl font-semibold max-sm:text-2xl">
+              {overallScore.toFixed(1)}
+            </div>
+            <div className="flex-1">
+              <div className="bg-[rgba(236,236,240,1)] dark:bg-neutral-800 w-full rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${overallScore}%` }}
+                />
+              </div>
+              <p className="text-xs text-[rgba(113,113,130,1)] dark:text-neutral-400 mt-1.5">
+                {overallScore >= 80
+                  ? "Excellent"
+                  : overallScore >= 60
+                  ? "Good"
+                  : overallScore >= 40
+                  ? "Average"
+                  : "Fair"}{" "}
+                Performance
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -627,10 +1105,41 @@ interface PricingCardProps {
 const PricingCard: React.FC<PricingCardProps> = ({ model }) => {
   if (!model) return null;
 
-  const inputPrice = model.inputPricePerM1Tokens;
-  const outputPrice = model.outputPricePerM1Tokens;
+  const inputPrice = model.inputPrice;
+  const outputPrice = model.outputPrice;
+
+  // Format price - ensure it's a number or proper string
+  const formatPrice = (price: string | undefined): string => {
+    if (!price || price === "Free (self-hosted)") {
+      return "Free";
+    }
+    // If it's N/A or similar
+    if (price === "N/A" || price.toLowerCase().includes("n/a")) {
+      return "N/A";
+    }
+    // Remove any text in parentheses like "(indicative)" or "(via Bedrock)"
+    const cleanPrice = price.replace(/\s*\([^)]*\)/g, "").trim();
+
+    // If it already starts with $, return it as is
+    if (cleanPrice.startsWith("$")) {
+      return cleanPrice;
+    }
+
+    // Try to parse as number and format
+    const numPrice = parseFloat(cleanPrice);
+    if (!isNaN(numPrice)) {
+      return `$${numPrice.toFixed(4)}`;
+    }
+
+    return price;
+  };
+
+  const formattedInputPrice = formatPrice(inputPrice);
+  const formattedOutputPrice = formatPrice(outputPrice);
+
+  // Check if model is free/self-hosted AFTER formatting
   const isFree =
-    model.openSource === "Yes" || inputPrice === "Free (self-hosted)";
+    formattedInputPrice === "Free" && formattedOutputPrice === "Free";
 
   return (
     <section className="bg-white dark:bg-neutral-900 border flex w-full flex-col items-stretch font-semibold mt-6 px-[25px] py-[27px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
@@ -646,7 +1155,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ model }) => {
       <div className="flex items-stretch gap-4 font-normal text-center mt-[25px] max-sm:mt-4 max-sm:gap-3 max-sm:flex-col">
         <div className="border flex flex-col items-stretch flex-1 pt-6 pb-[37px] px-[18px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-sm:pt-4 max-sm:pb-5 max-sm:px-4">
           <div className="text-neutral-950 dark:text-white text-2xl leading-none self-center max-sm:text-xl">
-            {isFree ? "Free" : inputPrice || "N/A"}
+            {formattedInputPrice}
           </div>
           <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-none mt-[9px] max-sm:text-xs max-sm:mt-2">
             {isFree ? "Self-hosted" : "per 1M input tokens"}
@@ -654,7 +1163,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ model }) => {
         </div>
         <div className="border flex flex-col items-center flex-1 px-8 py-[23px] rounded-[10px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:px-5 max-sm:pt-4 max-sm:pb-5 max-sm:px-4">
           <div className="text-neutral-950 dark:text-white text-2xl leading-none max-sm:text-xl">
-            {isFree ? "Free" : outputPrice || "N/A"}
+            {formattedOutputPrice}
           </div>
           <div className="text-[rgba(113,113,130,1)] dark:text-white text-sm leading-5 mt-[9px] max-sm:text-xs max-sm:mt-2">
             {isFree ? "Self-hosted" : "per 1M output tokens"}
@@ -800,6 +1309,21 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Community Metrics */}
+              <CommunityMetricsSection model={model} />
+
+              {/* Language Support */}
+              <LanguageSupportSection model={model} />
+
+              {/* Safety & Compliance */}
+              <SafetyComplianceSection model={model} />
+
+              {/* Training Details */}
+              <TrainingDetailsSection model={model} />
+
+              {/* Ecosystem Support */}
+              <EcosystemSection model={model} />
               {/* Dynamic Capabilities Graph - full width below cards */}
               <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
                 <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
@@ -1174,6 +1698,28 @@ const Index = () => {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-sm:gap-4">
+                  {model.modelArchitecture && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        Architecture
+                      </span>
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                        {model.modelArchitecture}
+                      </span>
+                    </div>
+                  )}
+
+                  {model.modelVersion && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        Model Version
+                      </span>
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                        {model.modelVersion}
+                      </span>
+                    </div>
+                  )}
+
                   {model.contextWindow && (
                     <div className="flex flex-col gap-2 max-sm:gap-1">
                       <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400 max-sm:text-xs">
@@ -1272,32 +1818,292 @@ const Index = () => {
                       </span>
                     </div>
                   )}
+
+                  {model.energyEfficiency && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        Energy Efficiency
+                      </span>
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                        {model.energyEfficiency}
+                      </span>
+                    </div>
+                  )}
+
+                  {model.trainingComputeFlops && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        Training Compute
+                      </span>
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                        {model.trainingComputeFlops} FLOPs
+                      </span>
+                    </div>
+                  )}
+
+                  {model.exactDiskSizeGb && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        Exact Disk Size
+                      </span>
+                      <span className="text-lg font-semibold text-neutral-950 dark:text-white">
+                        {model.exactDiskSizeGb} GB
+                      </span>
+                    </div>
+                  )}
+
+                  {model.aPiEndpoint && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[rgba(113,113,130,1)] dark:text-neutral-400">
+                        API Endpoint
+                      </span>
+                      <span className="text-sm font-semibold text-neutral-950 dark:text-white break-all">
+                        {model.aPiEndpoint}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Ecosystem Support */}
-                {model.ecosystemSupport && (
+                {/* Data Composition */}
+                {model.trainingDataComposition && (
                   <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] max-sm:mt-4 max-sm:pt-4">
                     <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3 max-sm:text-xs max-sm:mb-2">
-                      Ecosystem Support
+                      Training Data Composition
                     </h3>
                     <p className="text-neutral-950 dark:text-white text-base max-sm:text-sm">
-                      {model.ecosystemSupport}
+                      {model.trainingDataComposition}
                     </p>
                   </div>
                 )}
 
-                {/* Training Dataset */}
-                {model.trainingDatasetNames && (
+                {/* Evaluation Framework */}
+                {model.evaluationFramework && (
                   <div className="mt-4 max-sm:mt-3">
                     <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3 max-sm:text-xs max-sm:mb-2">
-                      Training Datasets
+                      Evaluation Framework
                     </h3>
                     <p className="text-neutral-950 dark:text-white text-base max-sm:text-sm">
-                      {model.trainingDatasetNames}
+                      {model.evaluationFramework}
                     </p>
                   </div>
                 )}
               </section>
+
+              {/* Research & Documentation */}
+              {(model.researchPaperUrl ||
+                model.modelCardUrl ||
+                model.dOi ||
+                model.dOiLink) && (
+                <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+                  <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+                    Research & Documentation
+                  </h2>
+                  <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+                    Academic papers and technical documentation
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-sm:gap-3">
+                    {model.researchPaperUrl && (
+                      <a
+                        href={model.researchPaperUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors max-sm:p-3"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl max-sm:text-xl">📄</span>
+                          <div>
+                            <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                              Research Paper
+                            </h3>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 break-all max-sm:text-[10px]">
+                              {model.researchPaperUrl}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    )}
+
+                    {model.modelCardUrl && (
+                      <a
+                        href={model.modelCardUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors max-sm:p-3"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl max-sm:text-xl">🗂️</span>
+                          <div>
+                            <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                              Model Card
+                            </h3>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 break-all max-sm:text-[10px]">
+                              {model.modelCardUrl}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    )}
+
+                    {(model.dOiLink || model.dOi) && (
+                      <a
+                        href={model.dOiLink || `https://doi.org/${model.dOi}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors max-sm:p-3"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl max-sm:text-xl">🔗</span>
+                          <div>
+                            <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                              DOI{" "}
+                              {model.dOiVerificationStatus &&
+                                `(${model.dOiVerificationStatus})`}
+                            </h3>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 break-all max-sm:text-[10px]">
+                              {model.dOi || model.dOiLink}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    )}
+
+                    {model.dataSource && (
+                      <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-lg p-4 max-sm:p-3">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl max-sm:text-xl">📊</span>
+                          <div>
+                            <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                              Data Sources
+                            </h3>
+                            <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+                              {model.dataSource}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Historical Changelog */}
+              {model.historicalChangelog && (
+                <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+                  <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+                    Version History
+                  </h2>
+                  <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+                    Model evolution and release notes
+                  </p>
+
+                  <div className="space-y-4 max-sm:space-y-3">
+                    {model.historicalChangelog
+                      .split("||")
+                      .map((entry, index) => {
+                        const parts = entry.trim().split(":");
+                        const date = parts[0];
+                        const description = parts.slice(1).join(":").trim();
+
+                        return (
+                          <div key={index} className="flex gap-4 max-sm:gap-3">
+                            <div className="flex flex-col items-center">
+                              <div className="w-3 h-3 rounded-full bg-purple-500 max-sm:w-2 max-sm:h-2" />
+                              {index <
+                                model.historicalChangelog!.split("||").length -
+                                  1 && (
+                                <div className="w-0.5 h-full bg-purple-200 dark:bg-purple-800 mt-2" />
+                              )}
+                            </div>
+                            <div className="flex-1 pb-6 max-sm:pb-4">
+                              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-1 max-sm:text-xs">
+                                {date}
+                              </h3>
+                              <p className="text-sm text-[rgba(113,113,130,1)] dark:text-neutral-400 max-sm:text-xs">
+                                {description}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {model.releaseNotes && (
+                    <div className="mt-6 pt-6 border-t border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] max-sm:mt-4 max-sm:pt-4">
+                      <h3 className="text-neutral-950 dark:text-white font-semibold text-sm mb-3 max-sm:text-xs max-sm:mb-2">
+                        Latest Release Notes
+                      </h3>
+                      <p className="text-neutral-950 dark:text-white text-base max-sm:text-sm">
+                        {model.releaseNotes}
+                      </p>
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* Data Confidence & Sources */}
+              {(model.dataConfidenceScore ||
+                model.verifiedSources ||
+                model.confidenceSourceBreakdown) && (
+                <section className="bg-white dark:bg-neutral-900 border flex flex-col text-base mt-8 px-[25px] py-[26px] rounded-[14px] border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] border-solid max-md:max-w-full max-md:px-5 max-sm:mt-4 max-sm:px-4 max-sm:py-5">
+                  <h2 className="text-neutral-950 dark:text-white font-semibold leading-none max-sm:text-sm">
+                    Data Quality & Verification
+                  </h2>
+                  <p className="text-[rgba(113,113,130,1)] dark:text-white font-normal mt-[11px] mb-6 max-sm:text-sm max-sm:mt-2 max-sm:mb-4">
+                    Information reliability and source verification
+                  </p>
+
+                  {model.dataConfidenceScore && (
+                    <div className="mb-6 max-sm:mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-neutral-950 dark:text-white max-sm:text-xs">
+                          Confidence Score:{" "}
+                          {model.dataConfidenceRating || "N/A"}
+                        </span>
+                        <span className="text-lg font-bold text-neutral-950 dark:text-white max-sm:text-base">
+                          {model.dataConfidenceScore}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-3 max-sm:h-2">
+                        <div
+                          className="h-3 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 max-sm:h-2"
+                          style={{ width: `${model.dataConfidenceScore}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {model.verifiedSources && (
+                    <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 max-sm:mb-3 max-sm:p-3">
+                      <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-2 max-sm:text-xs">
+                        Verified Sources
+                      </h3>
+                      <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+                        {model.verifiedSources}
+                      </p>
+                    </div>
+                  )}
+
+                  {model.confidenceSourceBreakdown && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 max-sm:p-3">
+                      <h3 className="text-sm font-semibold text-neutral-950 dark:text-white mb-2 max-sm:text-xs">
+                        Source Breakdown
+                      </h3>
+                      <p className="text-sm text-neutral-950 dark:text-white max-sm:text-xs">
+                        {model.confidenceSourceBreakdown}
+                      </p>
+                    </div>
+                  )}
+
+                  {model.estimatedFields && (
+                    <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 max-sm:mt-3 max-sm:p-2">
+                      <p className="text-xs text-yellow-800 dark:text-yellow-200 max-sm:text-[10px]">
+                        ⚠️ Some fields are estimated: {model.estimatedFields}
+                      </p>
+                    </div>
+                  )}
+                </section>
+              )}
             </div>
           </main>
 
