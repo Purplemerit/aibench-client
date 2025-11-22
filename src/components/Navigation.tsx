@@ -14,7 +14,7 @@ const Navigation = () => {
     setIsDarkMode((prev) => {
       const next = !prev;
 
-      // Create ripple effect overlay
+      // Create shredder effect overlay
       const overlay = document.createElement("div");
       overlay.style.cssText = `
         position: fixed;
@@ -29,54 +29,60 @@ const Navigation = () => {
 
       document.body.appendChild(overlay);
 
-      // Create multiple ripple circles for organic effect
-      const rippleCount = 8;
-      const button = document.activeElement as HTMLElement;
-      const rect = button?.getBoundingClientRect();
-      const startX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-      const startY = rect ? rect.top + rect.height / 2 : 50;
+      // Create vertical strips like a paper shredder
+      const stripCount = 40;
+      const stripWidth = window.innerWidth / stripCount;
 
-      for (let i = 0; i < rippleCount; i++) {
-        const ripple = document.createElement("div");
-        const delay = i * 50;
-        const maxSize = Math.max(window.innerWidth, window.innerHeight) * 3;
+      for (let i = 0; i < stripCount; i++) {
+        const strip = document.createElement("div");
+        const delay = i * 15; // Staggered shredding effect
+        const randomDuration = 600 + Math.random() * 300; // Varying speeds
 
-        ripple.style.cssText = `
+        strip.style.cssText = `
           position: absolute;
-          left: ${startX}px;
-          top: ${startY}px;
-          width: 0;
-          height: 0;
-          border-radius: 50%;
+          left: ${i * stripWidth}px;
+          top: 0;
+          width: ${stripWidth}px;
+          height: 100%;
           background: ${
-            next ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.95)"
+            next ? "rgba(0, 0, 0, 0.98)" : "rgba(255, 255, 255, 0.98)"
           };
-          transform: translate(-50%, -50%);
-          animation: rippleExpand ${800 + delay}ms ease-out forwards;
+          transform: translateY(-100%) scaleY(0);
+          transform-origin: top;
+          animation: shredFall ${randomDuration}ms ease-in-out forwards;
           animation-delay: ${delay}ms;
-          opacity: ${1 - i * 0.1};
+          box-shadow: ${
+            i % 2 === 0
+              ? "inset -1px 0 2px rgba(0,0,0,0.1)"
+              : "inset 1px 0 2px rgba(0,0,0,0.1)"
+          };
         `;
 
-        overlay.appendChild(ripple);
+        overlay.appendChild(strip);
       }
 
-      // Add keyframe animation
-      if (!document.querySelector("#ripple-animation-style")) {
+      // Add keyframe animation for shredding effect
+      if (!document.querySelector("#shred-animation-style")) {
         const style = document.createElement("style");
-        style.id = "ripple-animation-style";
+        style.id = "shred-animation-style";
         style.textContent = `
-          @keyframes rippleExpand {
+          @keyframes shredFall {
             0% {
-              width: 0;
-              height: 0;
-              opacity: 0.8;
+              transform: translateY(-100%) scaleY(0);
+              opacity: 0;
             }
-            50% {
-              opacity: 0.6;
+            10% {
+              opacity: 1;
+            }
+            40% {
+              transform: translateY(0) scaleY(1);
+            }
+            60% {
+              transform: translateY(0) scaleY(1);
+              opacity: 1;
             }
             100% {
-              width: ${Math.max(window.innerWidth, window.innerHeight) * 3}px;
-              height: ${Math.max(window.innerWidth, window.innerHeight) * 3}px;
+              transform: translateY(100%) scaleY(0.8);
               opacity: 0;
             }
           }
@@ -84,19 +90,19 @@ const Navigation = () => {
         document.head.appendChild(style);
       }
 
-      // Toggle dark mode class with slight delay for smoother transition
+      // Toggle dark mode class during the animation
       setTimeout(() => {
         if (next) {
           document.body.classList.add("dark");
         } else {
           document.body.classList.remove("dark");
         }
-      }, 200);
+      }, 400);
 
       // Clean up overlay
       setTimeout(() => {
         overlay.remove();
-      }, 1200);
+      }, 1400);
 
       return next;
     });
