@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ModelCard from "./ModelCard";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
+import FeaturedModelsSkeleton from "./skeletons/FeaturedModelsSkeleton";
 
 const FeaturedModels = () => {
   const navigate = useNavigate();
@@ -261,18 +262,7 @@ const FeaturedModels = () => {
   );
 
   if (loading) {
-    return (
-      <section className="w-full flex flex-col items-center bg-[#F6F3FF] dark:bg-[#232136] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-8 sm:py-10 md:py-12 lg:py-16">
-        <div className="w-full max-w-screen-xl">
-          <h2 className="text-2xl sm:text-3xl font-semibold leading-8 sm:leading-9 text-neutral-950 dark:text-white text-center mb-4">
-            Featured Models
-          </h2>
-          <p className="text-center text-[#717182] dark:text-white">
-            Loading...
-          </p>
-        </div>
-      </section>
-    );
+    return <FeaturedModelsSkeleton />;
   }
 
   return (

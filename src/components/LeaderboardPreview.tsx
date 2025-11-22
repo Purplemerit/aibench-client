@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
+import LeaderboardPreviewSkeleton from "./skeletons/LeaderboardPreviewSkeleton";
 
 const LeaderboardPreview = () => {
   const navigate = useNavigate();
@@ -119,14 +120,7 @@ const LeaderboardPreview = () => {
   ];
 
   if (loading) {
-    return (
-      <section className="w-full flex flex-col items-center px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-8 sm:py-10 md:py-12 lg:py-16 dark:bg-black">
-        <h2 className="text-2xl sm:text-3xl font-semibold leading-8 sm:leading-9 text-neutral-950 dark:text-white text-center mb-4">
-          Leaderboard Preview
-        </h2>
-        <p className="text-center text-[#717182] dark:text-white">Loading...</p>
-      </section>
-    );
+    return <LeaderboardPreviewSkeleton />;
   }
 
   return (

@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
+import ModelViewSkeleton from "@/components/skeletons/ModelViewSkeleton";
 
 // Model interface
 interface Model {
@@ -760,13 +761,11 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-900">
+      <>
         <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-neutral-950 dark:text-white text-xl">Loading...</p>
-        </div>
+        <ModelViewSkeleton />
         <Footer />
-      </div>
+      </>
     );
   }
 

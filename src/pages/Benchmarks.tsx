@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { api } from "@/lib/api";
+import BenchmarksSkeleton from "@/components/skeletons/BenchmarksSkeleton";
 import {
   BarChart,
   Bar,
@@ -437,18 +438,11 @@ const BenchmarksPage = () => {
 
   if (loading) {
     return (
-      <div className="bg-[rgba(246,243,255,1)] dark:bg-black min-h-screen">
+      <>
         <Navigation />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[rgba(117,71,207,1)] mx-auto mb-4"></div>
-            <p className="text-neutral-950 dark:text-white">
-              Loading benchmark data...
-            </p>
-          </div>
-        </div>
+        <BenchmarksSkeleton />
         <Footer />
-      </div>
+      </>
     );
   }
 

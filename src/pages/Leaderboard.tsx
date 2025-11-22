@@ -18,6 +18,7 @@ import SearchWithDropdown from "@/components/SearchWithDropdown";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useCompare } from "@/contexts/CompareContext";
+import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";
 
 const categories = [
   "All",
@@ -258,12 +259,11 @@ export default function Leaderboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+      <>
         <Navigation />
-        <p className="text-neutral-950 dark:text-white">
-          Loading leaderboard...
-        </p>
-      </div>
+        <LeaderboardSkeleton />
+        <Footer />
+      </>
     );
   }
 

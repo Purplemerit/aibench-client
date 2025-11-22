@@ -4,6 +4,7 @@ import Navigation from "../../components/Navigation";
 import Footer from "../../components/Footer";
 import { useCompare } from "../../contexts/CompareContext";
 import api from "@/lib/api";
+import ModelComparisonSkeleton from "@/components/skeletons/ModelComparisonSkeleton";
 import {
   BarChart,
   Bar,
@@ -1061,14 +1062,11 @@ const ModelComparisonPage = () => {
 
   if (loading) {
     return (
-      <div className="box-border min-h-screen bg-white dark:bg-black">
+      <>
         <Navigation />
-        <main className="box-border flex w-full flex-col justify-center items-center min-h-[calc(100vh_-_65px)] bg-[#F6F3FF] dark:bg-neutral-950">
-          <p className="text-neutral-950 dark:text-white text-lg">
-            Loading comparison data...
-          </p>
-        </main>
-      </div>
+        <ModelComparisonSkeleton />
+        <Footer />
+      </>
     );
   }
 

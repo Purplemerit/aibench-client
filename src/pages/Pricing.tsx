@@ -12,6 +12,7 @@ import { Checkbox } from "../components/ui/checkbox";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import api from "@/lib/api";
+import PricingSkeleton from "@/components/skeletons/PricingSkeleton";
 
 interface PricingModel {
   modelName: string;
@@ -1353,12 +1354,7 @@ const Pricing: React.FC = () => {
             </p>
           </header>
           {loading ? (
-            <div className="text-center py-12 max-sm:py-8">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4 max-sm:h-8 max-sm:w-8 max-sm:mb-3"></div>
-              <p className="text-neutral-950 dark:text-white text-lg max-sm:text-base">
-                Loading pricing data...
-              </p>
-            </div>
+            <PricingSkeleton />
           ) : pricingData.length === 0 ? (
             <div className="box-border bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-12 text-center max-md:p-8 max-sm:p-6">
               <svg
