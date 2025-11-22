@@ -190,7 +190,7 @@ const Navigation = () => {
 
   return (
     <nav className="!fixed !top-0 !left-0 !right-0 !z-[9999] box-border flex items-center w-full h-16 px-20 py-4 max-md:px-10 max-sm:px-5 bg-white/95 dark:bg-black/95 backdrop-blur-sm text-neutral-950 dark:text-white border-b border-gray-200 dark:border-gray-700">
-      <div className="flex items-center z-10">
+      <NavLink to="/" className="flex items-center z-10 no-underline">
         <div className="box-border w-8 h-8 flex items-center justify-center rounded-[10px] bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] mr-2">
           <svg
             width="20"
@@ -211,7 +211,7 @@ const Navigation = () => {
         <div className="text-lg font-normal leading-7 ml-2 text-neutral-950 dark:text-white">
           AIBench
         </div>
-      </div>
+      </NavLink>
 
       {/* Desktop nav links */}
       {!isMobile && (
@@ -324,7 +324,11 @@ const Navigation = () => {
                 <SheetTitle>Menu</SheetTitle>
               </span>
               {/* Logo and Brand Name */}
-              <div className="flex items-center pb-4 border-b border-gray-200 dark:border-gray-700">
+              <NavLink
+                to="/"
+                onClick={() => setIsSheetOpen(false)}
+                className="flex items-center pb-4 border-b border-gray-200 dark:border-gray-700 no-underline"
+              >
                 <div className="box-border w-8 h-8 flex items-center justify-center rounded-[10px] bg-[linear-gradient(90deg,_#B18BEF_0%,_#4B00A8_100%)] mr-2">
                   <svg
                     width="20"
@@ -345,7 +349,7 @@ const Navigation = () => {
                 <div className="text-lg font-semibold leading-7 ml-2 text-neutral-950 dark:text-white">
                   AIBench
                 </div>
-              </div>
+              </NavLink>
               <NavLinks closeSheet={() => setIsSheetOpen(false)} />
             </SheetContent>
           </Sheet>

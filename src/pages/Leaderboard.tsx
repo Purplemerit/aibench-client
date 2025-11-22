@@ -281,9 +281,14 @@ export default function Leaderboard() {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, selectedLicense, selectedYear]);
 
-  // Scroll to top when page changes
+  // Scroll to top of results when page changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const resultsSection = document.querySelector(".max-w-7xl");
+    if (resultsSection) {
+      resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, [currentPage]);
 
   if (loading) {
