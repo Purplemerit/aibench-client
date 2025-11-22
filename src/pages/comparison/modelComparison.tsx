@@ -41,11 +41,11 @@ interface ModelDetail {
   outputPrice?: number;
   contextWindow?: string;
   maxOutputTokens?: string;
-  imageSupport?: boolean;
-  audioSupport?: boolean;
-  videoSupport?: boolean;
-  apiAvailable?: boolean;
-  openSource?: boolean;
+  imageSupport?: boolean | string;
+  audioSupport?: boolean | string;
+  videoSupport?: boolean | string;
+  apiAvailable?: boolean | string;
+  openSource?: boolean | string;
 }
 
 // ModelCard component
@@ -776,23 +776,33 @@ const DetailedComparison: React.FC<DetailedComparisonProps> = ({ models }) => {
   const featuresData = [
     {
       feature: "Image Support",
-      values: models.map((m) => (m.imageSupport ? "✓" : "✗")),
+      values: models.map((m) =>
+        m.imageSupport === "Yes" || m.imageSupport === true ? "✓" : "✗"
+      ),
     },
     {
       feature: "Audio Support",
-      values: models.map((m) => (m.audioSupport ? "✓" : "✗")),
+      values: models.map((m) =>
+        m.audioSupport === "Yes" || m.audioSupport === true ? "✓" : "✗"
+      ),
     },
     {
       feature: "Video Support",
-      values: models.map((m) => (m.videoSupport ? "✓" : "✗")),
+      values: models.map((m) =>
+        m.videoSupport === "Yes" || m.videoSupport === true ? "✓" : "✗"
+      ),
     },
     {
       feature: "API Available",
-      values: models.map((m) => (m.apiAvailable ? "✓" : "✗")),
+      values: models.map((m) =>
+        m.apiAvailable === "Yes" || m.apiAvailable === true ? "✓" : "✗"
+      ),
     },
     {
       feature: "Open Source",
-      values: models.map((m) => (m.openSource ? "✓" : "✗")),
+      values: models.map((m) =>
+        m.openSource === "Yes" || m.openSource === true ? "✓" : "✗"
+      ),
     },
   ];
 
