@@ -111,6 +111,20 @@ export default function Leaderboard() {
   const [selectedYear, setSelectedYear] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const modelsPerPage = 20;
+  const [isDark, setIsDark] = useState(
+    typeof window !== "undefined" && document.body.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.body.classList.contains("dark"));
+    });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -327,6 +341,7 @@ export default function Leaderboard() {
               <SearchWithDropdown
                 placeholder="Search models or organizations..."
                 onSearch={setSearchQuery}
+                isDark={isDark}
               />
             </div>
 

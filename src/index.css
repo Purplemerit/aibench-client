@@ -109,4 +109,89 @@ All colors MUST be HSL.
     overflow-x: hidden;
     min-height: 100vh;
   }
+
+  /* Custom Scrollbar Styles - Modern & Sleek */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60% / 0.6),
+      hsl(270 70% 60% / 0.8)
+    );
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 6px hsl(270 70% 60% / 0.3);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60% / 0.8),
+      hsl(270 70% 60%)
+    );
+    box-shadow: 0 0 12px hsl(270 70% 60% / 0.5);
+    transform: scaleX(1.1);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60%),
+      hsl(270 70% 50%)
+    );
+    box-shadow: 0 0 16px hsl(270 70% 60% / 0.7);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(270 70% 60% / 0.6) transparent;
+  }
+
+  /* Dark mode scrollbar enhancement */
+  .dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60% / 0.5),
+      hsl(270 70% 60% / 0.7)
+    );
+    box-shadow: 0 0 8px hsl(270 70% 60% / 0.4);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60% / 0.7),
+      hsl(270 70% 60% / 0.9)
+    );
+    box-shadow: 0 0 14px hsl(270 70% 60% / 0.6);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 60% / 0.9),
+      hsl(270 70% 60%)
+    );
+    box-shadow: 0 0 20px hsl(270 70% 60% / 0.8);
+  }
+
+  .dark * {
+    scrollbar-color: hsl(270 70% 60% / 0.5) transparent;
+  }
 }

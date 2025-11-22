@@ -33,8 +33,8 @@ const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
   const variants = {
     initial: {
       opacity: 0,
-      x: direction > 0 ? 50 : -50,
-      scale: 0.98,
+      x: direction > 0 ? 30 : -30,
+      scale: 0.96,
     },
     animate: {
       opacity: 1,
@@ -43,8 +43,8 @@ const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
     },
     exit: {
       opacity: 0,
-      x: direction > 0 ? -50 : 50,
-      scale: 0.98,
+      x: direction > 0 ? -30 : 30,
+      scale: 0.96,
     },
   };
 
@@ -56,9 +56,10 @@ const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
       animate="animate"
       exit="exit"
       transition={{
-        type: "tween",
-        ease: [0.4, 0.0, 0.2, 1],
-        duration: 0.35,
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        mass: 0.8,
       }}
       style={{
         position: "absolute",
@@ -66,6 +67,7 @@ const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
         minHeight: "100vh",
         top: 0,
         left: 0,
+        willChange: "opacity, transform",
       }}
       className="bg-background"
     >
