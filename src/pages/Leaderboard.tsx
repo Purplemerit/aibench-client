@@ -193,10 +193,24 @@ export default function Leaderboard() {
 
   // Filter models based on search, category, license, and year
   const filteredModels = modelData.filter((model) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      model.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      model.organization.toLowerCase().includes(searchQuery.toLowerCase());
+    // Improved search with word matching and word boundaries
+    let matchesSearch = searchQuery === "";
+
+    if (!matchesSearch && searchQuery) {
+      const searchTerm = searchQuery.toLowerCase().trim();
+      const searchWords = searchTerm.split(/\s+/);
+
+      // Check if all search words are present in either model name or organization (case-insensitive)
+      matchesSearch = searchWords.every((word) => {
+        const wordRegex = new RegExp(
+          word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i"
+        );
+        return (
+          wordRegex.test(model.model) || wordRegex.test(model.organization)
+        );
+      });
+    }
 
     // Normalize model type for matching
     const normalizedType = model.type.toLowerCase();

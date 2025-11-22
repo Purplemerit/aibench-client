@@ -12,6 +12,10 @@ interface Model {
   openSource?: string;
 }
 
+interface ScoredModel extends Model {
+  searchScore: number;
+}
+
 interface SearchWithDropdownProps {
   placeholder?: string;
   isDark?: boolean;
@@ -56,17 +60,68 @@ const SearchWithDropdown: React.FC<SearchWithDropdownProps> = ({
 
       setLoading(true);
       try {
-        const response = await api.getAllModels({ limit: 10 });
+        const response = await api.getAllModels({ limit: 200 });
         if (response.success && response.data) {
-          const filtered = response.data.filter(
-            (model: Model) =>
-              model.modelName
-                ?.toLowerCase()
-                .includes(searchValue.toLowerCase()) ||
-              model.organization
-                ?.toLowerCase()
-                .includes(searchValue.toLowerCase())
-          );
+          const searchTerm = searchValue.toLowerCase().trim();
+          const searchWords = searchTerm.split(/\s+/);
+
+          // Smart filtering with ranking
+          const filtered = response.data
+            .filter((model: Model) => {
+              // Check if all search words are present (case-insensitive)
+              return searchWords.every((word) => {
+                const wordRegex = new RegExp(
+                  word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                  "i"
+                );
+                return (
+                  wordRegex.test(model.modelName || "") ||
+                  wordRegex.test(model.organization || "")
+                );
+              });
+            })
+            .map((model: Model) => {
+              const modelName = model.modelName?.toLowerCase() || "";
+              const organization = model.organization?.toLowerCase() || "";
+
+              let score = 0;
+
+              // Exact match gets highest score
+              if (modelName === searchTerm || organization === searchTerm) {
+                score += 1000;
+              }
+
+              // Starts with search term
+              if (
+                modelName.startsWith(searchTerm) ||
+                organization.startsWith(searchTerm)
+              ) {
+                score += 500;
+              }
+
+              // Word boundary match (e.g., "gpt" matches "GPT-4")
+              searchWords.forEach((word) => {
+                const wordBoundaryRegex = new RegExp(
+                  `\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+                  "i"
+                );
+                if (wordBoundaryRegex.test(model.modelName || "")) score += 100;
+                if (wordBoundaryRegex.test(model.organization || ""))
+                  score += 50;
+              });
+
+              // Rank position bonus (higher rank = better)
+              if (model.globalRankPosition) {
+                score += Math.max(0, 100 - model.globalRankPosition);
+              }
+
+              return { ...model, searchScore: score };
+            })
+            .sort(
+              (a: ScoredModel, b: ScoredModel) => b.searchScore - a.searchScore
+            )
+            .slice(0, 10);
+
           setSuggestions(filtered);
           setIsOpen(filtered.length > 0);
         }
