@@ -1036,7 +1036,6 @@ const ModelInfo: React.FC<ModelInfoProps> = ({ model }) => {
         {model.parameters && (
           <div className="border border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.10)] rounded-xl p-5 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/10 max-sm:p-4">
             <div className="flex items-center gap-3 mb-3 max-sm:mb-2">
-
               <h3 className="text-neutral-950 dark:text-white text-sm font-semibold leading-none max-sm:text-xs">
                 Parameters
               </h3>
@@ -1229,6 +1228,9 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Scroll to top when component mounts or id changes
+    window.scrollTo(0, 0);
+
     const fetchModel = async () => {
       if (!id) {
         navigate("/leaderboard");
