@@ -145,13 +145,15 @@ export default function Leaderboard() {
               score: model.overallBenchmarkScore || 0,
               cost: model.inputPrice || "Free",
               license:
-                model.openSource === "Yes"
-                  ? "Open Source"
-                  : model.license || "API",
+                model.license ||
+                (model.openSource === "Yes" ? "Open Source" : "API"),
               released: model.releaseDate || "N/A",
               id: model._id,
             })
           );
+          console.log("Unique licenses:", [
+            ...new Set(formattedData.map((m: any) => m.license)),
+          ]);
           setModelData(formattedData);
         }
       } catch (error) {
@@ -232,21 +234,23 @@ export default function Leaderboard() {
       (selectedCategory === "Multi-Modal" &&
         normalizedType.includes("multimodal"));
 
-    // Normalize license for matching
-    const normalizedLicense = model.license.toLowerCase();
+    // Normalize license for matching - ensure we handle undefined/null
+    const normalizedLicense = (model.license || "").toLowerCase().trim();
 
     const matchesLicense =
       selectedLicense === "all" ||
       (selectedLicense === "api" &&
         (normalizedLicense === "api" ||
-          normalizedLicense.includes("proprietary"))) ||
+          normalizedLicense.includes("proprietary") ||
+          normalizedLicense === "")) ||
       (selectedLicense === "open" &&
         (normalizedLicense.includes("open") ||
-          model.organization === "Open Source")) ||
-      (selectedLicense === "apache" && normalizedLicense.includes("apache")) ||
-      (selectedLicense === "mit" && normalizedLicense.includes("mit")) ||
+          normalizedLicense === "open source" ||
+          model.license === "Open Source")) ||
+      (selectedLicense === "apache" && /apache/i.test(normalizedLicense)) ||
+      (selectedLicense === "mit" && /\bmit\b/i.test(normalizedLicense)) ||
       (selectedLicense === "commercial" &&
-        normalizedLicense.includes("commercial"));
+        /commercial/i.test(normalizedLicense));
 
     const matchesYear =
       selectedYear === "all" ||
