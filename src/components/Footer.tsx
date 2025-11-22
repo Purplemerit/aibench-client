@@ -25,21 +25,49 @@ const Footer = () => {
   return (
     <footer className="w-full bg-[#F6F3FF] dark:bg-[#232136] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 pt-8 sm:pt-10 md:pt-12 pb-6 sm:pb-8 md:pb-12 border-t-[0.667px] border-t-[rgba(0,0,0,0.10)] border-solid">
       <div className="w-full max-w-screen-xl relative mx-auto">
-        {/* Mobile Layout: All sections stacked */}
-        <div className="grid grid-cols-1 sm:hidden gap-6 mb-6">
-          {footerSections.map((section, index) => (
-            <div key={index}>
-              <h4 className="text-sm font-normal leading-5 text-neutral-950 dark:text-white mb-3">
-                {section.title}
-              </h4>
+        {/* Mobile Layout: AIBench full width, then 2 columns */}
+        <div className="sm:hidden mb-6">
+          {/* AIBench - Full width */}
+          <div className="mb-6">
+            <h4 className="text-sm font-normal leading-5 text-neutral-950 dark:text-white mb-3">
+              AIBench
+            </h4>
+            <p className="text-xs font-normal leading-4 text-[#717182] dark:text-white">
+              Transparent AI model comparisons and benchmarks for better
+              decision making.
+            </p>
+          </div>
 
-              {section.isMain ? (
-                <p className="text-xs font-normal leading-4 text-[#717182] dark:text-white">
-                  {section.description}
-                </p>
-              ) : (
+          {/* Two columns: Resources & Connect on left, Company on right */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left column: Resources and Connect */}
+            <div className="flex flex-col gap-6">
+              {/* Resources */}
+              <div>
+                <h4 className="text-sm font-normal leading-5 text-neutral-950 dark:text-white mb-3">
+                  Resources
+                </h4>
                 <div className="flex flex-col gap-1.5">
-                  {section.links?.map((link, linkIndex) => (
+                  {["Documentation", "Benchmarks", "Pricing Guide"].map(
+                    (link, linkIndex) => (
+                      <button
+                        key={linkIndex}
+                        className="text-sm font-semibold leading-5 text-[#717182] dark:text-white cursor-pointer transition-colors duration-200 hover:text-neutral-950 dark:hover:text-white text-left"
+                      >
+                        {link}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Connect */}
+              <div>
+                <h4 className="text-sm font-normal leading-5 text-neutral-950 dark:text-white mb-3">
+                  Connect
+                </h4>
+                <div className="flex flex-col gap-1.5">
+                  {["GitHub", "Twitter", "Discord"].map((link, linkIndex) => (
                     <button
                       key={linkIndex}
                       className="text-sm font-semibold leading-5 text-[#717182] dark:text-white cursor-pointer transition-colors duration-200 hover:text-neutral-950 dark:hover:text-white text-left"
@@ -48,9 +76,28 @@ const Footer = () => {
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
             </div>
-          ))}
+
+            {/* Right column: Company */}
+            <div>
+              <h4 className="text-sm font-normal leading-5 text-neutral-950 dark:text-white mb-3">
+                Company
+              </h4>
+              <div className="flex flex-col gap-1.5">
+                {["About Us", "Contact", "Privacy Policy"].map(
+                  (link, linkIndex) => (
+                    <button
+                      key={linkIndex}
+                      className="text-sm font-semibold leading-5 text-[#717182] dark:text-white cursor-pointer transition-colors duration-200 hover:text-neutral-950 dark:hover:text-white text-left"
+                    >
+                      {link}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tablet & Desktop Layout: 2 columns on tablet, 4 on desktop */}

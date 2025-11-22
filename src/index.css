@@ -102,4 +102,11 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Ensure smooth page transitions */
+  #root {
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 }
