@@ -396,15 +396,21 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ models }) => {
           }}
         >
           <style>{`
+            .radar-chart .radar-grid { stroke: #DDDDDD; stroke-width: 1; }
+            .radar-chart .radar-label { fill: #555555; }
+            .radar-chart .radar-fill { fill: #B18BEF; opacity: 0.35; }
+            .radar-chart .radar-stroke { stroke: #B18BEF; stroke-width: 2; }
+            .radar-chart .radar-point { fill: #B18BEF; }
+            .radar-chart .radar-value { fill: #B18BEF; font-weight: 700; }
+            
             @media (prefers-color-scheme: dark) {
-              .radar-chart .radar-grid { stroke: #444444 !important; stroke-width: 1 !important; }
-              .radar-chart .radar-label { fill: #FFFFFF !important; font-weight: 600 !important; }
+              .radar-chart .radar-grid { stroke: #555555 !important; }
+              .radar-chart .radar-label { fill: #E0E0E0 !important; }
               .radar-chart .radar-fill { fill: #B18BEF !important; opacity: 0.4 !important; }
-              .radar-chart .radar-stroke { stroke: #B18BEF !important; stroke-width: 2 !important; }
+              .radar-chart .radar-stroke { stroke: #B18BEF !important; }
               .radar-chart .radar-point { fill: #B18BEF !important; }
               .radar-chart .radar-value { fill: #B18BEF !important; font-weight: 700 !important; }
             }
-            .radar-chart .radar-value { fill: #B18BEF; font-weight: 700; }
           `}</style>
           {/* Grid lines - 4 concentric diamonds */}
           <path
@@ -462,53 +468,53 @@ const PerformanceRadar: React.FC<PerformanceRadarProps> = ({ models }) => {
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
-            fontSize="16"
-            fontWeight="600"
+            fontSize="14"
             letterSpacing="0em"
+            textAnchor="middle"
           >
-            <tspan x="247.506" y="37.5882">
+            <tspan x="272.17" y="32">
               MMLU
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
-            fontSize="16"
-            fontWeight="600"
+            fontSize="14"
             letterSpacing="0em"
+            textAnchor="start"
           >
-            <tspan x="394.57" y="164.248">
+            <tspan x="400" y="165">
               HumanEval
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
-            fontSize="16"
-            fontWeight="600"
+            fontSize="14"
             letterSpacing="0em"
+            textAnchor="middle"
           >
-            <tspan x="243.857" y="290.908">
+            <tspan x="272.17" y="305">
               GSM8K
             </tspan>
           </text>
           <text
             className="radar-label"
             fill="#808080"
-            style={{ whiteSpace: "pre" }}
+            style={{ whiteSpace: "pre", fontWeight: "600" }}
             fontFamily="Inter"
-            fontSize="16"
-            fontWeight="600"
+            fontSize="14"
             letterSpacing="0em"
+            textAnchor="end"
           >
-            <tspan x="66.5513" y="164.248">
-              MATH Score
+            <tspan x="140" y="165">
+              MATH
             </tspan>
           </text>
 
