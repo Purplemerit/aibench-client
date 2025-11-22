@@ -29,11 +29,11 @@ const HeroSection = () => {
   }, []);
 
   const handleSearch = (value: string) => {
-    console.log("Search:", value);
+    // Search functionality
   };
 
   const handleCategoryChange = (category: string) => {
-    console.log("Category:", category);
+    // Category filter functionality
   };
 
   return (

@@ -151,9 +151,6 @@ export default function Leaderboard() {
               id: model._id,
             })
           );
-          console.log("Unique licenses:", [
-            ...new Set(formattedData.map((m: any) => m.license)),
-          ]);
           setModelData(formattedData);
         }
       } catch (error) {
