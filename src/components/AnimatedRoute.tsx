@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { ReactNode } from "react";
+import { ReactNode, useLayoutEffect } from "react";
 
 interface AnimatedRouteProps {
   children: ReactNode;
@@ -16,6 +16,12 @@ const getRouteIndex = (path: string): number => {
 
 const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
   const location = useLocation();
+
+  // Scroll to top when component mounts - use layoutEffect for immediate scroll
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   // Get current and previous route indices
   const currentIndex = getRouteIndex(location.pathname);

@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import { CompareProvider } from "./contexts/CompareContext";
 import AnimatedRoute from "./components/AnimatedRoute";
 import Navigation from "./components/Navigation";
+import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
 import Leaderboard from "./pages/Leaderboard";
@@ -21,7 +22,8 @@ const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <>
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <ScrollToTop />
       <Navigation />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
@@ -84,7 +86,7 @@ const AnimatedRoutes = () => {
           />
         </Routes>
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 const App = () => (
